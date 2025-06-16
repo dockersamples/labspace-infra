@@ -27,5 +27,5 @@ RUN apt update && \
 USER 1000
 RUN code-server --install-extension orta.vscode-jest && \
     code-server --install-extension ms-azuretools.vscode-docker
-COPY ./config.yaml /home/coder/.config/code-server/config.yaml
-COPY ./settings.json /home/coder/.local/share/code-server/User/settings.json
+COPY --chown=coder:coder ./config.yaml /home/coder/.config/code-server/config.yaml
+COPY --chown=coder:coder ./settings.json /home/coder/.local/share/code-server/User/settings.json
