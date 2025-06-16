@@ -1,4 +1,11 @@
 services:
+  project-setup:
+    image: michaelirwin244/workshop-poc:setup
+    volumes:
+      - project:/project
+    environment:
+      PROJECT_CLONE_URL: https://github.com/mikesir87/workshop-poc-content
+
   instructions:
     image: michaelirwin244/workshop-poc:markdown-server
     ports:
@@ -12,14 +19,7 @@ services:
       project-setup:
         condition: service_completed_successfully
 
-  project-setup:
-    image: michaelirwin244/workshop-poc:setup
-    volumes:
-      - project:/project
-    environment:
-      PROJECT_CLONE_URL: https://github.com/mikesir87/workshop-poc-content
-
-  coder:
+  workspace:
     image: michaelirwin244/workshop-poc:workspace
     command: /home/coder/project
     depends_on:
@@ -41,15 +41,26 @@ services:
     image: michaelirwin244/workshop-poc:host-forwarding
     volumes:
       - socket-proxy:/var/run
-    network_mode: service:coder
+    network_mode: service:workspace
     environment:
       LABEL_FILTER: demo-setup=true
     depends_on:
-      - coder
+      - workspace
+      - socket-proxy
+
+  workspace-cleaner:
+    image: michaelirwin244/workshop-poc:workspace-cleaner
+    volumes:
+      - socket-proxy:/var/run
+    environment:
+      LABEL_FILTER: demo-setup=true
+    depends_on:
+      - socket-proxy
 
   socket-proxy:
     image: mikesir87/docker-socket-proxy
     # image: socket-proxy
+    # use_api_socket: true
     volumes:
       - socket-proxy:/tmp/proxy
       - /var/run/docker.sock:/var/run/docker.sock
@@ -86,11 +97,11 @@ services:
             requiredLabels:
               demo-setup: "true"
       LISTEN_SOCKET_PATH: /tmp/proxy/docker.sock
-    # pre_stop:
-    #   - command: docker run -d --name command-run alpine tail -f /dev/null
-    #   - command: docker rm -f $(docker ps -aq --filter "label=demo-setup=true") || true
-    #   - command: docker volume rm -f $(docker volume ls -q --filter "label=demo-setup=true") || true
-    #   - command: docker network rm -f $(docker network ls -q --filter "label=demo-setup=true") || true
+    pre_stop:
+      - command: docker run -d --name command-run alpine tail -f /dev/null
+      - command: docker rm -f $(docker ps -aq --filter "label=demo-setup=true") || true
+      - command: docker volume rm -f $(docker volume ls -q --filter "label=demo-setup=true") || true
+      - command: docker network rm -f $(docker network ls -q --filter "label=demo-setup=true") || true
 
 volumes:
   socket-proxy:
