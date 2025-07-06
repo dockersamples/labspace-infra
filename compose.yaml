@@ -1,6 +1,7 @@
 services:
   project-setup:
     image: michaelirwin244/workshop-poc:setup
+    pull_policy: always
     volumes:
       - project:/project
     environment:
@@ -23,6 +24,7 @@ services:
 
   instructions:
     image: michaelirwin244/workshop-poc:markdown-server
+    pull_policy: always
     ports:
       - 8000:3000
     volumes:
@@ -36,6 +38,7 @@ services:
 
   workspace:
     image: michaelirwin244/workshop-poc:workspace
+    pull_policy: always
     command: /home/coder/project
     depends_on:
       project-setup:
@@ -56,6 +59,7 @@ services:
 
   host-forwarding:
     image: michaelirwin244/workshop-poc:host-port-republisher
+    pull_policy: always
     volumes:
       - socket-proxy:/var/run
     network_mode: service:workspace
@@ -67,6 +71,7 @@ services:
 
   workspace-cleaner:
     image: michaelirwin244/workshop-poc:workspace-cleaner
+    pull_policy: always
     volumes:
       - socket-proxy:/var/run
     environment:
@@ -76,6 +81,7 @@ services:
 
   socket-proxy:
     image: mikesir87/docker-socket-proxy
+    pull_policy: always
     # image: socket-proxy
     # use_api_socket: true
     volumes:
