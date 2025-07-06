@@ -6,6 +6,7 @@ services:
     environment:
       PROJECT_CLONE_URL: https://github.com/mikesir87/workshop-poc-content
 
+
   instructions:
     image: michaelirwin244/workshop-poc:markdown-server
     ports:
@@ -28,6 +29,8 @@ services:
     ports:
       - 8085:8085 # For the IDE itself
       - 3000:3000 # For the application running in the IDE
+    environment:
+      TESTCONTAINERS_HOST_OVERRIDE: localhost
     volumes:
       - socket-proxy:/var/run
       - type: volume
@@ -60,10 +63,10 @@ services:
   socket-proxy:
     image: mikesir87/docker-socket-proxy
     # image: socket-proxy
-    # use_api_socket: true
+    use_api_socket: true
     volumes:
       - socket-proxy:/tmp/proxy
-      - /var/run/docker.sock:/var/run/docker.sock
+      # - /var/run/docker.sock:/var/run/docker.sock
     environment:
       DEBUG_LOGS: "true"
       CONFIG_DATA: |
@@ -84,6 +87,10 @@ services:
           - type: addLabels
             labels:
               demo-setup: "true"
+
+          - type: addToNetwork
+            networks:
+              - workshop-poc
         gates:
           - type: mountSource
             allowedSources:
@@ -97,14 +104,17 @@ services:
             requiredLabels:
               demo-setup: "true"
       LISTEN_SOCKET_PATH: /tmp/proxy/docker.sock
-    pre_stop:
-      - command: docker run -d --name command-run alpine tail -f /dev/null
-      - command: docker rm -f $(docker ps -aq --filter "label=demo-setup=true") || true
-      - command: docker volume rm -f $(docker volume ls -q --filter "label=demo-setup=true") || true
-      - command: docker network rm -f $(docker network ls -q --filter "label=demo-setup=true") || true
+    # pre_stop:
+    #   - command: docker rm -f $(docker ps -aq --filter "label=demo-setup=true") || true
+    #   - command: docker volume rm -f $(docker volume ls -q --filter "label=demo-setup=true") || true
+    #   - command: docker network rm -f $(docker network ls -q --filter "label=demo-setup=true") || true
 
 volumes:
   socket-proxy:
     name: socket-proxy
   project:
     name: project
+
+networks:
+  default:
+    name: workshop-poc
