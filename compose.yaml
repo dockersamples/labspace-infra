@@ -41,7 +41,7 @@ services:
           subpath: workspace
 
   host-forwarding:
-    image: michaelirwin244/workshop-poc:host-forwarding
+    image: michaelirwin244/workshop-poc:host-port-republisher
     volumes:
       - socket-proxy:/var/run
     network_mode: service:workspace
@@ -63,10 +63,10 @@ services:
   socket-proxy:
     image: mikesir87/docker-socket-proxy
     # image: socket-proxy
-    use_api_socket: true
+    # use_api_socket: true
     volumes:
       - socket-proxy:/tmp/proxy
-      # - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       DEBUG_LOGS: "true"
       CONFIG_DATA: |
