@@ -27,4 +27,12 @@ if [ -f "./setup.sh" ]; then
   bash ./setup.sh
 fi
 
+if [ -n "$SETUP_SCRIPT" ]; then
+  if [ -f "$SETUP_SCRIPT" ]; then
+    bash "$SETUP_SCRIPT"
+  else
+    echo "Warning: SETUP_SCRIPT defined ('$SETUP_SCRIPT'), but not found."
+  fi
+fi
+
 chown 1000:1000 -R /project
