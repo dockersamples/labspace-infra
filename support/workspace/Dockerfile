@@ -7,6 +7,8 @@ EXPOSE 8085
 RUN mkdir -p ~/.docker/cli-plugins && chown -R coder:coder ~/.docker
 COPY --link --from=docker /usr/local/bin/docker /usr/local/bin/docker
 COPY --link --from=docker --chown=1000:1000 /usr/local/libexec/docker/cli-plugins /home/coder/.docker/cli-plugins
+COPY --link --from=docker/scout-cli --chown=1000:1000 /docker-scout /home/coder/.docker/cli-plugins/docker-scout
+COPY --link --from=docker/docker-model-cli-desktop-module:v0.1.32 /cli-plugins/model/linux/docker-model /home/coder/.docker/cli-plugins/docker-model
 
 USER root
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x -o /tmp/nodesource_setup.sh && \
