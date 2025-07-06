@@ -20,22 +20,32 @@ async function onContainerStart(containerId) {
 
   if (containerData.NetworkSettings && containerData.NetworkSettings.Ports) {
     const ports = Object.keys(containerData.NetworkSettings.Ports)
-      .filter(portKey => containerData.NetworkSettings.Ports[portKey])
-      .map(portKey => parseInt(portKey.split('/')[0], 10));
+      .filter(portKey => containerData.NetworkSettings.Ports[portKey] && 
+        containerData.NetworkSettings.Ports[portKey][0] && 
+        containerData.NetworkSettings.Ports[portKey][0].HostPort)
+      .map(portKey => ({ 
+        containerPort: parseInt(portKey.split('/')[0], 10), 
+        hostPort: parseInt(containerData.NetworkSettings.Ports[portKey][0].HostPort),
+      }))
+      .filter(port => port.hostPort && port.containerPort);
+
+    console.log("Found ports for container:", containerData.Id, ports);
 
     const socatProcs = [];
 
     ports.forEach(port => {
-      const hostPort = port + PORT_OFFSET;
+      const hostPort = port.hostPort + PORT_OFFSET;
+      const containerPort = port.containerPort;
 
-      console.log(`Setting up port forwarding: host port ${hostPort} -> container ${ipAddress}:${port}`);
+      console.log(`Setting up port forwarding: host port ${hostPort} -> container ${ipAddress}:${containerPort}`);
 
-      const proc = child_process.spawn('socat', [`TCP-LISTEN:${hostPort},fork,reuseaddr`, `TCP:${ipAddress}:${port}`], {
+      const proc = child_process.spawn('socat', [`TCP-LISTEN:${hostPort},fork,reuseaddr`, `TCP:${ipAddress}:${containerPort}`], {
         stdio: 'inherit'
       });
       socatProcs.push(proc);
 
       proc.on('exit', (code, signal) => {
+        console.log(`socat process for container ${containerData.Id} on port ${hostPort} exited with code ${code}, signal ${signal}`);
         socatProcs.splice(socatProcs.indexOf(proc), 1);
       });
     });
