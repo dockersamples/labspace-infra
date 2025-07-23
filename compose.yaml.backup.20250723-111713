@@ -6,20 +6,6 @@ services:
     environment:
       PROJECT_CLONE_URL: https://github.com/mikesir87/workshop-poc-content
 
-  lab-interface:
-    image: nginx:alpine
-    container_name: lab-interface
-    ports:
-      - "8080:80"
-    volumes:
-      - ./lab-interface:/usr/share/nginx/html:ro
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - workspace
-      - instructions
-    restart: unless-stopped
-    labels:
-      - demo-setup=true
 
   instructions:
     image: michaelirwin244/workshop-poc:markdown-server
@@ -130,6 +116,6 @@ volumes:
     name: project
 
 networks:
-  workshop-poc:
+  default:
     name: workshop-poc
-
+  # Lab interface serving the split-screen layout

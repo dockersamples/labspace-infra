@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker Workshop Lab - Interactive Tutorial</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            background: #ffffff;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Left Panel - Tutorial Content */
+        .tutorial-panel {
+            width: 50%;
+            background: #ffffff;
+            border-right: 1px solid #e0e0e0;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .tutorial-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .tutorial-header h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .tutorial-subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e9ecef;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .tutorial-nav {
+            background: #ffffff;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            position: sticky;
+            top: 110px;
+            z-index: 90;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            color: #495057;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-tab:hover {
+            background: #e9ecef;
+            border-color: #007bff;
+        }
+
+        .nav-tab.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .tutorial-content {
+            padding: 30px;
+            max-width: none;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tutorial-content h2 {
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: 600;
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #007bff;
+        }
+
+        .tutorial-content h3 {
+            color: #495057;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 25px 0 15px 0;
+        }
+
+        .tutorial-content p {
+            color: #495057;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .tutorial-content ul {
+            margin: 16px 0;
+            padding-left: 20px;
+        }
+
+        .tutorial-content li {
+            color: #495057;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .step {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #007bff;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .step:hover {
+            box-shadow: 0 2px 8px rgba(0,123,255,0.1);
+            transform: translateY(-1px);
+        }
+
+        .step.completed {
+            border-left-color: #28a745;
+            background: #f8fff9;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .step-number {
+            background: #007bff;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            margin-right: 12px;
+            transition: background-color 0.2s;
+        }
+
+        .step.completed .step-number {
+            background: #28a745;
+        }
+
+        .step-title {
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 16px 0;
+            position: relative;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+            overflow-x: auto;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .code-block:hover {
+            background: #e9ecef;
+            border-color: #007bff;
+        }
+
+        .code-block::before {
+            content: 'Click to copy';
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            background: #007bff;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .code-block:hover::before {
+            opacity: 1;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border: 1px solid #b8daff;
+            border-left: 4px solid #007bff;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+
+        .info-box.success {
+            background: #f8fff9;
+            border-color: #c3e6cb;
+            border-left-color: #28a745;
+        }
+
+        .info-box.warning {
+            background: #fff8e1;
+            border-color: #ffeaa7;
+            border-left-color: #ffc107;
+        }
+
+        .info-box h4 {
+            color: #495057;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        /* Right Panel - VS Code */
+        .vscode-panel {
+            width: 50%;
+            background: #1e1e1e;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .vscode-header {
+            background: #2d2d30;
+            padding: 12px 20px;
+            border-bottom: 1px solid #3e3e42;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 48px;
+        }
+
+        .vscode-title {
+            color: #cccccc;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .vscode-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #28a745;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-text {
+            color: #28a745;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .vscode-iframe {
+            flex: 1;
+            border: none;
+            background: #1e1e1e;
+        }
+
+        .vscode-placeholder {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #cccccc;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .vscode-placeholder svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 20px;
+            opacity: 0.6;
+        }
+
+        .vscode-placeholder h3 {
+            color: #cccccc;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .vscode-placeholder p {
+            color: #999;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .access-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 16px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .access-button:hover {
+            background: #0056b3;
+            text-decoration: none;
+            color: white;
+        }
+
+        /* Resize Handle */
+        .resize-handle {
+            width: 4px;
+            background: #e0e0e0;
+            cursor: col-resize;
+            position: relative;
+            transition: background-color 0.2s;
+        }
+
+        .resize-handle:hover {
+            background: #007bff;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .tutorial-panel {
+                width: 100%;
+                height: 50vh;
+            }
+
+            .vscode-panel {
+                width: 100%;
+                height: 50vh;
+            }
+
+            .resize-handle {
+                display: none;
+            }
+        }
+
+        /* Scrollbar Styling */
+        .tutorial-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .tutorial-panel::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .tutorial-panel::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .tutorial-panel::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Tutorial Panel -->
+    <div class="tutorial-panel">
+        <div class="tutorial-header">
+            <h1>Docker Workshop Lab Tutorial</h1>
+            <div class="tutorial-subtitle">Interactive hands-on Docker learning experience</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="tutorial-nav">
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-section="getting-started">Getting Started</button>
+                <button class="nav-tab" data-section="containers">Containers</button>
+                <button class="nav-tab" data-section="images">Images & Builds</button>
+                <button class="nav-tab" data-section="compose">Multi-Container</button>
+                <button class="nav-tab" data-section="advanced">Advanced</button>
+            </div>
+        </div>
+
+        <div class="tutorial-content">
+            <!-- Getting Started Section -->
+            <div id="getting-started" class="section active">
+                <h2>🚀 Getting Started with Docker</h2>
+                <p>Welcome to this hands-on Docker tutorial! You'll learn how to work with containers, images, and multi-container applications using a real development environment.</p>
+
+                <div class="info-box">
+                    <h4>🎯 What You'll Learn</h4>
+                    <ul>
+                        <li>Docker fundamentals and container lifecycle</li>
+                        <li>Building and managing container images</li>
+                        <li>Working with volumes and networking</li>
+                        <li>Multi-container applications with Docker Compose</li>
+                        <li>Best practices and debugging techniques</li>
+                    </ul>
+                </div>
+
+                <div class="step" data-step="1">
+                    <div class="step-header">
+                        <div class="step-number">1</div>
+                        <div class="step-title">Verify Your Environment</div>
+                    </div>
+                    <p>First, let's make sure Docker is properly installed and working in your environment.</p>
+                    <div class="code-block" onclick="copyCode(this)">docker --version
+                        docker info</div>
+                    <p>You should see Docker version information and system details.</p>
+                </div>
+
+                <div class="step" data-step="2">
+                    <div class="step-header">
+                        <div class="step-number">2</div>
+                        <div class="step-title">Check Running Containers</div>
+                    </div>
+                    <p>See what containers are currently running in your isolated environment.</p>
+                    <div class="code-block" onclick="copyCode(this)">docker ps
+                        docker ps -a</div>
+                    <div class="info-box warning">
+                        <h4>⚠️ Isolated Environment</h4>
+                        <p>Your environment is isolated for security. You'll only see containers created within this workshop.</p>
+                    </div>
+                </div>
+
+                <div class="step" data-step="3">
+                    <div class="step-header">
+                        <div class="step-number">3</div>
+                        <div class="step-title">Your First Container</div>
+                    </div>
+                    <p>Let's run your first container to test the setup.</p>
+                    <div class="code-block" onclick="copyCode(this)">docker run hello-world</div>
+                    <p>This downloads and runs a test container that displays a welcome message.</p>
+                </div>
+            </div>
+
+            <!-- Containers Section -->
+            <div id="containers" class="section">
+                <h2>📦 Working with Containers</h2>
+                <p>Learn how to create, manage, and interact with Docker containers.</p>
+
+                <div class="step" data-step="4">
+                    <div class="step-header">
+                        <div class="step-number">4</div>
+                        <div class="step-title">Interactive Containers</div>
+                    </div>
+                    <p>Run an interactive container where you can execute commands.</p>
+                    <div class="code-block" onclick="copyCode(this)">docker run -it --name my-ubuntu ubuntu bash</div>
+                    <p>Inside the container, try these commands:</p>
+                    <div class="code-block" onclick="copyCode(this)">whoami
+                        pwd
+                        ls -la
+                        cat /etc/os-release
+                        echo "Hello from inside the container!"
+                        exit</div>
+                </div>
+
+                <div class="step" data-step="5">
+                    <div class="step-header">
+                        <div class="step-number">5</div>
+                        <div class="step-title">Container Lifecycle</div>
+                    </div>
+                    <p>Learn how to manage container lifecycle with start, stop, and remove operations.</p>
+                    <div class="code-block" onclick="copyCode(this)"># See all containers (running and stopped)
+                        docker ps -a
+
+                        # Start a stopped container
+                        docker start my-ubuntu
+
+                        # Stop a running container
+                        docker stop my-ubuntu
+
+                        # Remove a container
+                        docker rm my-ubuntu</div>
+                </div>
+
+                <div class="step" data-step="6">
+                    <div class="step-header">
+                        <div class="step-number">6</div>
+                        <div class="step-title">Running Web Services</div>
+                    </div>
+                    <p>Start a web server and learn about port mapping.</p>
+                    <div class="code-block" onclick="copyCode(this)">docker run -d --name webserver -p 8080:80 nginx:alpine</div>
+                    <p>Test the web server:</p>
+                    <div class="code-block" onclick="copyCode(this)">curl http://localhost:8080
+                        docker logs webserver</div>
+                    <div class="info-box success">
+                        <h4>✅ Port Forwarding</h4>
+                        <p>The workshop environment automatically forwards ports, so you can access services via localhost.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Images Section -->
+            <div id="images" class="section">
+                <h2>🏗️ Images and Building</h2>
+                <p>Learn how to work with Docker images and build your own.</p>
+
+                <div class="step" data-step="7">
+                    <div class="step-header">
+                        <div class="step-number">7</div>
+                        <div class="step-title">Exploring Images</div>
+                    </div>
+                    <p>Understand Docker images and how to manage them.</p>
+                    <div class="code-block" onclick="copyCode(this)"># List local images
+                        docker images
+
+                        # Pull a specific image
+                        docker pull node:18-alpine
+
+                        # Inspect an image
+                        docker inspect node:18-alpine
+
+                        # See image layers
+                        docker history node:18-alpine</div>
+                </div>
+
+                <div class="step" data-step="8">
+                    <div class="step-header">
+                        <div class="step-number">8</div>
+                        <div class="step-title">Building Your First Image</div>
+                    </div>
+                    <p>Create a simple Dockerfile and build a custom image.</p>
+                    <div class="code-block" onclick="copyCode(this)"># Create a simple Dockerfile
+                        cat > Dockerfile << 'EOF'
+                        FROM node:18-alpine
+                        WORKDIR /app
+                        COPY package*.json ./
+                        RUN npm install
+                        COPY . .
+                        EXPOSE 3000
+                        CMD ["npm", "start"]
+                        EOF</div>
+                    <p>Build the image:</p>
+                    <div class="code-block" onclick="copyCode(this)">docker build -t my-app:latest .</div>
+                </div>
+            </div>
+
+            <!-- Compose Section -->
+            <div id="compose" class="section">
+                <h2>🔗 Multi-Container Applications</h2>
+                <p>Learn to orchestrate multiple containers using Docker Compose.</p>
+
+                <div class="step" data-step="9">
+                    <div class="step-header">
+                        <div class="step-number">9</div>
+                        <div class="step-title">Docker Compose Basics</div>
+                    </div>
+                    <p>Start the multi-container application stack.</p>
+                    <div class="code-block" onclick="copyCode(this)"># View the compose configuration
+                        cat docker-compose.yml
+
+                        # Start all services
+                        docker compose up -d
+
+                        # Check service status
+                        docker compose ps</div>
+                </div>
+
+                <div class="step" data-step="10">
+                    <div class="step-header">
+                        <div class="step-number">10</div>
+                        <div class="step-title">Service Communication</div>
+                    </div>
+                    <p>Learn how containers communicate in a compose network.</p>
+                    <div class="code-block" onclick="copyCode(this)"># Execute commands in running containers
+                        docker compose exec workspace bash
+
+                        # Inside the container, test connectivity
+                        ping db
+                        nc -z redis 6379
+                        exit
+
+                        # View service logs
+                        docker compose logs -f webapp</div>
+                </div>
+            </div>
+
+            <!-- Advanced Section -->
+            <div id="advanced" class="section">
+                <h2>🚀 Advanced Topics</h2>
+                <p>Explore advanced Docker concepts and debugging techniques.</p>
+
+                <div class="step" data-step="11">
+                    <div class="step-header">
+                        <div class="step-number">11</div>
+                        <div class="step-title">Volume Management</div>
+                    </div>
+                    <p>Work with persistent data using volumes.</p>
+                    <div class="code-block" onclick="copyCode(this)"># Create a volume
+                        docker volume create my-data
+
+                        # Run container with volume
+                        docker run -it --rm -v my-data:/data ubuntu bash
+
+                        # Inside container:
+                        echo "Persistent data!" > /data/test.txt
+                        exit
+
+                        # Verify data persists
+                        docker run -it --rm -v my-data:/data ubuntu cat /data/test.txt</div>
+                </div>
+
+                <div class="step" data-step="12">
+                    <div class="step-header">
+                        <div class="step-number">12</div>
+                        <div class="step-title">Debugging Containers</div>
+                    </div>
+                    <p>Learn debugging techniques for containerized applications.</p>
+                    <div class="code-block" onclick="copyCode(this)"># Inspect running containers
+                        docker inspect [container-name]
+
+                        # View resource usage
+                        docker stats [container-name]
+
+                        # Debug inside containers
+                        docker exec -it [container-name] sh
+
+                        # View container processes
+                        docker top [container-name]</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resize Handle -->
+    <div class="resize-handle" id="resizeHandle"></div>
+
+    <!-- VS Code Panel -->
+    <div class="vscode-panel">
+        <div class="vscode-header">
+            <div class="vscode-title">Development Environment</div>
+            <div class="vscode-status">
+                <div class="status-dot"></div>
+                <div class="status-text">Connected</div>
+            </div>
+        </div>
+
+        <div class="vscode-placeholder" id="vscodePlaceholder">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M23.15 2.587L18.21.21a1.494 1.494 0 0 0-1.705.29l-9.46 8.63-4.12-3.128a.999.999 0 0 0-1.276.057L.327 7.261A1 1 0 0 0 .326 8.74L3.899 12 .326 15.26a1 1 0 0 0 .001 1.479L1.65 17.94a.999.999 0 0 0 1.276.057l4.12-3.128 9.46 8.63a1.492 1.492 0 0 0 1.704.29l4.942-2.377A1.5 1.5 0 0 0 24 20.06V3.939a1.5 1.5 0 0 0-.85-1.352zm-5.146 14.861L10.826 12l7.178-5.448v10.896z"/>
+            </svg>
+            <h3>VS Code Environment</h3>
+            <p>Your integrated development environment with terminal access</p>
+            <p>Complete with file explorer, code editor, and Docker CLI</p>
+            <a href="http://localhost:8085" target="_blank" class="access-button">Open in New Tab</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Navigation handling
+    const navTabs = document.querySelectorAll('.nav-tab');
+    const sections = document.querySelectorAll('.section');
+
+    navTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Remove active from all tabs and sections
+            navTabs.forEach(t => t.classList.remove('active'));
+            sections.forEach(s => s.classList.remove('active'));
+
+            // Add active to clicked tab
+            tab.classList.add('active');
+
+            // Show corresponding section
+            const sectionId = tab.getAttribute('data-section');
+            document.getElementById(sectionId).classList.add('active');
+
+            // Update progress
+            updateProgress();
+        });
+    });
+
+    // Step completion handling
+    const steps = document.querySelectorAll('.step');
+    const completedSteps = new Set();
+
+    steps.forEach(step => {
+        step.addEventListener('click', () => {
+            const stepNum = step.getAttribute('data-step');
+            if (!completedSteps.has(stepNum)) {
+                completedSteps.add(stepNum);
+                step.classList.add('completed');
+                updateProgress();
+            }
+        });
+    });
+
+    // Code copying functionality
+    function copyCode(element) {
+        const text = element.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            const original = element.style.background;
+            element.style.background = '#e7f3ff';
+            element.style.borderColor = '#007bff';
+
+            setTimeout(() => {
+                element.style.background = original;
+                element.style.borderColor = '';
+            }, 800);
+        });
+    }
+
+    // Progress tracking
+    function updateProgress() {
+        const totalSteps = steps.length;
+        const completedCount = completedSteps.size;
+        const progress = (completedCount / totalSteps) * 100;
+
+        document.getElementById('progressFill').style.width = progress + '%';
+    }
+
+    // Resize functionality
+    let isResizing = false;
+    const resizeHandle = document.getElementById('resizeHandle');
+    const tutorialPanel = document.querySelector('.tutorial-panel');
+    const vscodePanel = document.querySelector('.vscode-panel');
+
+    resizeHandle.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        document.addEventListener('mousemove', handleResize);
+        document.addEventListener('mouseup', stopResize);
+        e.preventDefault();
+    });
+
+    function handleResize(e) {
+        if (!isResizing) return;
+
+        const containerRect = document.querySelector('.container').getBoundingClientRect();
+        const newLeftWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+
+        if (newLeftWidth > 25 && newLeftWidth < 75) {
+            tutorialPanel.style.width = newLeftWidth + '%';
+            vscodePanel.style.width = (100 - newLeftWidth) + '%';
+        }
+    }
+
+    function stopResize() {
+        isResizing = false;
+        document.removeEventListener('mousemove', handleResize);
+        document.removeEventListener('mouseup', stopResize);
+    }
+
+    // VS Code integration
+    function checkVSCode() {
+        fetch('http://localhost:8085')
+            .then(response => {
+                if (response.ok) {
+                    const placeholder = document.getElementById('vscodePlaceholder');
+                    const iframe = document.createElement('iframe');
+                    iframe.className = 'vscode-iframe';
+                    iframe.src = 'http://localhost:8085';
+                    iframe.title = 'VS Code Server';
+
+                    placeholder.parentNode.replaceChild(iframe, placeholder);
+                }
+            })
+            .catch(() => {
+                // VS Code not ready, will try again
+            });
+    }
+
+    // Check for VS Code every 3 seconds
+    setInterval(checkVSCode, 3000);
+    checkVSCode(); // Initial check
+</script>
+</body>
+</html>
