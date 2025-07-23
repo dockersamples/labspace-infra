@@ -372,9 +372,12 @@
             border-radius: 6px;
             text-decoration: none;
             display: inline-block;
-            margin-top: 16px;
+            margin: 5px;
             font-weight: 500;
             transition: background-color 0.2s;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
         }
 
         .access-button:hover {
@@ -720,7 +723,10 @@
             <h3>VS Code Environment</h3>
             <p>Your integrated development environment with terminal access</p>
             <p>Complete with file explorer, code editor, and Docker CLI</p>
-            <a href="http://localhost:8085" target="_blank" class="access-button">Open in New Tab</a>
+            <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+                <button onclick="manualEmbedVSCode()" class="access-button">Load VS Code Here</button>
+                <a href="http://localhost:8085" target="_blank" class="access-button" style="background: #6c757d;">Open in New Tab</a>
+            </div>
         </div>
     </div>
 </div>
@@ -819,27 +825,47 @@
     }
 
     // VS Code integration
-    function checkVSCode() {
-        fetch('http://localhost:8085')
-            .then(response => {
-                if (response.ok) {
-                    const placeholder = document.getElementById('vscodePlaceholder');
-                    const iframe = document.createElement('iframe');
-                    iframe.className = 'vscode-iframe';
-                    iframe.src = 'http://localhost:8085';
-                    iframe.title = 'VS Code Server';
+    function embedVSCode() {
+        const placeholder = document.getElementById('vscodePlaceholder');
+        if (placeholder) {
+            const iframe = document.createElement('iframe');
+            iframe.className = 'vscode-iframe';
+            iframe.src = 'http://localhost:8085';
+            iframe.title = 'VS Code Server';
 
-                    placeholder.parentNode.replaceChild(iframe, placeholder);
-                }
-            })
-            .catch(() => {
-                // VS Code not ready, will try again
-            });
+            // Add loading handler
+            iframe.onload = function() {
+                console.log('VS Code loaded successfully');
+            };
+
+            iframe.onerror = function() {
+                console.log('Error loading VS Code');
+            };
+
+            placeholder.parentNode.replaceChild(iframe, placeholder);
+        }
     }
 
-    // Check for VS Code every 3 seconds
-    setInterval(checkVSCode, 3000);
-    checkVSCode(); // Initial check
+    function checkVSCode() {
+        // Try to detect VS Code by creating a test image request
+        const img = new Image();
+        img.onload = function() {
+            embedVSCode();
+        };
+        img.onerror = function() {
+            // VS Code not ready, try again later
+            setTimeout(checkVSCode, 3000);
+        };
+        img.src = 'http://localhost:8085/favicon.ico?' + Date.now();
+    }
+
+    // Manual embed function for the button
+    function manualEmbedVSCode() {
+        embedVSCode();
+    }
+
+    // Start checking for VS Code immediately
+    setTimeout(checkVSCode, 1000);
 </script>
 </body>
 </html>
