@@ -217,38 +217,111 @@
             background: #f8f9fa;
             border: 1px solid #e9ecef;
             border-radius: 6px;
-            padding: 16px;
+            padding: 16px 50px 16px 16px;
             margin: 16px 0;
             position: relative;
             font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
             font-size: 14px;
             line-height: 1.4;
             overflow-x: auto;
-            cursor: pointer;
+            cursor: text;
             transition: all 0.2s;
+            user-select: text;
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
 
         .code-block:hover {
             background: #e9ecef;
             border-color: #007bff;
+            box-shadow: 0 2px 8px rgba(0,123,255,0.15);
         }
 
-        .code-block::before {
-            content: 'Click to copy';
+        .copy-button {
             position: absolute;
             top: 8px;
-            right: 12px;
+            right: 8px;
             background: #007bff;
             color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .copy-button:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .copy-button:active {
+            transform: scale(0.95);
+        }
+
+        .select-button {
+            position: absolute;
+            top: 8px;
+            right: 60px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .select-button:hover {
+            background: #545b62;
+            transform: scale(1.05);
+        }
+
+        .code-block.selected {
+            background: #cce7ff;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+
+        .copy-status {
+            position: absolute;
+            top: 35px;
+            right: 8px;
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 11px;
+            font-weight: 600;
+            z-index: 15;
             opacity: 0;
-            transition: opacity 0.2s;
+            transition: opacity 0.3s;
         }
 
-        .code-block:hover::before {
+        .copy-status.success {
+            background: #28a745;
+            color: white;
             opacity: 1;
+        }
+
+        .copy-status.error {
+            background: #ffc107;
+            color: #212529;
+            opacity: 1;
+        }
+
+        .manual-copy-notice {
+            background: #e7f3ff;
+            border: 1px solid #b8daff;
+            border-left: 4px solid #007bff;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 16px 0;
+            font-size: 13px;
         }
 
         .info-box {
@@ -276,6 +349,16 @@
             color: #495057;
             margin-bottom: 8px;
             font-weight: 600;
+        }
+
+        kbd {
+            background: #e9ecef;
+            border: 1px solid #adb5bd;
+            border-radius: 3px;
+            color: #495057;
+            font-family: monospace;
+            font-size: 0.875em;
+            padding: 2px 4px;
         }
 
         /* Right Panel - VS Code */
@@ -457,6 +540,7 @@
                 <button class="nav-tab" data-section="containers">Containers</button>
                 <button class="nav-tab" data-section="images">Images & Builds</button>
                 <button class="nav-tab" data-section="compose">Multi-Container</button>
+                <button class="nav-tab" data-section="agentic-compose">Agentic Compose</button>
                 <button class="nav-tab" data-section="advanced">Advanced</button>
             </div>
         </div>
@@ -478,14 +562,21 @@
                     </ul>
                 </div>
 
+                <div class="info-box success">
+                    <h4>💡 How to Copy Commands</h4>
+                    <p><strong>Method 1:</strong> Click any code block to copy commands instantly. <em>Your browser may ask for clipboard permission - please allow it for the best experience.</em></p>
+                    <p><strong>Method 2:</strong> If clipboard access is blocked, manually select the code text and use <kbd>Ctrl+C</kbd> (or <kbd>Cmd+C</kbd> on Mac) to copy, then <kbd>Ctrl+V</kbd> to paste in the VS Code terminal.</p>
+                    <p><strong>Tip:</strong> You can also press <kbd>Enter</kbd> or <kbd>Space</kbd> when a code block is focused.</p>
+                </div>
+
                 <div class="step" data-step="1">
                     <div class="step-header">
                         <div class="step-number">1</div>
                         <div class="step-title">Verify Your Environment</div>
                     </div>
                     <p>First, let's make sure Docker is properly installed and working in your environment.</p>
-                    <div class="code-block" onclick="copyCode(this)">docker --version
-                        docker info</div>
+                    <div class="code-block">docker --version</div>
+                    <div class="code-block">docker info</div>
                     <p>You should see Docker version information and system details.</p>
                 </div>
 
@@ -495,8 +586,8 @@
                         <div class="step-title">Check Running Containers</div>
                     </div>
                     <p>See what containers are currently running in your isolated environment.</p>
-                    <div class="code-block" onclick="copyCode(this)">docker ps
-                        docker ps -a</div>
+                    <div class="code-block">docker ps</div>
+                    <div class="code-block">docker ps -a</div>
                     <div class="info-box warning">
                         <h4>⚠️ Isolated Environment</h4>
                         <p>Your environment is isolated for security. You'll only see containers created within this workshop.</p>
@@ -509,7 +600,7 @@
                         <div class="step-title">Your First Container</div>
                     </div>
                     <p>Let's run your first container to test the setup.</p>
-                    <div class="code-block" onclick="copyCode(this)">docker run hello-world</div>
+                    <div class="code-block">docker run hello-world</div>
                     <p>This downloads and runs a test container that displays a welcome message.</p>
                 </div>
             </div>
@@ -525,14 +616,14 @@
                         <div class="step-title">Interactive Containers</div>
                     </div>
                     <p>Run an interactive container where you can execute commands.</p>
-                    <div class="code-block" onclick="copyCode(this)">docker run -it --name my-ubuntu ubuntu bash</div>
-                    <p>Inside the container, try these commands:</p>
-                    <div class="code-block" onclick="copyCode(this)">whoami
-                        pwd
-                        ls -la
-                        cat /etc/os-release
-                        echo "Hello from inside the container!"
-                        exit</div>
+                    <div class="code-block">docker run -it --name my-ubuntu ubuntu bash</div>
+                    <p>Inside the container, try these commands one by one:</p>
+                    <div class="code-block">whoami</div>
+                    <div class="code-block">pwd</div>
+                    <div class="code-block">ls -la</div>
+                    <div class="code-block">cat /etc/os-release</div>
+                    <div class="code-block">echo "Hello from inside the container!"</div>
+                    <div class="code-block">exit</div>
                 </div>
 
                 <div class="step" data-step="5">
@@ -541,16 +632,13 @@
                         <div class="step-title">Container Lifecycle</div>
                     </div>
                     <p>Learn how to manage container lifecycle with start, stop, and remove operations.</p>
-                    <div class="code-block" onclick="copyCode(this)"># See all containers (running and stopped)
-                        docker ps -a
-
-                        # Start a stopped container
-                        docker start my-ubuntu
-
-                        # Stop a running container
-                        docker stop my-ubuntu
-
-                        # Remove a container
+                    <div class="code-block"># See all containers (running and stopped)
+                        docker ps -a</div>
+                    <div class="code-block"># Start a stopped container
+                        docker start my-ubuntu</div>
+                    <div class="code-block"># Stop a running container
+                        docker stop my-ubuntu</div>
+                    <div class="code-block"># Remove a container
                         docker rm my-ubuntu</div>
                 </div>
 
@@ -560,10 +648,10 @@
                         <div class="step-title">Running Web Services</div>
                     </div>
                     <p>Start a web server and learn about port mapping.</p>
-                    <div class="code-block" onclick="copyCode(this)">docker run -d --name webserver -p 8080:80 nginx:alpine</div>
+                    <div class="code-block">docker run -d --name webserver -p 8080:80 nginx:alpine</div>
                     <p>Test the web server:</p>
-                    <div class="code-block" onclick="copyCode(this)">curl http://localhost:8080
-                        docker logs webserver</div>
+                    <div class="code-block">curl http://localhost:8080</div>
+                    <div class="code-block">docker logs webserver</div>
                     <div class="info-box success">
                         <h4>✅ Port Forwarding</h4>
                         <p>The workshop environment automatically forwards ports, so you can access services via localhost.</p>
@@ -582,16 +670,13 @@
                         <div class="step-title">Exploring Images</div>
                     </div>
                     <p>Understand Docker images and how to manage them.</p>
-                    <div class="code-block" onclick="copyCode(this)"># List local images
-                        docker images
-
-                        # Pull a specific image
-                        docker pull node:18-alpine
-
-                        # Inspect an image
-                        docker inspect node:18-alpine
-
-                        # See image layers
+                    <div class="code-block"># List local images
+                        docker images</div>
+                    <div class="code-block"># Pull a specific image
+                        docker pull node:18-alpine</div>
+                    <div class="code-block"># Inspect an image
+                        docker inspect node:18-alpine</div>
+                    <div class="code-block"># See image layers
                         docker history node:18-alpine</div>
                 </div>
 
@@ -601,7 +686,7 @@
                         <div class="step-title">Building Your First Image</div>
                     </div>
                     <p>Create a simple Dockerfile and build a custom image.</p>
-                    <div class="code-block" onclick="copyCode(this)"># Create a simple Dockerfile
+                    <div class="code-block"># Create a simple Dockerfile
                         cat > Dockerfile << 'EOF'
                         FROM node:18-alpine
                         WORKDIR /app
@@ -612,7 +697,7 @@
                         CMD ["npm", "start"]
                         EOF</div>
                     <p>Build the image:</p>
-                    <div class="code-block" onclick="copyCode(this)">docker build -t my-app:latest .</div>
+                    <div class="code-block">docker build -t my-app:latest .</div>
                 </div>
             </div>
 
@@ -627,13 +712,11 @@
                         <div class="step-title">Docker Compose Basics</div>
                     </div>
                     <p>Start the multi-container application stack.</p>
-                    <div class="code-block" onclick="copyCode(this)"># View the compose configuration
-                        cat docker-compose.yml
-
-                        # Start all services
-                        docker compose up -d
-
-                        # Check service status
+                    <div class="code-block"># View the compose configuration
+                        cat docker-compose.yml</div>
+                    <div class="code-block"># Start all services
+                        docker compose up -d</div>
+                    <div class="code-block"># Check service status
                         docker compose ps</div>
                 </div>
 
@@ -643,16 +726,252 @@
                         <div class="step-title">Service Communication</div>
                     </div>
                     <p>Learn how containers communicate in a compose network.</p>
-                    <div class="code-block" onclick="copyCode(this)"># Execute commands in running containers
-                        docker compose exec workspace bash
-
-                        # Inside the container, test connectivity
-                        ping db
-                        nc -z redis 6379
-                        exit
-
-                        # View service logs
+                    <div class="code-block"># Execute commands in running containers
+                        docker compose exec workspace bash</div>
+                    <p>Inside the container, test connectivity:</p>
+                    <div class="code-block">ping db</div>
+                    <div class="code-block">nc -z redis 6379</div>
+                    <div class="code-block">exit</div>
+                    <p>View service logs:</p>
+                    <div class="code-block"># View service logs
                         docker compose logs -f webapp</div>
+                </div>
+            </div>
+
+            <!-- Agentic Compose Section -->
+            <div id="agentic-compose" class="section">
+                <h2>🤖 Agentic Compose - Building AI Agents with Docker</h2>
+                <p>Learn how to build, ship, and run AI agents using Docker Compose. This workshop covers Docker's new AI features including Model Runner and MCP Gateway for creating intelligent agentic applications.</p>
+
+                <div class="info-box">
+                    <h4>🎯 What You'll Build</h4>
+                    <p>Agentic applications need three things: <strong>models</strong>, <strong>tools</strong>, and <strong>code</strong> that glues them together. This workshop walks through each component using Docker's latest AI capabilities.</p>
+                    <ul>
+                        <li><strong>🧠 Models:</strong> Docker Model Runner for local AI inference</li>
+                        <li><strong>🛠️ Tools:</strong> MCP (Model Context Protocol) Gateway for external tool integration</li>
+                        <li><strong>🧑‍💻 Code:</strong> Frameworks like LangGraph, CrewAI, Spring AI integration</li>
+                    </ul>
+                </div>
+
+                <div class="info-box warning">
+                    <h4>⚠️ Prerequisites</h4>
+                    <ul>
+                        <li>Docker Desktop 4.43.1+ (easiest) or Docker Engine 28.3+ with Compose 2.38.1+</li>
+                        <li>Docker Model Runner 0.1.32+</li>
+                        <li>Basic understanding of AI concepts (models, agents, tools)</li>
+                    </ul>
+                </div>
+
+                <div class="step" data-step="13">
+                    <div class="step-header">
+                        <div class="step-number">13</div>
+                        <div class="step-title">Verify Docker AI Prerequisites</div>
+                    </div>
+                    <p>First, ensure you have Docker's AI features properly installed and running.</p>
+                    <div class="code-block">docker model status</div>
+                    <div class="code-block">docker compose version</div>
+                    <div class="code-block">docker model list</div>
+                    <p>You should see Docker Model Runner is active and ready to run AI models locally.</p>
+                </div>
+
+                <div class="step" data-step="14">
+                    <div class="step-header">
+                        <div class="step-number">14</div>
+                        <div class="step-title">Clone the Agentic Compose Workshop</div>
+                    </div>
+                    <p>Get the workshop materials and explore the structure.</p>
+                    <div class="code-block">git clone https://github.com/ajeetraina/workshop-agentic-compose.git</div>
+                    <div class="code-block">cd workshop-agentic-compose</div>
+                    <div class="code-block">ls -la</div>
+                    <div class="code-block">cat compose.yaml</div>
+                </div>
+
+                <div class="step" data-step="15">
+                    <div class="step-header">
+                        <div class="step-number">15</div>
+                        <div class="step-title">Understanding Models - Docker Model Runner</div>
+                    </div>
+                    <p>Learn about running AI models locally with Docker Model Runner.</p>
+                    <p><strong>Pull a language model (this may take a while - ~2.9GB):</strong></p>
+                    <div class="code-block">docker model pull llama3.2:3b</div>
+                    <p><strong>Check model details:</strong></p>
+                    <div class="code-block">docker model inspect llama3.2:3b</div>
+                    <p><strong>Start the model server:</strong></p>
+                    <div class="code-block">docker model serve llama3.2:3b --port 11434</div>
+                    <div class="info-box success">
+                        <h4>🧠 About Docker Model Runner</h4>
+                        <p>Docker Model Runner provides a consistent way to run AI models locally, supporting various model formats and providing a unified API for inference across different model types.</p>
+                    </div>
+                </div>
+
+                <div class="step" data-step="16">
+                    <div class="step-header">
+                        <div class="step-number">16</div>
+                        <div class="step-title">Testing Model Inference</div>
+                    </div>
+                    <p>Test your local model with a simple inference request.</p>
+                    <p><strong>Test the model with a chat completion:</strong></p>
+                    <div class="code-block">curl -X POST http://localhost:11434/v1/chat/completions \
+                        -H "Content-Type: application/json" \
+                        -d '{
+                        "model": "llama3.2:3b",
+                        "messages": [
+                        {"role": "user", "content": "What is Docker and why is it useful?"}
+                        ]
+                        }'</div>
+                    <p><strong>Or test with a simpler endpoint:</strong></p>
+                    <div class="code-block">curl http://localhost:11434/api/generate \
+                        -d '{"model": "llama3.2:3b", "prompt": "Explain containerization briefly:"}'</div>
+                </div>
+
+                <div class="step" data-step="17">
+                    <div class="step-header">
+                        <div class="step-number">17</div>
+                        <div class="step-title">Setting Up MCP Gateway</div>
+                    </div>
+                    <p>Configure the Model Context Protocol Gateway for tool integration.</p>
+                    <div class="code-block">docker compose up mcp-gateway -d</div>
+                    <div class="code-block">docker compose ps mcp-gateway</div>
+                    <div class="code-block">curl http://localhost:3001/mcp/tools</div>
+                    <div class="info-box">
+                        <h4>🛠️ About MCP Gateway</h4>
+                        <p>The MCP Gateway provides a secure, standardized way for AI agents to connect to external tools and services. It acts as a bridge between your AI models and various APIs, databases, and other tools.</p>
+                    </div>
+                </div>
+
+                <div class="step" data-step="18">
+                    <div class="step-header">
+                        <div class="step-number">18</div>
+                        <div class="step-title">Compose Configuration for AI Services</div>
+                    </div>
+                    <p>Examine how to configure AI services in Docker Compose.</p>
+                    <div class="code-block"># View the complete compose configuration
+                        cat compose.yaml</div>
+                    <div class="code-block"># Start all services in the background
+                        docker compose up -d</div>
+                    <div class="code-block"># Monitor service startup
+                        docker compose logs -f</div>
+                    <div class="code-block"># Check all services are running
+                        docker compose ps</div>
+                    <p>Your compose file defines models, MCP tools, and application services working together.</p>
+                </div>
+
+                <div class="step" data-step="19">
+                    <div class="step-header">
+                        <div class="step-number">19</div>
+                        <div class="step-title">Building Your First AI Agent</div>
+                    </div>
+                    <p>Create a simple AI agent that uses both the model and MCP tools.</p>
+                    <div class="code-block"># Access the agent development environment
+                        docker compose exec agent-dev bash</div>
+                    <p>Inside the agent container, explore the code:</p>
+                    <div class="code-block"># View the agent code structure
+                        ls -la /app</div>
+                    <div class="code-block"># Look at the main agent script
+                        cat /app/simple_agent.py</div>
+                    <div class="code-block"># Run your first agent
+                        python /app/simple_agent.py</div>
+                </div>
+
+                <div class="step" data-step="20">
+                    <div class="step-header">
+                        <div class="step-number">20</div>
+                        <div class="step-title">Integrating Popular Frameworks</div>
+                    </div>
+                    <p>Learn how to integrate with popular agentic frameworks using Compose.</p>
+                    <div class="code-block"># Start LangGraph service
+                        docker compose up langgraph -d</div>
+                    <div class="code-block"># Start CrewAI service
+                        docker compose up crewai -d</div>
+                    <div class="code-block"># Test framework integration
+                        curl http://localhost:8001/langgraph/status</div>
+                    <div class="code-block"># View framework logs
+                        docker compose logs langgraph</div>
+                    <div class="info-box">
+                        <h4>🔗 Framework Integration</h4>
+                        <p>Docker Compose seamlessly integrates with popular frameworks:</p>
+                        <ul>
+                            <li><strong>LangGraph:</strong> For building stateful, multi-actor applications</li>
+                            <li><strong>CrewAI:</strong> For multi-agent collaboration</li>
+                            <li><strong>Spring AI:</strong> For Java-based AI applications</li>
+                            <li><strong>Vercel AI SDK:</strong> For TypeScript/JavaScript agents</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="step" data-step="21">
+                    <div class="step-header">
+                        <div class="step-number">21</div>
+                        <div class="step-title">Working with MCP Tools</div>
+                    </div>
+                    <p>Explore and use various MCP tools for extending agent capabilities.</p>
+                    <div class="code-block"># List available MCP tools
+                        docker run --rm docker/mcp-toolkit list</div>
+                    <div class="code-block"># Install a file system MCP tool
+                        docker run --rm docker/mcp-toolkit install filesystem</div>
+                    <div class="code-block"># Install a web search MCP tool
+                        docker run --rm docker/mcp-toolkit install web-search</div>
+                    <div class="code-block"># Test tool connectivity
+                        curl http://localhost:3001/mcp/tools/filesystem/status</div>
+                </div>
+
+                <div class="step" data-step="22">
+                    <div class="step-header">
+                        <div class="step-number">22</div>
+                        <div class="step-title">Agent with Tool Integration</div>
+                    </div>
+                    <p>Build an agent that uses multiple tools through the MCP Gateway.</p>
+                    <div class="code-block"># Run the advanced agent with tools
+                        docker compose exec agent-dev python /app/tool_agent.py</div>
+                    <div class="code-block"># Monitor tool usage in MCP Gateway
+                        docker compose logs mcp-gateway -f</div>
+                    <div class="code-block"># Test agent capabilities
+                        curl -X POST http://localhost:8002/agent/task \
+                        -H "Content-Type: application/json" \
+                        -d '{"task": "Search for Docker documentation and summarize key points"}'</div>
+                </div>
+
+                <div class="step" data-step="23">
+                    <div class="step-header">
+                        <div class="step-number">23</div>
+                        <div class="step-title">Production Deployment</div>
+                    </div>
+                    <p>Prepare your agentic application for production deployment.</p>
+                    <div class="code-block"># Build production images
+                        docker compose build --parallel</div>
+                    <div class="code-block"># Tag images for deployment
+                        docker tag workshop-agent:latest myregistry/workshop-agent:v1.0</div>
+                    <div class="code-block"># View production compose configuration
+                        cat compose.prod.yaml</div>
+                    <div class="code-block"># Deploy to production environment
+                        docker compose -f compose.prod.yaml up -d</div>
+                    <div class="info-box success">
+                        <h4>🚀 Production Ready</h4>
+                        <p>Your agentic application is now containerized and ready for deployment with proper scaling, monitoring, and security configurations.</p>
+                    </div>
+                </div>
+
+                <div class="step" data-step="24">
+                    <div class="step-header">
+                        <div class="step-number">24</div>
+                        <div class="step-title">Cleanup and Next Steps</div>
+                    </div>
+                    <p>Clean up resources and explore advanced topics.</p>
+                    <div class="code-block"># Stop all services
+                        docker compose down</div>
+                    <div class="code-block"># Remove downloaded models (optional)
+                        docker model rm llama3.2:3b</div>
+                    <div class="code-block"># Clean up unused images
+                        docker image prune -f</div>
+                    <div class="info-box">
+                        <h4>🎓 What's Next?</h4>
+                        <ul>
+                            <li>Explore the <a href="https://docs.docker.com/ai/" target="_blank">Docker AI documentation</a></li>
+                            <li>Check out the <a href="https://github.com/docker/compose-for-agents" target="_blank">Compose for Agents examples</a></li>
+                            <li>Try the <a href="https://docs.docker.com/ai/mcp-gateway/" target="_blank">MCP Gateway advanced features</a></li>
+                            <li>Build your own MCP tools and contribute to the ecosystem</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
@@ -667,17 +986,15 @@
                         <div class="step-title">Volume Management</div>
                     </div>
                     <p>Work with persistent data using volumes.</p>
-                    <div class="code-block" onclick="copyCode(this)"># Create a volume
-                        docker volume create my-data
-
-                        # Run container with volume
-                        docker run -it --rm -v my-data:/data ubuntu bash
-
-                        # Inside container:
-                        echo "Persistent data!" > /data/test.txt
-                        exit
-
-                        # Verify data persists
+                    <div class="code-block"># Create a volume
+                        docker volume create my-data</div>
+                    <div class="code-block"># Run container with volume
+                        docker run -it --rm -v my-data:/data ubuntu bash</div>
+                    <p>Inside container:</p>
+                    <div class="code-block">echo "Persistent data!" > /data/test.txt</div>
+                    <div class="code-block">exit</div>
+                    <p>Verify data persists:</p>
+                    <div class="code-block"># Verify data persists
                         docker run -it --rm -v my-data:/data ubuntu cat /data/test.txt</div>
                 </div>
 
@@ -687,16 +1004,13 @@
                         <div class="step-title">Debugging Containers</div>
                     </div>
                     <p>Learn debugging techniques for containerized applications.</p>
-                    <div class="code-block" onclick="copyCode(this)"># Inspect running containers
-                        docker inspect [container-name]
-
-                        # View resource usage
-                        docker stats [container-name]
-
-                        # Debug inside containers
-                        docker exec -it [container-name] sh
-
-                        # View container processes
+                    <div class="code-block"># Inspect running containers
+                        docker inspect [container-name]</div>
+                    <div class="code-block"># View resource usage
+                        docker stats [container-name]</div>
+                    <div class="code-block"># Debug inside containers
+                        docker exec -it [container-name] sh</div>
+                    <div class="code-block"># View container processes
                         docker top [container-name]</div>
                 </div>
             </div>
@@ -769,19 +1083,109 @@
         });
     });
 
-    // Code copying functionality
-    function copyCode(element) {
-        const text = element.textContent;
-        navigator.clipboard.writeText(text).then(() => {
-            const original = element.style.background;
-            element.style.background = '#e7f3ff';
-            element.style.borderColor = '#007bff';
+    // Enhanced copy functionality with better error handling
+    function copyText(text, element) {
+        // Try modern clipboard API first
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(() => {
+                showCopyStatus(element, 'success', '✅ Copied!');
+            }).catch((err) => {
+                console.log('Clipboard API failed:', err);
+                fallbackCopyTextToClipboard(text, element);
+            });
+        } else {
+            // Use fallback method
+            fallbackCopyTextToClipboard(text, element);
+        }
+    }
 
-            setTimeout(() => {
-                element.style.background = original;
-                element.style.borderColor = '';
-            }, 800);
-        });
+    function fallbackCopyTextToClipboard(text, element) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 2em;
+                height: 2em;
+                padding: 0;
+                border: none;
+                outline: none;
+                boxShadow: none;
+                background: transparent;
+                opacity: 0;
+            `;
+
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                showCopyStatus(element, 'success', '✅ Copied!');
+            } else {
+                showCopyStatus(element, 'error', '⚠️ Select manually & Ctrl+C');
+            }
+        } catch (err) {
+            console.error('Fallback copy failed:', err);
+            showCopyStatus(element, 'error', '⚠️ Select manually & Ctrl+C');
+        }
+
+        document.body.removeChild(textArea);
+    }
+
+    function selectCodeText(element) {
+        const codeBlock = element.closest('.code-block');
+        const selection = window.getSelection();
+        const range = document.createRange();
+
+        // Find the text content, excluding buttons
+        const textNode = Array.from(codeBlock.childNodes).find(node =>
+            node.nodeType === Node.TEXT_NODE ||
+            (node.nodeType === Node.ELEMENT_NODE && !node.classList.contains('copy-button') && !node.classList.contains('select-button') && !node.classList.contains('copy-status'))
+        );
+
+        if (textNode) {
+            range.selectNodeContents(textNode.nodeType === Node.TEXT_NODE ? codeBlock : textNode);
+        } else {
+            range.selectNodeContents(codeBlock);
+        }
+
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        // Visual feedback
+        codeBlock.classList.add('selected');
+        setTimeout(() => {
+            codeBlock.classList.remove('selected');
+        }, 2000);
+
+        showCopyStatus(codeBlock, 'success', '✅ Selected! Press Ctrl+C');
+    }
+
+    function showCopyStatus(element, type, message) {
+        // Remove any existing status
+        const existingStatus = element.querySelector('.copy-status');
+        if (existingStatus) {
+            existingStatus.remove();
+        }
+
+        const status = document.createElement('div');
+        status.className = `copy-status ${type}`;
+        status.textContent = message;
+        element.appendChild(status);
+
+        setTimeout(() => {
+            if (status.parentNode) {
+                status.style.opacity = '0';
+                setTimeout(() => {
+                    if (status.parentNode) {
+                        status.parentNode.removeChild(status);
+                    }
+                }, 300);
+            }
+        }, 2500);
     }
 
     // Progress tracking
@@ -864,8 +1268,94 @@
         embedVSCode();
     }
 
-    // Start checking for VS Code immediately
-    setTimeout(checkVSCode, 1000);
+    // Initialize enhanced copy functionality
+    function initializeCopyFunctionality() {
+        // Add copy and select buttons to all code blocks
+        document.querySelectorAll('.code-block').forEach(block => {
+            // Create copy button
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-button';
+            copyBtn.textContent = '📋 Copy';
+            copyBtn.title = 'Copy code to clipboard';
+            copyBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const text = block.textContent.replace(/📋 Copy|📝 Select/g, '').trim();
+                copyText(text, block);
+            });
+
+            // Create select button
+            const selectBtn = document.createElement('button');
+            selectBtn.className = 'select-button';
+            selectBtn.textContent = '📝 Select';
+            selectBtn.title = 'Select all text for manual copying';
+            selectBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                selectCodeText(selectBtn);
+            });
+
+            // Add buttons to code block
+            block.appendChild(copyBtn);
+            block.appendChild(selectBtn);
+
+            // Add keyboard accessibility
+            block.setAttribute('tabindex', '0');
+            block.setAttribute('role', 'region');
+            block.setAttribute('aria-label', 'Code block with copy and select options');
+
+            // Keyboard support
+            block.addEventListener('keydown', function(e) {
+                if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
+                    // Allow normal Ctrl+C when text is selected
+                    return;
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const text = block.textContent.replace(/📋 Copy|📝 Select/g, '').trim();
+                    copyText(text, block);
+                } else if (e.key === ' ') {
+                    e.preventDefault();
+                    selectCodeText(block);
+                }
+            });
+        });
+    }
+
+    // Test clipboard functionality on page load
+    async function testClipboard() {
+        if (navigator.clipboard) {
+            try {
+                // Try to request clipboard permission
+                await navigator.permissions.query({name: 'clipboard-write'});
+                console.log('Clipboard access available');
+            } catch (err) {
+                console.log('Clipboard permission check not supported, will try fallback');
+            }
+        } else if (!document.queryCommandSupported('copy')) {
+            console.warn('No clipboard functionality available - manual copy required');
+
+            // Show a notice to the user
+            const notice = document.createElement('div');
+            notice.innerHTML = `
+                    <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 10px; margin: 10px; border-radius: 6px; font-size: 14px;">
+                        <strong>📋 Clipboard Notice:</strong> Automatic copying may not work in your browser.
+                        Please manually select and copy code blocks using Ctrl+C (or Cmd+C on Mac).
+                    </div>
+                `;
+
+            const firstInfoBox = document.querySelector('.info-box');
+            if (firstInfoBox) {
+                firstInfoBox.parentNode.insertBefore(notice, firstInfoBox);
+            }
+        }
+    }
+
+    // Initialize everything when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        testClipboard();
+        initializeCopyFunctionality();
+
+        // Start checking for VS Code
+        setTimeout(checkVSCode, 1000);
+    });
 </script>
 </body>
 </html>
