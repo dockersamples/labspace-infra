@@ -1,5 +1,5 @@
 group "default" {
-  targets = [ "markdown-server", "setup", "workspace", "host-port-republisher", "workspace-cleaner" ]
+  targets = [ "interface", "configurator", "ide", "host-port-republisher", "labspace-cleaner" ]
 }
 
 target "_common" {
@@ -11,27 +11,27 @@ target "_common" {
   ]
 }
 
-target "markdown-server" {
+target "interface" {
   inherits = ["_common"]
-  context = "./support/markdown-server"
+  context = "./lab-interface"
   tags = [
-    "michaelirwin244/workshop-poc:markdown-server",
+    "michaelirwin244/labspace-interface",
   ]
 }
 
-target "setup" {
+target "configurator" {
   inherits = ["_common"]
   context = "./support/setup"
   tags = [
-    "michaelirwin244/workshop-poc:setup",
+    "michaelirwin244/labspace-configurator",
   ]
 }
 
-target "workspace" {
+target "ide" {
   inherits = ["_common"]
   context = "./support/workspace"
   tags = [
-    "michaelirwin244/workshop-poc:workspace",
+    "michaelirwin244/labspace-ide",
   ]
 }
 
@@ -39,14 +39,14 @@ target "host-port-republisher" {
   inherits = ["_common"]
   context = "./support/host-port-republisher"
   tags = [
-    "michaelirwin244/workshop-poc:host-port-republisher",
+    "michaelirwin244/labspace-host-port-republisher",
   ]
 }
 
-target "workspace-cleaner" {
+target "labspace-cleaner" {
   inherits = ["_common"]
   context = "./support/workspace-cleaner"
   tags = [
-    "michaelirwin244/workshop-poc:workspace-cleaner",
+    "michaelirwin244/labspace-cleaner",
   ]
 }
