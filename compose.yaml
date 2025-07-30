@@ -1,48 +1,36 @@
 services:
-  project-setup:
-    image: michaelirwin244/workshop-poc:setup
+  configurator:
+    image: michaelirwin244/labspace-configurator
     pull_policy: always
     volumes:
       - project:/project
     environment:
       PROJECT_CLONE_URL: https://github.com/mikesir87/workshop-poc-content
 
-  lab-interface:
-    image: nginx:alpine
-    container_name: lab-interface
+  interface:
+    image: michaelirwin244/labspace-interface
     ports:
-      - "8080:80"
-    volumes:
-      - ./lab-interface:/usr/share/nginx/html:ro
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - workspace
-      - instructions
-    restart: unless-stopped
-    labels:
-      - demo-setup=true
-
-  instructions:
-    image: michaelirwin244/workshop-poc:markdown-server
-    pull_policy: always
-    ports:
-      - 8000:3000
+      - "3030:3030"
     volumes:
       - project:/project
     environment:
-      ROOT_DIR: /project/docs
-      SITE_TITLE: Workshop POC
+      CONTENT_PATH: /project
     depends_on:
-      project-setup:
+      workspace:
+        condition: service_started
+      configurator:
         condition: service_completed_successfully
+    restart: unless-stopped
 
   workspace:
-    image: michaelirwin244/workshop-poc:workspace
+    image: michaelirwin244/labspace-ide
     pull_policy: always
     command: /home/coder/project
     depends_on:
-      project-setup:
+      configurator:
         condition: service_completed_successfully
+      socket-proxy:
+        condition: service_started
     ports:
       - 8085:8085 # For the IDE itself
       - 3000:3000 # For the application running in the IDE
@@ -50,15 +38,10 @@ services:
       TESTCONTAINERS_HOST_OVERRIDE: localhost
     volumes:
       - socket-proxy:/var/run
-      - type: volume
-        source: project
-        target: /home/coder/project
-        volume:
-          nocopy: true
-          subpath: workspace
+      - project:/home/coder/project
 
   host-forwarding:
-    image: michaelirwin244/workshop-poc:host-port-republisher
+    image: michaelirwin244/labspace-host-port-republisher
     pull_policy: always
     volumes:
       - socket-proxy:/var/run
@@ -70,7 +53,7 @@ services:
       - socket-proxy
 
   workspace-cleaner:
-    image: michaelirwin244/workshop-poc:workspace-cleaner
+    image: michaelirwin244/labspace-cleaner
     pull_policy: always
     volumes:
       - socket-proxy:/var/run
@@ -110,11 +93,11 @@ services:
 
           - type: addToNetwork
             networks:
-              - workshop-poc
+              - labspace
         gates:
           - type: mountSource
             allowedSources:
-              - project
+              - labspace-project
               - socket-proxy
               - buildx_buildkit_default_state
 
@@ -133,9 +116,9 @@ volumes:
   socket-proxy:
     name: socket-proxy
   project:
-    name: project
+    name: labspace-project
 
 networks:
-  workshop-poc:
-    name: workshop-poc
+  default:
+    name: labspace
 
