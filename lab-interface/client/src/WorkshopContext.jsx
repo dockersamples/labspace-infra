@@ -8,60 +8,6 @@ import {
 import { toast } from "react-toastify";
 import Spinner from "react-bootstrap/Spinner";
 
-const DEFAULT = {
-  activeSection: {
-    id: "getting-started",
-    title: "Getting Started",
-    description:
-      "This section covers the basics of Docker, including installation and setup.",
-    content:
-      "Welcome to the Getting Started section! \n\nHere, you'll learn how to **install Docker**, set up your _environment_, and run your first container. This is the foundation for everything else you'll do in this workshop.",
-  },
-  changeActiveSection: () => {},
-  workshop: {
-    title: "Demo Labspace",
-    subtitle: "Interactive hands-on Docker learning experience",
-    sections: [
-      {
-        id: "getting-started",
-        title: "Getting Started",
-        description:
-          "This section covers the basics of Docker, including installation and setup.",
-        content:
-          "Welcome to the Getting Started section! \n\nHere, you'll learn how to **install Docker**, set up your _environment_, and run your first container. This is the foundation for everything else you'll do in this workshop.",
-      },
-      {
-        id: "containers",
-        title: "Containers",
-        description:
-          "Learn about Docker containers, how to create and manage them.",
-      },
-      {
-        id: "images-builds",
-        title: "Images & Builds",
-        description: "Understand Docker images, how to build and manage them.",
-      },
-      {
-        id: "multi-container",
-        title: "Multi-Container",
-        description:
-          "Explore multi-container applications using Docker Compose.",
-      },
-      {
-        id: "agentic-compose",
-        title: "Agentic Compose",
-        description:
-          "Learn about advanced features in Docker Compose for complex applications.",
-      },
-      {
-        id: "advanced",
-        title: "Advanced",
-        description: "Dive into advanced Docker topics and best practices.",
-      },
-    ],
-  },
-};
-
 const WorkshopContext = createContext();
 
 export const WorkshopContextProvider = ({ children }) => {
