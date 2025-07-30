@@ -1,72 +1,54 @@
-const MOCK_CONTENT_1 = `
-# Welcome to the Labspace Demo!
-
-This is a demo Labspace to demonstrate how they work! You can use this space to explore the features of Labspace, including containers, images, builds, and multi-container setups.
-
-## Running your first container 
-To get started, you can run your first container. Labspace allows you to run containers directly from the interface, making it easy to test and develop applications in isolated environments.
-
-\`\`\`console
-docker run -d -p 8080:80 nginx
-\`\`\`
-`;
-
-const MOCK_CONTENT_2 = `
-# Images & Builds
-In this section, you'll learn about Docker images and how to build them. Docker images are the blueprints for your containers, and understanding how to create and manage them is crucial for effective containerization.
-## Building a Docker Image
-To build a Docker image, you can use the following command:
-\`\`\`console
-docker build -t my-image:latest .
-\`\`\`
-`;
+import { parse } from "yaml";
+import fs from "fs";
+import path from "path";
 
 export class WorkshopStore {
+  constructor() {
+    this.sections = [];
+  }
+
   async bootstrap() {
-    return new Promise((resolve) => setTimeout(resolve, 1000));
+    if (!process.env.CONTENT_PATH) {
+      throw new Error("CONTENT_PATH environment variable is not set");
+    }
+
+    const labspaceYaml = fs.readFileSync(path.join(process.env.CONTENT_PATH, "labspace.yaml"), "utf8");
+    this.config = parse(labspaceYaml);
+
+    this.config.sections = this.config.sections.map((section) => ({
+      ...section,
+      id: section.title.toLowerCase().replace(/\s+/g, "-"),
+    }));
   }
 
   getWorkshopDetails() {
     return {
-      title: "Demo Labspace",
-      subtitle: "This is a demo Labspace to demonstrate how they work!",
-      sections: [
-        {
-          id: "getting-started",
-          title: "Getting Started",
-        },
-        {
-          id: "containers",
-          title: "Containers",
-        },
-        {
-          id: "images-builds",
-          title: "Images & Builds",
-        },
-        {
-          id: "multi-container",
-          title: "Multi-Container",
-        },
-        {
-          id: "advanced",
-          title: "Advanced Builds",
-        },
-      ],
+      title: this.config.title,
+      subtitle: this.config.description,
+      sections: this.config.sections.map((section) => ({
+        id: section.id,
+        title: section.title,
+      })),
     };
   }
 
   getSectionDetails(sectionId) {
-    const section = this.getWorkshopDetails().sections.find(
+    const section = this.config.sections.find(
       (section) => section.id === sectionId,
     );
+
     if (!section) {
       return null;
     }
 
+    console.log("Section", section);
+    
+    const content = fs.readFileSync(path.join(process.env.CONTENT_PATH, section.contentPath), "utf8");
+
     return {
-      ...section,
-      content:
-        Math.round(Math.random()) === 0 ? MOCK_CONTENT_1 : MOCK_CONTENT_2,
+      id: section.id,
+      title: section.title,
+      content
     };
   }
 }

@@ -41,7 +41,7 @@ export const WorkshopContextProvider = ({ children }) => {
       .then((response) => response.json())
       .then((data) => {
         setWorkshop(data);
-        setActiveSection(data.sections[0]); // Set the first section as active by default
+        changeActiveSection(data.sections[0].id); // Set the first section as active by default
       })
       .catch((error) => {
         console.error("Error fetching workshop data:", error);
@@ -53,9 +53,9 @@ export const WorkshopContextProvider = ({ children }) => {
           },
         );
       });
-  }, []);
+  }, [changeActiveSection]);
 
-  if (!workshop) {
+  if (!workshop || !activeSection) {
     return (
       <div className="loading text-center mt-5 w-100">
         <Spinner />

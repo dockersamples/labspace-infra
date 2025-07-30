@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/index.js",
+    "dev": "cross-env CONTENT_PATH=./mock-content-repo nodemon src/index.js",
     "prettier": "prettier --write .",
     "prettier-check": "prettier --check ."
   },
@@ -14,9 +14,11 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "yaml": "^2.8.0"
   },
   "devDependencies": {
+    "cross-env": "^10.0.0",
     "nodemon": "^3.1.10",
     "prettier": "^3.6.2"
   }

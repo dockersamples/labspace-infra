@@ -1,0 +1,9 @@
+title: Demo Labspace
+description: >
+  This is a demo labspace for the workshop. It includes a simple API and a mock content repository.
+
+sections:
+  - title: Running your first container
+    contentPath: ./01-containers.md
+  - title: Starting a database
+    contentPath: ./02-databases.md
