@@ -11,17 +11,23 @@ export function WorkshopNav() {
       <div className="workshop-nav">
         <Dropdown align="end">
           <Dropdown.Toggle variant="secondary" size="sm">
-            {activeSection?.title || "Sections"}
+            {(activeSection && (
+              <>
+                {sections.findIndex((s) => s.id === activeSection.id) + 1}.{" "}
+                {activeSection.title}
+              </>
+            )) ||
+              "Sections"}
           </Dropdown.Toggle>
 
           <Dropdown.Menu>
-            {sections.map((section) => (
+            {sections.map((section, index) => (
               <Dropdown.Item
                 key={section.id}
                 active={activeSection?.id === section.id}
                 onClick={() => changeActiveSection(section.id)}
               >
-                {section.title}
+                {index + 1}. {section.title}
               </Dropdown.Item>
             ))}
           </Dropdown.Menu>

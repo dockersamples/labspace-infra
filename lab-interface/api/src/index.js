@@ -1,49 +1,45 @@
-import express from 'express';
+import express from "express";
+import { WorkshopStore } from "./workshopStore.js";
 
 const app = express();
 const PORT = process.env.PORT || 3030;
+
+const workshopStore = new WorkshopStore();
 
 app.use(express.json());
 app.use(express.static("public"));
 
 app.get("/api/labspace", (req, res) => {
-  res.json({
-    title: "Demo Labspace",
-    subtitle: "This is a demo Labspace to demonstrate how they work!",
-    sections: [
-      {
-        id: "getting-started",
-        title: "Getting Started",
-      },
-      {
-        id: "containers",
-        title: "Containers",
-      },
-      {
-        id: "images-builds",
-        title: "Images & Builds",
-      },
-      {
-        id: "multi-container",
-        title: "Multi-Container",
-      },
-      {
-        id: "advanced",
-        title: "Advanced Builds",
-      },
-    ]
+  res.json(workshopStore.getWorkshopDetails());
+});
+
+app.get("/api/sections/:sectionId", (req, res) => {
+  const sectionId = req.params.sectionId;
+  const content = workshopStore.getSectionDetails(sectionId);
+
+  if (content) {
+    res.json(content);
+  } else {
+    res.status(404).json({ error: "Section not found" });
+  }
+});
+
+let server;
+
+(async function () {
+  await workshopStore.bootstrap();
+  console.log("WorkshopStore bootstrapped");
+
+  server = app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
   });
-});
 
-const server = app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
-
-["SIGINT", "SIGTERM"].forEach((signal) => {
-  process.on(signal, () => {
-    server.close(() => {
-      console.log(`Server closed due to ${signal}`);
-      process.exit(0);
+  ["SIGINT", "SIGTERM"].forEach((signal) => {
+    process.on(signal, () => {
+      server.close(() => {
+        console.log(`Server closed due to ${signal}`);
+        process.exit(0);
+      });
     });
   });
-});
+})();

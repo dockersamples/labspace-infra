@@ -1,5 +1,12 @@
-import { useEffect } from "react";
-import { useContext, createContext, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useContext,
+  createContext,
+  useState,
+} from "react";
+import { toast } from "react-toastify";
+import Spinner from "react-bootstrap/Spinner";
 
 const DEFAULT = {
   activeSection: {
@@ -61,14 +68,27 @@ export const WorkshopContextProvider = ({ children }) => {
   const [workshop, setWorkshop] = useState(null);
   const [activeSection, setActiveSection] = useState(null);
 
-  const changeActiveSection = (sectionId) => {
-    const section = workshop.sections.find((s) => s.id === sectionId);
-    if (section) {
-      setActiveSection(section);
-    } else {
-      console.warn(`Section with id ${sectionId} not found.`);
-    }
-  };
+  const changeActiveSection = useCallback(
+    (sectionId) => {
+      fetch(`/api/sections/${sectionId}`)
+        .then((response) => {
+          if (!response.ok) throw new Error("Section not found");
+          return response.json();
+        })
+        .then((section) => {
+          setActiveSection(section);
+        })
+        .catch((error) => {
+          console.error("Error fetching section data:", error);
+          // Fallback to default section if fetch fails
+          setActiveSection({});
+          toast.error(
+            "Failed to load section details. Validate the Labspace is running and try again.",
+          );
+        });
+    },
+    [setActiveSection],
+  );
 
   useEffect(() => {
     fetch("/api/labspace")
@@ -79,15 +99,21 @@ export const WorkshopContextProvider = ({ children }) => {
       })
       .catch((error) => {
         console.error("Error fetching workshop data:", error);
-        setWorkshop(DEFAULT.workshop);
-        setActiveSection(DEFAULT.activeSection);
+        toast.error(
+          "Failed to load workshop data. Validate the Labspace is running and refresh the page.",
+          {
+            autoClose: false,
+            onClick: () => window.location.reload(),
+          },
+        );
       });
   }, []);
 
   if (!workshop) {
     return (
-      <div className="loading">
-        <p>Loading workshop data...</p>
+      <div className="loading text-center mt-5 w-100">
+        <Spinner />
+        <p>Loading Labspace data...</p>
       </div>
     );
   }
