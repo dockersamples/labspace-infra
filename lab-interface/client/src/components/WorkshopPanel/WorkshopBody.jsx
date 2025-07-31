@@ -1,7 +1,8 @@
 import { useActiveSection } from "../../WorkshopContext";
-import ReactMarkdown from "react-markdown";
+import { MarkdownHooks } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
+import rehypeMermaid from "rehype-mermaid";
 import { CodeBlock } from "./markdown/CodeBlock";
 
 export function WorkshopBody() {
@@ -9,15 +10,15 @@ export function WorkshopBody() {
 
   return (
     <div className="workshop-body p-5 pt-3 pb-3">
-      <ReactMarkdown
+      <MarkdownHooks
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeRaw]}
+        rehypePlugins={[rehypeRaw, rehypeMermaid]}
         components={{
           code: CodeBlock,
         }}
       >
         {activeSection.content}
-      </ReactMarkdown>
+      </MarkdownHooks>
     </div>
   );
 }

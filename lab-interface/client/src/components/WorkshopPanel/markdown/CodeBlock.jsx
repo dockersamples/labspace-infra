@@ -4,6 +4,8 @@ import Button from "react-bootstrap/Button";
 import copy from "copy-to-clipboard";
 import { useCallback, useEffect, useState } from "react";
 
+console.log("Supported languages:", SyntaxHighlighter.supportedLanguages);
+
 export function CodeBlock({ node, inline, className, children, ...props }) {
   const [copied, setCopied] = useState(false);
 
@@ -20,6 +22,8 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
   }, [copied]);
 
   const match = /language-(\w+)/.exec(className || "");
+  let language = match ? match[1] : "text";
+  if (language === "sh" || language === "console") language = "bash";
 
   if (!match || inline) {
     return (
@@ -33,7 +37,7 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
     <div className="position-relative">
       <SyntaxHighlighter
         style={darcula}
-        language={match[1]}
+        language={language}
         PreTag="div"
         {...props}
       >
