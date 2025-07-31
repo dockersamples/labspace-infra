@@ -23,8 +23,6 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
   let language = match ? match[1] : "text";
   if (language === "sh" || language === "console") language = "bash";
 
-  console.log(language, className, node, props);
-
   if (!match || inline) {
     return (
       <code className={className} {...props}>
