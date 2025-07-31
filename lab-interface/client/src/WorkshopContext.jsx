@@ -37,6 +37,11 @@ export const WorkshopContextProvider = ({ children }) => {
   );
 
   useEffect(() => {
+    if (!workshop) return;
+    document.title = `${workshop.title} ${activeSection ? `- ${activeSection.title}` : ""}`;
+  }, [workshop, activeSection]);
+
+  useEffect(() => {
     fetch("/api/labspace")
       .then((response) => response.json())
       .then((data) => {

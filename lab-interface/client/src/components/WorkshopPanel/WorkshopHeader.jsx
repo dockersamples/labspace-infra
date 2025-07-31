@@ -11,11 +11,11 @@ export function WorkshopHeader() {
     <div className="workshop-header p-4 bg-light border-bottom position-sticky top-0">
       <Container fluid="sm">
         <Row>
-          <Col xs={12} sm={8}>
+          <Col xs={12} sm={9}>
             <h1>{title}</h1>
             <div className="workshop-subtitle text-muted">{subtitle}</div>
           </Col>
-          <Col xs={12} sm={4}>
+          <Col xs={12} sm={3}>
             <WorkshopNav />
           </Col>
         </Row>

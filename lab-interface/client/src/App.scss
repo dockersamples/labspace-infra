@@ -39,6 +39,7 @@ h4 {
 
 h1 {
   font-size: 28px;
+  margin: 20px 0 10px 0;
 }
 h2 {
   font-size: 24px;
@@ -87,6 +88,16 @@ li {
   }
 }
 
-pre button.btn {
-  font-family: $font-family-sans-serif !important;
+div.code-block {
+  button.btn {
+    font-family: $font-family-sans-serif !important;
+  }
+
+  // Give enough space for the copy button
+  > div {
+    &:has(+ .copy-button-container),
+    &:has(~ .copy-button-container) {
+      padding-right: 6rem !important;
+    }
+  }
 }

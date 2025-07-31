@@ -9,7 +9,7 @@ function App() {
   return (
     <>
       <WorkshopContextProvider>
-        <PanelGroup direction="horizontal">
+        <PanelGroup direction="horizontal" autoSaveId="persistence">
           <Panel defaultSize={50} minSize={20} className="resizable-panel">
             <div className="overflow-auto position-relative">
               <WorkshopPanel />
