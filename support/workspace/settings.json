@@ -1,4 +1,4 @@
 {
     "remote.autoForwardPorts": false,
-    "workbench.startupEditor": "readme"
+    "security.workspace.trust.enabled": false
 }

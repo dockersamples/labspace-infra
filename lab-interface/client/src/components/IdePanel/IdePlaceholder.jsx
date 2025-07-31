@@ -9,9 +9,6 @@ export function IdePlaceholder({ onLaunch }) {
       </svg>
 
       <h3>VS Code Environment</h3>
-      <p>
-        <strong>Password to access the editor:</strong> <code>password</code>
-      </p>
 
       <div
         style={{
