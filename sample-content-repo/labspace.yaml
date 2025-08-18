@@ -1,0 +1,15 @@
+title: About Labspaces
+description: >
+  This Labspace is intended to help you learn about the capabilities of Labspaces and how you can use them for your own training setups.
+
+sections:
+  - title: What is a Labspace?
+    contentPath: ./01-what-is-a-labspace.md
+  - title: The Docker environment
+    contentPath: ./02-the-docker-environment.md
+  - title: Mimicking the host network
+    contentPath: ./03-networking.md
+  - title: The VS Code Extension
+    contentPath: ./04-the-vscode-extension.md
+  - title: Labspace Content
+    contentPath: ./05-labspace-content.md
