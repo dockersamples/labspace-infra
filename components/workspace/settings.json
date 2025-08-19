@@ -1,0 +1,4 @@
+{
+    "remote.autoForwardPorts": false,
+    "security.workspace.trust.enabled": false
+}

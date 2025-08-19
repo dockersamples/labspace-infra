@@ -10,29 +10,31 @@ The project uses a combination of containers to create an isolated environment.
 
 ```mermaid
 flowchart TD
-    subgraph VS Code Server
+    classDef containerNode fill:#2560FF,color:#fff
+
+    subgraph VSCodeServer[VS Code Server container]
         project@{ shape: odd, label: "/home/coder/project" }
         socket@{ shape: odd, label: "/var/run/docker.sock" }
-        localhostPorts[Localhost ports]
 
         subgraph Shared Network Namespace
-            localhostPorts["Localhost ports"]
-            socat["Socat processes"]
-            Forwarder[Port forwarder]
+            PortRepublisher[Port republisher container]:::containerNode
         end
     end
 
-    Setup[Project setup] -->|Clones and populates workshop repo| Volume@{ shape: cyl, label: "project\nvolume" }
-    Volume --> project
+    VSCodeServer:::containerNode
 
-    Volume --> Instructions[Workshop instructions]
+    Setup[Labspace configurator]:::containerNode -->|Clones content repo and puts it into| Volume@{ shape: cyl, label: "Labspace\ncontent volume" }
 
-    SocketVolume -->|Mounted into| Forwarder
-    Forwarder -->|Listens for published ports and starts|socat
-    socat <--> |Can connect to published ports via localhost| localhostPorts
+    Volume --> |Mounted into| Interface[Labspace interface container]:::containerNode
+    Volume --> |Mounted at| project
 
-    ProxyContainer[Socket Proxy] -->|Creates Docker API proxy and mutator| SocketVolume@{ shape: cyl, label: "Docker socket\nvolume" }
+    SocketVolume -->|Mounted into| PortRepublisher
+
+    HostProxy@{ shape: odd, label: "Host engine socket" } --> |Mounted into|ProxyContainer
+    ProxyContainer[Socket Proxy]:::containerNode -->|Stores proxy-enabled socket into| SocketVolume@{ shape: cyl, label: "Docker socket\nvolume" }
     SocketVolume -->|Mounted at| socket
+
+    SocketVolume -->|Mounted into| WorkspaceCleaner[Workspace cleaner]:::containerNode
 ```
 
 - **VS Code Server** - utilizes the [coder/code-server](https://github.com/coder/code-server) project to provide VS Code in a browser

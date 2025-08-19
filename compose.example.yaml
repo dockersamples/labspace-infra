@@ -1,78 +1,44 @@
 ##################################################################################################
-# This Compose file is intended to setup a development environment for the Labspace infrastructure,
-# NOT for the development of Labspace content.
+# This Compose file is intended to serve as an example of what you might want to publish if you
+# are making your own Labspace. It defines all of the necessary components.
 #
-# If you are trying to develop a Labspace, use the `compose.content-dev.yaml` file.
+# The only segment you should have to adjust is the PROJECT_CLONE_URL in the configurator service.
 ##################################################################################################
+
 services:
   configurator:
-    build: ./components/configurator
+    image: michaelirwin244/labspace-configurator
     volumes:
       - content:/project
       - support-vscode-extension:/etc/support-extension
     environment:
-      DEV_MODE: true
-    develop:
-      watch:
-        - path: ./components/configurator
-          action: rebuild
+      PROJECT_CLONE_URL: https://github.com/mikesir87/labspace-about-lapspaces
 
-  interface-api:
-    build:
-      context: ./components/interface
-      target: server-dev
+  interface:
+    image: michaelirwin244/labspace-interface
+    ports:
+      - "3030:3030"
     volumes:
-      - ./sample-content-repo:/project
+      - content:/project
       - type: volume
         source: support-vscode-extension
-        target: /etc/cmd-executor/private-key
+        target: /etc/support-extension/private-key
         volume:
           subpath: private-key
       - type: volume
         source: support-vscode-extension
-        target: /etc/cmd-executor/socket
+        target: /etc/support-extension/socket
         volume:
           subpath: socket
-    environment:
-      CONTENT_DEV_MODE: true
     depends_on:
       workspace:
         condition: service_started
       configurator:
         condition: service_completed_successfully
     restart: unless-stopped
-    develop:
-      watch:
-        - path: ./components/interface/api/src
-          action: sync
-          target: /usr/local/app/src
-        - path: ./components/interface/api/package-lock.json
-          action: rebuild
-
-  interface-client:
-    build:
-      context: ./components/interface
-      target: client-dev
-    ports:
-      - 5173:5173
-    develop:
-      watch:
-        - path: ./components/interface/client/src
-          action: sync
-          target: /usr/local/app/src
-        - path: ./components/interface/client/package-lock.json
-          action: rebuild
-
-  # This service is not running anything, but simply building the extension
-  # and allowing it to be an additional build context for the workspace service
-  vscode-extension:
-    build: ./components/support-vscode-extension
 
   workspace:
-    build: 
-      context: ./components/workspace
-      additional_contexts:
-        extension: service:vscode-extension
+    image: michaelirwin244/labspace-workspace
     depends_on:
       configurator:
         condition: service_completed_successfully
@@ -83,26 +49,22 @@ services:
       - 3000:3000 # For the Node application running in the IDE
     volumes:
       - socket-proxy:/var/run
-      - ./sample-content-repo:/home/coder/project
+      - content:/home/coder/project
       - type: volume
         source: support-vscode-extension
-        target: /etc/cmd-executor/public-key
+        target: /etc/support-extension/public-key
         volume:
           subpath: public-key
       - type: volume
         source: support-vscode-extension
-        target: /etc/cmd-executor/socket
+        target: /etc/support-extension/socket
         volume:
           subpath: socket
-    develop:
-      watch:
-        - path: ./components/workspace
-          action: rebuild
+
 
   host-republisher:
-    build:
-      context: ./components/host-port-republisher
-      target: dev
+    image: michaelirwin244/labspace-host-port-republisher
+    pull_policy: always
     volumes:
       - socket-proxy:/var/run
     network_mode: service:workspace
@@ -111,24 +73,16 @@ services:
     depends_on:
       - workspace
       - socket-proxy
-    develop:
-      watch:
-        - path: ./src
-          action: sync
-          target: /usr/local/app/src
 
   workspace-cleaner:
-    build: ./components/workspace-cleaner
+    image: michaelirwin244/labspace-cleaner
+    pull_policy: always
     volumes:
       - socket-proxy:/var/run
     environment:
       LABEL_FILTER: labspace-resource=true
     depends_on:
       - socket-proxy
-    develop:
-      watch:
-        - path: ./components/workspace-cleaner
-          action: rebuild
 
   socket-proxy:
     image: mikesir87/docker-socket-proxy
@@ -184,3 +138,4 @@ volumes:
 networks:
   default:
     name: labspace
+
