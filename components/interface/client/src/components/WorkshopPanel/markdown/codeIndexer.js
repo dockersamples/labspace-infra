@@ -9,10 +9,11 @@ export function remarkCodeIndexer() {
   return (tree) => {
     let i = 0;
     visit(tree, "code", (node) => {
+      const codeIndex = i++;
+      
       if (node.meta && node.meta.indexOf("no-run-button") > -1)
         return;
 
-      const codeIndex = i++;
       node.data = node.data || {};
       node.data.codeIndex = codeIndex;
       node.data.hProperties = {
