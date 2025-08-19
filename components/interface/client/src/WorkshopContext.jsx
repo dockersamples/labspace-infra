@@ -39,6 +39,7 @@ export const WorkshopContextProvider = ({ children }) => {
         return response.json();
       })
       .then((section) => {
+        toast.dismiss("section-load-error");
         setActiveSection(s => JSON.stringify(s) === JSON.stringify(section) ? s : section);
       })
       .catch((error) => {
@@ -47,6 +48,10 @@ export const WorkshopContextProvider = ({ children }) => {
         setActiveSection({});
         toast.error(
           "Failed to load section details. Validate the Labspace is running and try again.",
+          {
+            toastId: "section-load-error",
+            autoClose: false,
+          }
         );
       });
     }, [activeSectionId, setActiveSection, refreshCounter],
@@ -84,12 +89,16 @@ export const WorkshopContextProvider = ({ children }) => {
   useEffect(() => {
     fetch("/api/labspace")
       .then((response) => response.json())
-      .then((data) => setWorkshop(data))
+      .then((data) => {
+        setWorkshop(data);
+        toast.dismiss("workshop-load-error");
+      })
       .catch((error) => {
         console.error("Error fetching workshop data:", error);
         toast.error(
           "Failed to load workshop data. Validate the Labspace is running and refresh the page.",
           {
+            toastId: "workshop-load-error",
             autoClose: false,
             onClick: () => window.location.reload(),
           },
