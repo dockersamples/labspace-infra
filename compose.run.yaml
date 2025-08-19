@@ -1,8 +1,7 @@
 ##################################################################################################
-# This Compose file is intended to serve as an example of what you might want to publish if you
-# are making your own Labspace. It defines all of the necessary components.
+# This Compose file is intended to run a Labspace. It can be run with the following:
 #
-# The only segment you should have to adjust is the PROJECT_CLONE_URL in the configurator service.
+# CONTENT_REPO_URL=https://github.com/username/labspace-content-repo docker compose -f compose.run.yaml up
 ##################################################################################################
 
 services:
@@ -12,7 +11,7 @@ services:
       - content:/project
       - support-vscode-extension:/etc/support-extension
     environment:
-      PROJECT_CLONE_URL: https://github.com/mikesir87/labspace-about-lapspaces
+      PROJECT_CLONE_URL: ${CONTENT_REPO_URL}
 
   interface:
     image: michaelirwin244/labspace-interface
@@ -22,12 +21,12 @@ services:
       - content:/project
       - type: volume
         source: support-vscode-extension
-        target: /etc/support-extension/private-key
+        target: /etc/cmd-executor/private-key
         volume:
           subpath: private-key
       - type: volume
         source: support-vscode-extension
-        target: /etc/support-extension/socket
+        target: /etc/cmd-executor/socket
         volume:
           subpath: socket
     depends_on:
@@ -52,12 +51,12 @@ services:
       - content:/home/coder/project
       - type: volume
         source: support-vscode-extension
-        target: /etc/support-extension/public-key
+        target: /etc/cmd-executor/public-key
         volume:
           subpath: public-key
       - type: volume
         source: support-vscode-extension
-        target: /etc/support-extension/socket
+        target: /etc/cmd-executor/socket
         volume:
           subpath: socket
 
