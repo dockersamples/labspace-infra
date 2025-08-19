@@ -64,6 +64,7 @@ services:
   host-republisher:
     image: michaelirwin244/labspace-host-port-republisher
     pull_policy: always
+    restart: always
     volumes:
       - socket-proxy:/var/run
     network_mode: service:workspace
