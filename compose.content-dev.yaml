@@ -1,7 +1,7 @@
 ##################################################################################################
 # This Compose file is intended to be used in the development of Labspace content.
 #
-# Set $PATH_TO_CONTENT to point to the path of your Labspace content (e.g. ./content)
+# Set $CONTENT_PATH to point to the path of your Labspace content (e.g. ./content)
 ##################################################################################################
 
 services:
@@ -18,7 +18,7 @@ services:
     ports:
       - "3030:3030"
     volumes:
-      - ${PATH_TO_CONTENT}:/project
+      - ${CONTENT_PATH}:/project
       - type: volume
         source: support-vscode-extension
         target: /etc/cmd-executor/private-key
@@ -50,7 +50,7 @@ services:
       - 3000:3000 # For the Node application running in the IDE
     volumes:
       - socket-proxy:/var/run
-      - ${PATH_TO_CONTENT}:/home/coder/project
+      - ${CONTENT_PATH}:/home/coder/project
       - type: volume
         source: support-vscode-extension
         target: /etc/cmd-executor/public-key
@@ -96,7 +96,7 @@ services:
           # is running out of a volume.
           - type: mountPath
             from: /home/coder/project
-            to: labspace-content
+            to: ${CONTENT_PATH}
 
           # If requests to use the Docker Socket are used (such as Testcontainers),
           # use the proxied one to ensure permissions, remappings, etc. are applied
@@ -112,12 +112,13 @@ services:
           - type: addToNetwork
             networks:
               - labspace
-        gates:
-          - type: mountSource
-            allowedSources:
-              - labspace-content
-              - labspace-socket-proxy
-              - buildx_buildkit_default_state
+        # gates:
+        #   - type: mountSource
+        #     allowedSources:
+        #       - labspace-content
+        #       - labspace-socket-proxy
+        #       - buildx_buildkit_default_state
+        #       - ${CONTENT_PATH}
 
         responseFilters:
           # Only return objects with the labels we mutated on
