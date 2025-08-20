@@ -94,7 +94,7 @@ If you want to make a Labspace, follow these steps:
 
 1. Create a repo or folder that will store your Labspace
 
-2. Create a `labspace.yaml` that defines the Labspace. See the example at `[./sample-content-repo/labspace.yaml](./sample-content-repo/labspace.yaml)`.
+2. Create a `labspace.yaml` that defines the Labspace. See the example at [`./sample-content-repo/labspace.yaml`](./sample-content-repo/labspace.yaml).
 
 3. Start a Labspace in "dev mode". This will mount the content, rather than fetch it, and configure the interface to poll for content changes.
 
