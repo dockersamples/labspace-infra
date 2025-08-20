@@ -10,15 +10,19 @@ export function remarkCodeIndexer() {
     let i = 0;
     visit(tree, "code", (node) => {
       const codeIndex = i++;
-      
-      if (node.meta && node.meta.indexOf("no-run-button") > -1)
-        return;
+
+      const hideRunButton =
+        node.meta && node.meta.indexOf("no-run-button") > -1;
+      const hideCopyButton =
+        node.meta && node.meta.indexOf("no-copy-button") > -1;
 
       node.data = node.data || {};
       node.data.codeIndex = codeIndex;
       node.data.hProperties = {
         ...(node.data.hProperties || {}),
         "data-code-index": codeIndex,
+        "data-display-run-button": hideRunButton ? "false" : "true",
+        "data-display-copy-button": hideCopyButton ? "false" : "true",
       };
     });
   };
