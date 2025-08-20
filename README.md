@@ -52,10 +52,27 @@ flowchart TD
 - **Host Port Republisher** - this container runs in the same network namespace as the VS Code Server and watches for container start/stop events that have published ports. It then starts socat processes to allow the forwarding of localhost ports to the container.
     - Example: start a postgres container in the IDE terminal, publishing the port. With this, you can then connect to it using `psql -h localhost` without using host network mode (which isn't always available)
 
-## Known limitations
+### Content architecture
 
-- Running multiple instances will cause port conflicts
-- Volume names are currently hard-coded in the Compose file (for remapping/allowlisting of mount sources)
+The _content_ for a Labspace is sourced from a git repository.
+
+At the root of the repository is a `labspace.yaml` that defines the Labspace. The following is an example:
+
+```yaml
+title: Sample Labspace
+description: >
+  This Labspace is an example and this description would appear in the header under the title.
+
+sections:
+# - title: The name/title of the section. This will appear in the dropdowns and used to generate an "id" of the section (for navigation, etc.)
+#   contentPath: The path to the Markdown file, relative to the root of the repository
+  - title: Section number one
+    contentPath: ./path/to/section-one.md
+  - title: The second section
+    contentPath: ./section-two.md
+```
+
+The markdown files support all GitHub-flavored Markdown. Any `bash`, `sh`, or `console` code blocks will automatically be given a "Run" button to easily run the command in the VS Code editor.
 
 ## Development
 
@@ -92,3 +109,8 @@ If you want to make a Labspace, follow these steps:
 
 5. Write your content as you wish! You should see the changes reflected in the interface shortly after saving any file changes.
 
+
+## Known limitations
+
+- Running multiple Labspaces concurrently is not supported at this time on the same machine
+- Volume names are currently hard-coded in the Compose file (for remapping/allowlisting of mount sources)
