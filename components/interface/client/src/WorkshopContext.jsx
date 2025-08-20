@@ -16,15 +16,18 @@ export const WorkshopContextProvider = ({ children }) => {
   const [activeSectionId, setActiveSectionId] = useState(null);
   const [refreshCounter, setRefreshCounter] = useState(0);
 
-  const changeActiveSection = useCallback((sectionId) => {
-    console.log("Changing active section to:", sectionId);
-    setActiveSectionId(sectionId);
-  }, [setActiveSectionId]);
+  const changeActiveSection = useCallback(
+    (sectionId) => {
+      console.log("Changing active section to:", sectionId);
+      setActiveSectionId(sectionId);
+    },
+    [setActiveSectionId],
+  );
 
   useEffect(() => {
     if (!workshop) return;
     if (workshop.devMode) {
-      const interval = setInterval(() => setRefreshCounter(c => c + 1), 2000);
+      const interval = setInterval(() => setRefreshCounter((c) => c + 1), 2000);
       return () => clearInterval(interval);
     }
   }, [workshop, setRefreshCounter]);
@@ -40,7 +43,9 @@ export const WorkshopContextProvider = ({ children }) => {
       })
       .then((section) => {
         toast.dismiss("section-load-error");
-        setActiveSection(s => JSON.stringify(s) === JSON.stringify(section) ? s : section);
+        setActiveSection((s) =>
+          JSON.stringify(s) === JSON.stringify(section) ? s : section,
+        );
       })
       .catch((error) => {
         console.error("Error fetching section data:", error);
@@ -51,11 +56,10 @@ export const WorkshopContextProvider = ({ children }) => {
           {
             toastId: "section-load-error",
             autoClose: false,
-          }
+          },
         );
       });
-    }, [activeSectionId, setActiveSection, refreshCounter],
-  );
+  }, [activeSectionId, setActiveSection, refreshCounter]);
 
   const runCommand = useCallback(
     (codeBlockIndex) => {
@@ -107,7 +111,7 @@ export const WorkshopContextProvider = ({ children }) => {
   }, [changeActiveSection, refreshCounter]);
 
   useEffect(() => {
-    setActiveSectionId(id => id || workshop?.sections?.[0]?.id);
+    setActiveSectionId((id) => id || workshop?.sections?.[0]?.id);
   }, [workshop, setActiveSectionId]);
 
   if (!workshop || !activeSection) {

@@ -15,8 +15,13 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
   let language = match ? match[1] : "text";
   if (language === "sh" || language === "console") language = "bash";
 
+  // These properties are populated by the codeIndexer remark plugin
   const codeIndex = node.properties.dataCodeIndex;
-  const canRun = codeIndex !== undefined && language === "bash";
+  const canRun =
+    node.properties.dataDisplayRunButton === "true" && language === "bash";
+  const canCopy = node.properties.dataDisplayCopyButton === "true";
+
+  console.log("Node properties", node.properties, children, canRun, canCopy);
 
   const onCopyClick = useCallback(() => {
     copy(children);
@@ -67,14 +72,16 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
         {String(children).replace(/\n$/, "")}
       </SyntaxHighlighter>
       <div className="button-container pt-1 bg-light align-self-stretch d-flex align-items-center">
-        <Button
-          className="m-2"
-          variant="secondary"
-          size="sm"
-          onClick={onCopyClick}
-        >
-          {copied ? "Copied!" : "📋"}
-        </Button>
+        {canCopy && (
+          <Button
+            className="m-2"
+            variant="secondary"
+            size="sm"
+            onClick={onCopyClick}
+          >
+            {copied ? "Copied!" : "📋"}
+          </Button>
+        )}
         {canRun && (
           <Button
             className="m-2"
