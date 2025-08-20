@@ -21,8 +21,6 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
     node.properties.dataDisplayRunButton === "true" && language === "bash";
   const canCopy = node.properties.dataDisplayCopyButton === "true";
 
-  console.log("Node properties", node.properties, children, canRun, canCopy);
-
   const onCopyClick = useCallback(() => {
     copy(children);
     setCopied(true);

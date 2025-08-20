@@ -3,6 +3,7 @@ import { MarkdownHooks } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import rehypeMermaid from "rehype-mermaid";
+import { rehypeGithubAlerts } from "rehype-github-alerts";
 import { CodeBlock } from "./markdown/CodeBlock";
 import { remarkCodeIndexer } from "./markdown/codeIndexer";
 import { useEffect, useRef } from "react";
@@ -35,7 +36,7 @@ export function WorkshopBody() {
         <div className="workshop-body p-5 pt-3 pb-3">
           <MarkdownHooks
             remarkPlugins={[remarkGfm, remarkCodeIndexer]}
-            rehypePlugins={[rehypeRaw, rehypeMermaid]}
+            rehypePlugins={[rehypeRaw, rehypeMermaid, rehypeGithubAlerts]}
             components={{
               code: CodeBlock,
               a: ExternalLink,
