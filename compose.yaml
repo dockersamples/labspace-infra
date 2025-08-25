@@ -131,7 +131,7 @@ services:
           action: rebuild
 
   socket-proxy:
-    image: mikesir87/docker-socket-proxy
+    image: mikesir87/docker-socket-proxy:v1.0.0
     pull_policy: always
     volumes:
       - socket-proxy:/tmp/proxy
