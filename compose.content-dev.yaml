@@ -84,7 +84,7 @@ services:
       - socket-proxy
 
   socket-proxy:
-    image: mikesir87/docker-socket-proxy
+    image: mikesir87/docker-socket-proxy:v1.0.0
     volumes:
       - socket-proxy:/tmp/proxy
       - /var/run/docker.sock:/var/run/docker.sock
