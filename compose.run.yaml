@@ -120,6 +120,7 @@ services:
               - labspace-content
               - labspace-socket-proxy
               - buildx_buildkit_default_state
+              - label:labspace-resource=true
 
         responseFilters:
           # Only return objects with the labels we mutated on
