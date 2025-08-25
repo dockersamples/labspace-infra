@@ -28,7 +28,9 @@ RUN apt update && \
 
 USER 1000
 RUN code-server --install-extension orta.vscode-jest && \
-    code-server --install-extension ms-azuretools.vscode-docker
+    code-server --install-extension ms-azuretools.vscode-docker && \
+    code-server --install-extension github.vscode-github-actions && \
+    code-server --install-extension docker.docker
 RUN --mount=from=extension,target=/extension code-server --install-extension /extension/support-extension.vsix
 COPY --chown=1000:1000 ./config.yaml /home/coder/.config/code-server/config.yaml
 COPY --chown=1000:1000 ./settings.json /home/coder/.local/share/code-server/User/settings.json
