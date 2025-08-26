@@ -44,6 +44,9 @@ jobs:
       - name: Publish Compose files
         run: |
           export CONTENT_PATH="/placeholder"
+          
+          docker compose version
+
           if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
             echo "y" | docker compose -f compose.run.yaml publish ${DOCKERHUB_USERNAME}/labspace:dev --with-env -y
             echo "y" | docker compose -f compose.content-dev.yaml publish ${DOCKERHUB_USERNAME}/labspace-content-dev:dev --with-env -y
