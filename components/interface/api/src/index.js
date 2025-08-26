@@ -35,6 +35,11 @@ app.post("/api/sections/:sectionId/command", (req, res) => {
     });
 });
 
+// Send all unknown routes to the frontend to handle
+app.get("*splat", (req, res) =>
+  res.sendFile(path.resolve("public", "index.html")),
+);
+
 let server;
 
 (async function () {
