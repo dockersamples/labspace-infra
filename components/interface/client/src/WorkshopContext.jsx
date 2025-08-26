@@ -7,21 +7,28 @@ import {
 } from "react";
 import { toast } from "react-toastify";
 import Spinner from "react-bootstrap/Spinner";
+import { useNavigate, useParams } from "react-router";
 
 const WorkshopContext = createContext();
 
 export const WorkshopContextProvider = ({ children }) => {
+  const { sectionId } = useParams();
+  const navigate = useNavigate();
   const [workshop, setWorkshop] = useState(null);
   const [activeSection, setActiveSection] = useState(null);
-  const [activeSectionId, setActiveSectionId] = useState(null);
+  const [activeSectionId, setActiveSectionId] = useState(sectionId);
   const [refreshCounter, setRefreshCounter] = useState(0);
+
+  useEffect(() => {
+    setActiveSectionId(sectionId);
+  }, [sectionId]);
 
   const changeActiveSection = useCallback(
     (sectionId) => {
       console.log("Changing active section to:", sectionId);
-      setActiveSectionId(sectionId);
+      navigate(`/${sectionId}`);
     },
-    [setActiveSectionId],
+    [navigate],
   );
 
   useEffect(() => {
