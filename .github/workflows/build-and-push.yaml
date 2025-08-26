@@ -41,23 +41,26 @@ jobs:
         with:
           push: true
 
-      - name: Publish Compose files
-        run: |
-          export CONTENT_PATH="/placeholder"
+      # Keeping this commented until Compose allows `-y` to include bind mount validation.
+      # Update was included in https://github.com/docker/compose/pull/13151. Just waiting for release
+      # and update in GHA.
+      # - name: Publish Compose files
+      #   run: |
+      #     export CONTENT_PATH="/placeholder"
           
-          docker compose version
+      #     docker compose version
 
-          if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
-            echo "y" | docker compose -f compose.run.yaml publish ${DOCKERHUB_USERNAME}/labspace:dev --with-env -y
-            echo "y" | docker compose -f compose.content-dev.yaml publish ${DOCKERHUB_USERNAME}/labspace-content-dev:dev --with-env -y
-          else
-            TAG="${GITHUB_REF#refs/tags/}"
+      #     if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
+      #       echo "y" | docker compose -f compose.run.yaml publish ${DOCKERHUB_USERNAME}/labspace:dev --with-env -y
+      #       echo "y" | docker compose -f compose.content-dev.yaml publish ${DOCKERHUB_USERNAME}/labspace-content-dev:dev --with-env -y
+      #     else
+      #       TAG="${GITHUB_REF#refs/tags/}"
 
-            sed -i "s/:latest/:${TAG}/g" compose.run.yaml
-            sed -i "s/:latest/:${TAG}/g" compose.content-dev.yaml
+      #       sed -i "s/:latest/:${TAG}/g" compose.run.yaml
+      #       sed -i "s/:latest/:${TAG}/g" compose.content-dev.yaml
 
-            echo "y" | docker compose -f compose.run.yaml publish ${DOCKERHUB_USERNAME}/labspace:latest --with-env -y
-            echo "y" | docker compose -f compose.run.yaml publish ${DOCKERHUB_USERNAME}/labspace:${TAG} --with-env -y
-            echo "y" | docker compose -f compose.content-dev.yaml publish ${DOCKERHUB_USERNAME}/labspace-content-dev:latest --with-env -y
-            echo "y" | docker compose -f compose.content-dev.yaml publish ${DOCKERHUB_USERNAME}/labspace-content-dev:${TAG} --with-env -y
-          fi
+      #       echo "y" | docker compose -f compose.run.yaml publish ${DOCKERHUB_USERNAME}/labspace:latest --with-env -y
+      #       echo "y" | docker compose -f compose.run.yaml publish ${DOCKERHUB_USERNAME}/labspace:${TAG} --with-env -y
+      #       echo "y" | docker compose -f compose.content-dev.yaml publish ${DOCKERHUB_USERNAME}/labspace-content-dev:latest --with-env -y
+      #       echo "y" | docker compose -f compose.content-dev.yaml publish ${DOCKERHUB_USERNAME}/labspace-content-dev:${TAG} --with-env -y
+      #     fi
