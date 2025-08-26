@@ -1,3 +1,4 @@
+import path from "path";
 import express from "express";
 import { WorkshopStore } from "./workshopStore.js";
 
