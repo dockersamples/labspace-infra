@@ -100,10 +100,10 @@ If you want to make a Labspace, follow these steps:
 
     ```console
     # On Mac
-    CONTENT_PATH=$PWD docker compose -f oci://michaelirwin244/labspaces:dev up
+    CONTENT_PATH=$PWD docker compose -f oci://dockersamples/labspace-content-dev up
 
     # On Windows with PowerShell
-    $Env:CONTENT_PATH = (Get-Location).Path; docker compose -f oci://michaelirwin244/labspaces:dev up
+    $Env:CONTENT_PATH = (Get-Location).Path; docker compose -f oci://dockersamples/labspace-content-dev up
     ```
 4. Open http://localhost:3030 to open the interface
 

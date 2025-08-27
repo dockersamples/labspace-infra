@@ -6,7 +6,7 @@
 
 services:
   configurator:
-    image: michaelirwin244/labspace-configurator:latest
+    image: dockersamples/labspace-configurator:latest
     volumes:
       - content:/project
       - support-vscode-extension:/etc/support-extension
@@ -14,7 +14,7 @@ services:
       PROJECT_CLONE_URL: ${CONTENT_REPO_URL}
 
   interface:
-    image: michaelirwin244/labspace-interface:latest
+    image: dockersamples/labspace-interface:latest
     ports:
       - "3030:3030"
     volumes:
@@ -37,7 +37,7 @@ services:
     restart: unless-stopped
 
   workspace:
-    image: michaelirwin244/labspace-workspace:latest
+    image: dockersamples/labspace-workspace:latest
     depends_on:
       configurator:
         condition: service_completed_successfully
@@ -62,7 +62,7 @@ services:
 
 
   host-republisher:
-    image: michaelirwin244/labspace-host-port-republisher:latest
+    image: dockersamples/labspace-host-port-republisher:latest
     pull_policy: always
     restart: always
     volumes:
@@ -75,7 +75,7 @@ services:
       - socket-proxy
 
   workspace-cleaner:
-    image: michaelirwin244/labspace-cleaner:latest
+    image: dockersamples/labspace-cleaner:latest
     pull_policy: always
     volumes:
       - socket-proxy:/var/run

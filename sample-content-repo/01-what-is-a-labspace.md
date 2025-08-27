@@ -22,7 +22,7 @@ The following Compose snippet shows how the content is merely an environment var
 ```yaml
 services:
   configurator:
-    image: michaelirwin244/labspace-configurator
+    image: dockersamples/labspace-configurator
     volumes:
       - project:/project
     environment:
