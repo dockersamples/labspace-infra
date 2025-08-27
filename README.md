@@ -4,6 +4,34 @@ This repository provides the infrastructure and components required to run Labsp
 
 ![Screenshot of the project opened in the browser using VS Code server](./screenshot.png)
 
+## Try it out
+
+To try out a Labspace, run the following command and then open your browser to [localhost:3030](http://localhost:3030):
+
+### Starting for Mac users
+
+Open a terminal and run the following command:
+
+```bash
+export CONTENT_REPO_URL=https://github.com/mikesir87/labspace-docker-overview 
+docker compose -f oci://dockersamples/labspace up -y
+```
+
+### Starting for Windows users
+
+Open a PowerShell and run the following command:
+
+```powershell
+$Env:CONTENT_REPO_URL = "https://github.com/mikesir87/labspace-docker-overview"
+docker compose -f oci://dockersamples/labspace up -y
+```
+
+### Viewing the Labspace
+
+Once the containers have started, open your browser to http://localhost:3030 and you’ll see the Labspace!
+
+
+
 ## Architecture
 
 A Labspace can be thought of as two types of materials coming together: **infrastructure** and **content**.
