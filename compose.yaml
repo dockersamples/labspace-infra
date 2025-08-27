@@ -131,7 +131,7 @@ services:
           action: rebuild
 
   socket-proxy:
-    image: mikesir87/docker-socket-proxy:v1.0.0
+    image: mikesir87/docker-socket-proxy:v1.1.0
     pull_policy: always
     volumes:
       - socket-proxy:/tmp/proxy
@@ -171,6 +171,10 @@ services:
         responseFilters:
           # Only return objects with the labels we mutated on
           - type: labelFilter
+            objectsToFilter:
+              - containers
+              - volumes
+              - networks
             requiredLabels:
               labspace-resource: "true"
       LISTEN_SOCKET_PATH: /tmp/proxy/docker.sock
