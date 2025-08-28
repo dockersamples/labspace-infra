@@ -29,6 +29,18 @@ $font-size-base: 0.875rem;
 
 @import "rehype-github-alerts/styling/css/index.css";
 
+@font-face {
+  font-family: "Material Symbols Outlined";
+  font-style: normal;
+  src: url(/material-symbols.woff2) format("woff");
+}
+
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-size: 1.5em;
+  font-weight: 400;
+}
+
 h1,
 h2,
 h3,
