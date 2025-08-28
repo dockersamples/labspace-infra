@@ -72,20 +72,10 @@ export class WorkshopStore {
   executeCommand(sectionId, codeBlockIndex) {
     const { content } = this.getSectionDetails(sectionId);
 
-    const codeBlocks = content.match(/```(.*?)```/gs);
-    if (!codeBlocks || codeBlocks[codeBlockIndex] === undefined) {
-      throw new Error(
-        `Code block at index ${codeBlockIndex} not found in section ${sectionId}`,
-      );
-    }
+    const { code } = this.#getCodeBlock(content, codeBlockIndex);
 
-    const command = codeBlocks[codeBlockIndex]
-      .split("\n")
-      .slice(1, -1)
-      .join("\n")
-      .trim();
     const payload = {
-      cmd: command,
+      cmd: code,
       aud: "cmd-executor",
       exp: Math.floor(Date.now() / 1000) + 15, // 15 seconds
       iat: Math.floor(Date.now() / 1000),
@@ -109,5 +99,45 @@ export class WorkshopStore {
       if (!res.ok)
         throw new Error(`Failed to execute command: ${res.statusText}`);
     });
+  }
+
+  async saveFile(sectionId, codeBlockIndex) {
+    const { content } = this.getSectionDetails(sectionId);
+
+    const codeBlock = this.#getCodeBlock(content, codeBlockIndex);
+    const fileName = codeBlock.meta["save-as"];
+    if (!fileName) {
+      throw new Error("Code block is missing 'save-as' metadata");
+    }
+
+    const filePath = path.join("/project", fileName);
+    fs.writeFileSync(filePath, codeBlock.code, "utf8");
+  }
+
+  #getCodeBlock(content, index) {
+    const codeBlocks = content.match(/```(.*?)```/gs);
+    if (!codeBlocks || codeBlocks[index] === undefined) {
+      throw new Error(
+        `Code block at index ${index} not found in section ${sectionId}`,
+      );
+    }
+
+    const codeRows = codeBlocks[index].split("\n");
+    const headerRow = codeRows.shift().substring(3);
+    codeRows.pop(); // remove the closing ```
+
+    const [language, ...metaInfo] = headerRow.split(" ");
+
+    const meta = metaInfo.reduce((acc, cur) => {
+      const [key, value] = cur.split("=");
+      acc[key.trim()] = value ? value : "true";
+      return acc;
+    }, {});
+
+    return {
+      language,
+      code: codeRows.join("\n").trim(),
+      meta,
+    };
   }
 }

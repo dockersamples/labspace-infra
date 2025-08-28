@@ -92,6 +92,30 @@ export const WorkshopContextProvider = ({ children }) => {
     [activeSection],
   );
 
+  const saveFileCommand = useCallback(
+    (codeBlockIndex) => {
+      return fetch(`/api/sections/${activeSection.id}/save-file`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ codeBlockIndex }),
+      })
+        .then((response) => {
+          if (!response.ok) throw new Error("Failed to save file");
+          return response.json();
+        })
+        .then((result) => {
+          console.log("Save file result:", result);
+        })
+        .catch((error) => {
+          console.error("Error saving file:", error);
+          toast.error("Failed to save file. Please try again.");
+        });
+    },
+    [activeSection],
+  );
+
   useEffect(() => {
     if (!workshop) return;
     document.title = `${workshop.title} ${activeSection ? `- ${activeSection.title}` : ""}`;
@@ -132,7 +156,13 @@ export const WorkshopContextProvider = ({ children }) => {
 
   return (
     <WorkshopContext.Provider
-      value={{ workshop, activeSection, changeActiveSection, runCommand }}
+      value={{
+        workshop,
+        activeSection,
+        changeActiveSection,
+        runCommand,
+        saveFileCommand,
+      }}
     >
       {children}
     </WorkshopContext.Provider>
@@ -149,4 +179,9 @@ export const useActiveSection = () => {
 export const useRunCommand = () => {
   const { runCommand } = useContext(WorkshopContext);
   return runCommand;
+};
+
+export const useSaveFileCommand = () => {
+  const { saveFileCommand } = useContext(WorkshopContext);
+  return saveFileCommand;
 };
