@@ -87,9 +87,14 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
             size="sm"
             onClick={onCopyClick}
           >
-            {copied ? "Copied!" : "📋"}
+            {copied ? (
+              "Copied!"
+            ) : (
+              <span className="material-symbols-outlined">content_copy</span>
+            )}
           </Button>
         )}
+
         {canRun && (
           <Button
             className="m-2"
@@ -97,9 +102,16 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
             size="sm"
             onClick={onRunClick}
           >
-            {running ? "Running" : errorRunning ? "❌ Error" : "▶️"}
+            {running ? (
+              "Running"
+            ) : errorRunning ? (
+              "❌ Error"
+            ) : (
+              <span className="material-symbols-outlined">terminal</span>
+            )}
           </Button>
         )}
+
         {canSaveAsFile && (
           <Button
             className="m-2"
@@ -107,7 +119,11 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
             size="sm"
             onClick={onSaveAsClick}
           >
-            {saving ? "Saving..." : "💾"}
+            {saving ? (
+              "Saving..."
+            ) : (
+              <span className="material-symbols-outlined">save</span>
+            )}
           </Button>
         )}
       </div>

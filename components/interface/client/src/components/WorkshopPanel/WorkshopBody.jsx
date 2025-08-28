@@ -8,6 +8,7 @@ import { CodeBlock } from "./markdown/CodeBlock";
 import { remarkCodeIndexer } from "./markdown/codeIndexer";
 import { useEffect, useRef } from "react";
 import { ExternalLink } from "./markdown/ExternalLink";
+import Button from "react-bootstrap/Button";
 
 export function WorkshopBody() {
   const bodyRef = useRef();
@@ -48,22 +49,26 @@ export function WorkshopBody() {
         <div className="workshop-footer d-flex justify-content-between p-3 border-top">
           <div>
             {hasPrev && (
-              <button
-                className="btn btn-secondary"
+              <Button
+                variant="secondary"
                 onClick={() => changeActiveSection(sections[index - 1].id)}
+                className="d-flex align-items-center"
               >
-                &larr; Previous
-              </button>
+                <span className="material-symbols-outlined me-1">arrow_back</span>
+                <span>Previous</span>
+              </Button>
             )}
           </div>
           <div>
             {hasNext && (
-              <button
-                className="btn btn-primary"
+              <Button
+                variant="primary"
                 onClick={() => changeActiveSection(sections[index + 1].id)}
+                className="d-flex align-items-center"
               >
-                Next &rarr;
-              </button>
+                <span className="me-1">Next</span>
+                <span className="material-symbols-outlined">arrow_forward</span>
+              </Button>
             )}
           </div>
         </div>
