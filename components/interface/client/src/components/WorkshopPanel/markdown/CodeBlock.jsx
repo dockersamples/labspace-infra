@@ -3,12 +3,14 @@ import { darcula } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import Button from "react-bootstrap/Button";
 import copy from "copy-to-clipboard";
 import { useCallback, useEffect, useState } from "react";
-import { useRunCommand } from "../../../WorkshopContext";
+import { useRunCommand, useSaveFileCommand } from "../../../WorkshopContext";
 
 export function CodeBlock({ node, inline, className, children, ...props }) {
   const runCommand = useRunCommand();
+  const saveFileCommand = useSaveFileCommand();
   const [copied, setCopied] = useState(false);
   const [running, setRunning] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [errorRunning, setErrorRunning] = useState(false);
 
   const match = /language-(\w+)/.exec(className || "");
@@ -20,6 +22,7 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
   const canRun =
     node.properties.dataDisplayRunButton === "true" && language === "bash";
   const canCopy = node.properties.dataDisplayCopyButton === "true";
+  const canSaveAsFile = node.properties.dataDisplaySaveAsButton === "true";
 
   const onCopyClick = useCallback(() => {
     copy(children);
@@ -32,6 +35,13 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
       .catch(() => setErrorRunning(true))
       .finally(() => setRunning(false));
   }, [setRunning, setErrorRunning, codeIndex]);
+
+  const onSaveAsClick = useCallback(() => {
+    setSaving(true);
+    saveFileCommand(codeIndex)
+      .catch(() => setErrorRunning(true))
+      .finally(() => setSaving(false));
+  }, [setSaving, codeIndex]);
 
   useEffect(() => {
     if (copied) {
@@ -88,6 +98,16 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
             onClick={onRunClick}
           >
             {running ? "Running" : errorRunning ? "❌ Error" : "▶️"}
+          </Button>
+        )}
+        {canSaveAsFile && (
+          <Button
+            className="m-2"
+            variant="secondary"
+            size="sm"
+            onClick={onSaveAsClick}
+          >
+            {saving ? "Saving..." : "💾"}
           </Button>
         )}
       </div>

@@ -11,19 +11,27 @@ export function remarkCodeIndexer() {
     visit(tree, "code", (node) => {
       const codeIndex = i++;
 
-      const hideRunButton =
-        node.meta && node.meta.indexOf("no-run-button") > -1;
-      const hideCopyButton =
-        node.meta && node.meta.indexOf("no-copy-button") > -1;
-
       node.data = node.data || {};
       node.data.codeIndex = codeIndex;
       node.data.hProperties = {
         ...(node.data.hProperties || {}),
         "data-code-index": codeIndex,
-        "data-display-run-button": hideRunButton ? "false" : "true",
-        "data-display-copy-button": hideCopyButton ? "false" : "true",
       };
+
+      const codeBlockMeta = (node.meta || "").split(/\s+/);
+
+      node.data.hProperties["data-display-run-button"] = codeBlockMeta.includes(
+        "no-run-button",
+      )
+        ? "false"
+        : "true";
+      node.data.hProperties["data-display-copy-button"] =
+        codeBlockMeta.includes("no-copy-button") ? "false" : "true";
+      node.data.hProperties["data-display-save-as-button"] = codeBlockMeta.find(
+        (m) => m.startsWith("save-as"),
+      )
+        ? "true"
+        : "false";
     });
   };
 }

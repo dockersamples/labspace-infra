@@ -36,6 +36,17 @@ app.post("/api/sections/:sectionId/command", (req, res) => {
     });
 });
 
+app.post("/api/sections/:sectionId/save-file", (req, res) => {
+  const { codeBlockIndex } = req.body;
+  workshopStore
+    .saveFile(req.params.sectionId, codeBlockIndex)
+    .then(() => res.json({ success: true, message: "File saved" }))
+    .catch((error) => {
+      console.error("Error saving file:", error);
+      res.status(500).json({ error: "Failed to save file" });
+    });
+});
+
 // Send all unknown routes to the frontend to handle
 app.get("*splat", (req, res) =>
   res.sendFile(path.resolve("public", "index.html")),
