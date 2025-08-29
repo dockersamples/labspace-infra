@@ -8,7 +8,7 @@ export function WorkshopHeader() {
   const { title, subtitle } = useWorkshop();
 
   return (
-    <div className="workshop-header p-4 bg-light border-bottom">
+    <div className="workshop-header p-4 bg-light-subtle border-bottom">
       <Container fluid="sm">
         <Row>
           <Col xs={12} sm={9}>

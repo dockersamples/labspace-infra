@@ -79,7 +79,7 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
       >
         {String(children).replace(/\n$/, "")}
       </SyntaxHighlighter>
-      <div className="button-container pt-1 bg-light align-self-stretch d-flex align-items-center">
+      <div className="button-container pt-1  bg-light-subtle align-self-stretch d-flex align-items-center">
         {canCopy && (
           <Button
             className="m-2"
