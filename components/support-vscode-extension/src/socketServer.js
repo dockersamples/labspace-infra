@@ -39,7 +39,7 @@ class SocketServer {
                     throw new Error('command rejected by allowedCommandPattern');
                 }
 
-                const term = await this.#ensureTerminal(payload.cwd);
+                const term = await this.#ensureTerminal(payload.cwd, payload.terminalId);
                 term.sendText(cmd, true);
                 res.json({ ok: true, ran: cmd });
             } catch (err) {
@@ -66,24 +66,29 @@ class SocketServer {
         try { if (fs.existsSync(this.cfg.socketPath)) fs.unlinkSync(this.cfg.socketPath); } catch {}
     }
 
-    async #ensureTerminal(cwd) {
+    async #ensureTerminal(cwd, requestedTerminalName = null) {
+        if (requestedTerminalName) {
+            const existing = vscode.window.terminals.find(t => t.name === requestedTerminalName);
+            if (existing) {
+                existing.show(true);
+                if (cwd) existing.sendText(`cd ${this.#escapePath(cwd)}`, true);
+                return existing;
+            }
+
+            const term = vscode.window.createTerminal({ name: requestedTerminalName, cwd });
+            this.term = term;
+            term.show(true);
+            return term;
+        }
+
         if (vscode.window.activeTerminal) {
             return vscode.window.activeTerminal;
         }
 
-        if (this.cfg.runInExistingTerminal) {
-            const existing = vscode.window.terminals.find(t => t.name === this.cfg.terminalName);
-            if (existing) {
-                this.term = existing;
-                if (cwd) this.term.sendText(`cd ${this.#escapePath(cwd)}`, true);
-                return this.term;
-            }
-        }
         const term = vscode.window.createTerminal({ name: this.cfg.terminalName, cwd });
         this.term = term;
         term.show(true);
-        if (this.cleanupTimer) clearTimeout(this.cleanupTimer);
-        this.cleanupTimer = setTimeout(() => this.#gcTerminals(), 3600000);
+
         return term;
     }
 
