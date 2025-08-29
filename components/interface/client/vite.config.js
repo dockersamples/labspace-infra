@@ -16,6 +16,13 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      "/images": {
+        target: inContainer
+          ? "http://interface-api:3030"
+          : "http://localhost:3030",
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 });
