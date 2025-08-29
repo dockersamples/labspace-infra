@@ -9,6 +9,9 @@ import { remarkCodeIndexer } from "./markdown/codeIndexer";
 import { useEffect, useRef } from "react";
 import { ExternalLink } from "./markdown/ExternalLink";
 import Button from "react-bootstrap/Button";
+import Image from "react-bootstrap/Image";
+import { RenderedImage } from "./markdown/RenderedImage";
+import { RenderedSvg } from "./markdown/RenderedSvg";
 
 export function WorkshopBody() {
   const bodyRef = useRef();
@@ -41,6 +44,8 @@ export function WorkshopBody() {
             components={{
               code: CodeBlock,
               a: ExternalLink,
+              img: RenderedImage,
+              svg: RenderedSvg,
             }}
           >
             {activeSection.content}

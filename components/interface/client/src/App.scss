@@ -99,7 +99,7 @@ li {
   outline: none;
 
   &:hover {
-    background-color: #aaa;
+    background-color: var(--bs-dark-bg-subtle);
   }
 
   svg {

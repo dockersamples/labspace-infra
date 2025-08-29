@@ -47,6 +47,8 @@ app.post("/api/sections/:sectionId/save-file", (req, res) => {
     });
 });
 
+app.use(express.static("/project"));
+
 // Send all unknown routes to the frontend to handle
 app.get("*splat", (req, res) =>
   res.sendFile(path.resolve("public", "index.html")),
