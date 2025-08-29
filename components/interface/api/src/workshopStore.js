@@ -72,7 +72,7 @@ export class WorkshopStore {
   executeCommand(sectionId, codeBlockIndex) {
     const { content } = this.getSectionDetails(sectionId);
 
-    const { code } = this.#getCodeBlock(content, codeBlockIndex);
+    const { code, meta } = this.#getCodeBlock(content, codeBlockIndex);
 
     const payload = {
       cmd: code,
@@ -81,6 +81,10 @@ export class WorkshopStore {
       iat: Math.floor(Date.now() / 1000),
       jti: crypto.randomUUID(),
     };
+
+    if (meta["terminal-id"]) {
+      payload.terminalId = meta["terminal-id"];
+    }
 
     const token = jwt.sign(payload, this.signingKey, { algorithm: "ES256" });
 
