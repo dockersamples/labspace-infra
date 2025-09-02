@@ -20,7 +20,8 @@ group "default" {
     "interface", 
     "workspace", 
     "host-port-republisher", 
-    "labspace-cleaner" 
+    "labspace-cleaner",
+    "launcher"
   ]
 }
 
@@ -81,4 +82,10 @@ target "labspace-cleaner" {
   inherits = ["_common"]
   context = "./components/workspace-cleaner"
   tags = tags(IMAGE_NAMESPACE, "labspace-cleaner", IMAGE_TAG)
+}
+
+target "launcher" {
+  inherits = ["_common"]
+  context = "./components/launcher"
+  tags = tags(IMAGE_NAMESPACE, "labspace-launcher", IMAGE_TAG)
 }
