@@ -1,0 +1,56 @@
+// Colors defined by brand guidelines
+// Beyond blue, each is the 700 variant of the color
+$blue: #2560ff;
+$purple: #5700bb;
+$red: #e40c2c;
+$orange: #da5c00;
+$yellow: #eb9c00;
+$green: #2d9568;
+$teal: #2c9ea0;
+
+$gray-100: #e7eaef !default;
+$gray-200: #c8cfda !default;
+$gray-300: #a9b4c6 !default;
+$gray-400: #8b99b2 !default;
+$gray-500: #6c7e9d !default;
+$gray-600: #566581 !default;
+$gray-700: #434c5f !default;
+$gray-800: #2c333f !default;
+$gray-900: #1e2129 !default;
+$black: #0f121b !default;
+
+$font-family-sans-serif: Inter, Helvetica, Arial, sans-serif;
+$font-family-monospace: "Roboto Mono", "Courier New", Courier, monospace;
+$font-size-base: 0.875rem;
+
+$light-bg-subtle-dark: $gray-800;
+
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/bootstrap";
+
+@font-face {
+  font-family: "Material Symbols Outlined";
+  font-style: normal;
+  src: url(/material-symbols.woff2) format("woff");
+}
+
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-size: 1.5em;
+  font-weight: 400;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 700;
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+li {
+  margin-bottom: 8px;
+  line-height: 1.5;
+}

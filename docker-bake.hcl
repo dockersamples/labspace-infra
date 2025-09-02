@@ -21,7 +21,8 @@ group "default" {
     "workspace", 
     "host-port-republisher", 
     "labspace-cleaner",
-    "launcher"
+    "launcher",
+    "dd-extension",
   ]
 }
 
@@ -88,4 +89,10 @@ target "launcher" {
   inherits = ["_common"]
   context = "./components/launcher"
   tags = tags(IMAGE_NAMESPACE, "labspace-launcher", IMAGE_TAG)
+}
+
+target "dd-extension" {
+  inherits = ["_common"]
+  context = "./dd-extension"
+  tags = tags(IMAGE_NAMESPACE, "labspace-extension", IMAGE_TAG)
 }
