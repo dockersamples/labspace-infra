@@ -115,6 +115,7 @@ export class WorkshopStore {
     }
 
     const filePath = path.join("/project", fileName);
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.writeFileSync(filePath, codeBlock.code, "utf8");
   }
 
