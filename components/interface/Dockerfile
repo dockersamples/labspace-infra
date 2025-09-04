@@ -37,4 +37,5 @@ COPY api/src ./src
 COPY --from=client-build /usr/local/app/dist ./public
 
 EXPOSE 3000
+USER 1000
 CMD ["node", "src/index.js"]
