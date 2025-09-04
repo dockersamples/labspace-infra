@@ -1,4 +1,4 @@
-FROM codercom/code-server
+FROM codercom/code-server:4.103.2
 
 ENV CS_DISABLE_GETTING_STARTED_OVERRIDE=1
 ENV PORT=8085
