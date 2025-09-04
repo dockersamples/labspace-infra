@@ -139,9 +139,13 @@ export class WorkshopStore {
       return acc;
     }, {});
 
+    // Get the indentation to trim off extra text that might occur
+    // when a code block is nested inside a list item
+    const indentation = codeRows[0].match(/^\s*/)[0].length;
+
     return {
       language,
-      code: codeRows.join("\n").trim(),
+      code: codeRows.map((row) => row.substring(indentation)).join("\n"),
       meta,
     };
   }
