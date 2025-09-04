@@ -1,17 +1,14 @@
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { darcula } from "react-syntax-highlighter/dist/cjs/styles/prism";
-import Button from "react-bootstrap/Button";
+
 import copy from "copy-to-clipboard";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import { useRunCommand, useSaveFileCommand } from "../../../WorkshopContext";
+import { CodeBlockAction } from "./CodeBlockAction";
 
 export function CodeBlock({ node, inline, className, children, ...props }) {
   const runCommand = useRunCommand();
   const saveFileCommand = useSaveFileCommand();
-  const [copied, setCopied] = useState(false);
-  const [running, setRunning] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [errorRunning, setErrorRunning] = useState(false);
 
   const match = /language-(\w+)/.exec(className || "");
   let language = match ? match[1] : "text";
@@ -26,36 +23,16 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
 
   const onCopyClick = useCallback(() => {
     copy(children);
-    setCopied(true);
-  }, [setCopied, children]);
+    return Promise.resolve();
+  }, [children]);
 
   const onRunClick = useCallback(() => {
-    setRunning(true);
-    runCommand(codeIndex)
-      .catch(() => setErrorRunning(true))
-      .finally(() => setRunning(false));
-  }, [setRunning, setErrorRunning, codeIndex]);
+    return runCommand(codeIndex);
+  }, [codeIndex]);
 
   const onSaveAsClick = useCallback(() => {
-    setSaving(true);
-    saveFileCommand(codeIndex)
-      .catch(() => setErrorRunning(true))
-      .finally(() => setSaving(false));
-  }, [setSaving, codeIndex]);
-
-  useEffect(() => {
-    if (copied) {
-      const timer = setTimeout(() => setCopied(false), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [copied, setCopied]);
-
-  useEffect(() => {
-    if (errorRunning) {
-      const timer = setTimeout(() => setErrorRunning(false), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [errorRunning, setErrorRunning]);
+    return saveFileCommand(codeIndex);
+  }, [codeIndex]);
 
   if (!match || inline) {
     return (
@@ -80,52 +57,31 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
         {String(children).replace(/\n$/, "")}
       </SyntaxHighlighter>
       <div className="button-container pt-1  bg-light-subtle align-self-stretch d-flex align-items-center">
-        {canCopy && (
-          <Button
-            className="m-2"
-            variant="secondary"
-            size="sm"
-            onClick={onCopyClick}
-          >
-            {copied ? (
-              "Copied!"
-            ) : (
-              <span className="material-symbols-outlined">content_copy</span>
-            )}
-          </Button>
-        )}
+          {canCopy && (
+              <CodeBlockAction
+                  icon="content_copy"
+                  onClick={onCopyClick}
+                  completedText="Copied!"
+                  tooltip="Copy to clipboard"
+              />
+          )}
+          {canRun && (
+              <CodeBlockAction
+                  icon="play_circle"
+                  onClick={onRunClick}
+                  tooltip="Run code"
+              />
+          )}
 
-        {canRun && (
-          <Button
-            className="m-2"
-            variant="secondary"
-            size="sm"
-            onClick={onRunClick}
-          >
-            {running ? (
-              "Running"
-            ) : errorRunning ? (
-              "❌ Error"
-            ) : (
-              <span className="material-symbols-outlined">terminal</span>
-            )}
-          </Button>
-        )}
+          {canSaveAsFile && (
+              <CodeBlockAction
+                  icon="save"
+                  onClick={onSaveAsClick}
+                  completedText="Saved!"
+                  tooltip="Save file"
+              />
+          )}
 
-        {canSaveAsFile && (
-          <Button
-            className="m-2"
-            variant="secondary"
-            size="sm"
-            onClick={onSaveAsClick}
-          >
-            {saving ? (
-              "Saving..."
-            ) : (
-              <span className="material-symbols-outlined">save</span>
-            )}
-          </Button>
-        )}
       </div>
     </div>
   );
