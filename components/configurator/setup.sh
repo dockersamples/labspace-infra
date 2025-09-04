@@ -81,6 +81,7 @@ update_permissions() {
   chown 1000:1000 -R /project
   chown 1000:1000 -R /etc/support-extension/socket
   chown 1000:1000 -R /etc/support-extension/public-key
+  chown 1000:1000 -R /etc/support-extension/private-key
 }
 
 setup_directories
