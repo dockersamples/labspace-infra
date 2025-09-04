@@ -62,12 +62,14 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
                   icon="content_copy"
                   onClick={onCopyClick}
                   completedText="Copied!"
+                  tooltip="Copy to clipboard"
               />
           )}
           {canRun && (
               <CodeBlockAction
                   icon="play_circle"
                   onClick={onRunClick}
+                  tooltip="Run code"
               />
           )}
 
@@ -76,6 +78,7 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
                   icon="save"
                   onClick={onSaveAsClick}
                   completedText="Saved!"
+                  tooltip="Save file"
               />
           )}
 
