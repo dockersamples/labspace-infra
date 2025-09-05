@@ -37,7 +37,7 @@ services:
     restart: unless-stopped
 
   workspace:
-    image: dockersamples/labspace-workspace:latest
+    image: dockersamples/labspace-workspace-node:latest
     depends_on:
       configurator:
         condition: service_completed_successfully

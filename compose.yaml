@@ -74,7 +74,7 @@ services:
 
   workspace:
     build: 
-      context: ./components/workspace
+      context: ./components/workspace/base
       additional_contexts:
         extension: service:vscode-extension
     depends_on:
