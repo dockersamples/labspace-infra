@@ -1,45 +1,73 @@
 const vscode = require('vscode');
 const { ExpressSocketServer } = require("./socketServer.js");
+const { HostPortRepublisher } = require("./hostPortRepublisher.js");
 
-let server;
+let socketServer;
+let hostPortRepublisher;
+let logChannel;
 
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-	const start = () => {
-        stop();
-        server = new ExpressSocketServer(
-			vscode.workspace.getConfiguration('labRunner'), 
-			context.asAbsolutePath('package.json')
-		);
-        server.start();
-    };
+    logChannel = vscode.window.createOutputChannel("Labspace Support");
 
-    const stop = () => {
-        if (server) {
-            server.dispose();
-            server = undefined;
-        }
-    };
-
-    start();
+    startSocketServer(context, logChannel);
+    startHostPortRepublisher(logChannel);
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('labRunner.restartServer', () => {
-            vscode.window.showInformationMessage('Lab Runner: restarting HTTP socket server...');
-            start();
+        vscode.commands.registerCommand('labspace-support.restartCommandServer', () => {
+            startSocketServer(context, logChannel);
+            vscode.window.showInformationMessage('Labspace Support: restart complete');
         }),
-        { dispose: stop }
+        { dispose: stopSocketServer }
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('labspace-support.restartPortRepublisher', () => {
+            startHostPortRepublisher(logChannel);
+            vscode.window.showInformationMessage('Labspace Support: restart complete');
+        }),
+        { dispose: stopPortRepublisher }
     );
 }
 
-// This method is called when your extension is deactivated
-function deactivate() {
-	if (server) {
-        server.dispose();
-        server = undefined;
+function startSocketServer(context, logChannel) {
+    stopSocketServer();
+    socketServer = new ExpressSocketServer(
+        vscode.workspace.getConfiguration('labspace-support'), 
+        context.asAbsolutePath('package.json'),
+        logChannel
+    );
+    socketServer.start();
+}
+
+function stopSocketServer() {
+    if (socketServer) {
+        socketServer.dispose();
+        socketServer = undefined;
     }
+}
+
+function startHostPortRepublisher(logChannel) {
+    hostPortRepublisher = new HostPortRepublisher(
+        process.env.LABEL_FILTER ? process.env.LABEL_FILTER.split(',') : ["demo=app"],
+        logChannel
+    );
+    hostPortRepublisher.start();
+}
+
+function stopPortRepublisher() {
+    if (hostPortRepublisher) {
+        hostPortRepublisher.close();
+        hostPortRepublisher = undefined;
+    }
+}
+
+// This method is called when the extension is deactivated
+function deactivate() {
+	stopSocketServer();
+    stopPortRepublisher();
 }
 
 module.exports = {

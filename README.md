@@ -47,10 +47,6 @@ flowchart TD
     subgraph VSCodeServer[VS Code Server container]
         project@{ shape: odd, label: "/home/coder/project" }
         socket@{ shape: odd, label: "/var/run/docker.sock" }
-
-        subgraph Shared Network Namespace
-            PortRepublisher[Port republisher container]:::containerNode
-        end
     end
 
     VSCodeServer:::containerNode
@@ -59,8 +55,6 @@ flowchart TD
 
     Volume --> |Mounted into| Interface[Labspace interface]:::containerNode
     Volume --> |Mounted at| project
-
-    SocketVolume -->|Mounted into| PortRepublisher
 
     HostProxy@{ shape: odd, label: "Host engine socket" } --> |Mounted into|ProxyContainer
     ProxyContainer[Socket Proxy]:::containerNode -->|Stores proxy-enabled socket into| SocketVolume@{ shape: cyl, label: "Docker socket\nvolume" }
@@ -77,8 +71,9 @@ flowchart TD
   - Mounts in new containers are only allowed from within the project
   - Mount source paths are remapped to the volume the files are found in (even if using relative paths)
   - Requests to start a new container with the Docker socket will be remapped to use the proxied socket. This ensures Testcontainers config also uses the remapping, etc.
-- **Host Port Republisher** - this container runs in the same network namespace as the VS Code Server and watches for container start/stop events that have published ports. It then starts socat processes to allow the forwarding of localhost ports to the container.
-    - Example: start a postgres container in the IDE terminal, publishing the port. With this, you can then connect to it using `psql -h localhost` without using host network mode (which isn't always available)
+- **VS Code extension** - a custom VS Code extension that provides additional support and functionality in the system, including:
+  - Support the "Run" button from the interface to send commands to run in the terminal
+  - Host port republisher - watches for containers that are publishing ports and sets up socat proxies to enable direct communication using localhost inside the environment
 
 ### Content architecture
 
