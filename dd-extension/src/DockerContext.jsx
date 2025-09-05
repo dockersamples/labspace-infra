@@ -10,10 +10,10 @@ import { parse } from "yaml";
 
 const HIGHLIGHTED_LABSPACES = [
   {
-    title: "Using containers without going all-in",
+    title: "Container-supported development",
     description:
-      "Run databases, debug tools, and more across your entire team with minimal setup.",
-    repo: "http://github.com/mikesir87/labspace-docker-overview",
+      "Use containers to easily run and version databases, debug tools, and more across your entire team with minimal setup.",
+    repo: "http://github.com/mikesir87/labspace-container-supported-development",
   },
 ];
 
