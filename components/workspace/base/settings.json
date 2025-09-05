@@ -1,0 +1,8 @@
+{
+    "remote.autoForwardPorts": false,
+    "security.workspace.trust.enabled": false,
+    "window.autoDetectColorScheme": true,
+    "terminal.integrated.env.linux": {
+        "PATH": "${env:PATH}"
+    }
+}

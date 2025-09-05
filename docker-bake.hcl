@@ -18,10 +18,18 @@ group "default" {
     "configurator", 
     "support-vscode-extension",
     "interface", 
-    "workspace", 
+    "workspaces", 
     "labspace-cleaner",
     "launcher",
     "dd-extension",
+  ]
+}
+
+target "workspaces" {
+  targets = [
+    "workspace-base",
+    "workspace-node", 
+    "workspace-java"
   ]
 }
 
@@ -62,13 +70,33 @@ target "configurator" {
   tags = tags(IMAGE_NAMESPACE, "labspace-configurator", IMAGE_TAG)
 }
 
-target "workspace" {
+target "workspace-base" {
   inherits = ["_common"]
-  context = "./components/workspace"
-  tags = tags(IMAGE_NAMESPACE, "labspace-workspace", IMAGE_TAG)
+  context = "./components/workspace/base"
+  tags = tags(IMAGE_NAMESPACE, "labspace-workspace-base", IMAGE_TAG)
 
   contexts = {
     extension = "target:support-vscode-extension"
+  }
+}
+
+target "workspace-node" {
+  inherits = ["_common"]
+  context = "./components/workspace/node"
+  tags = tags(IMAGE_NAMESPACE, "labspace-workspace-node", IMAGE_TAG)
+
+  contexts = {
+    labspace-workspace-base = "target:workspace-base"
+  }
+}
+
+target "workspace-java" {
+  inherits = ["_common"]
+  context = "./components/workspace/java"
+  tags = tags(IMAGE_NAMESPACE, "labspace-workspace-java", IMAGE_TAG)
+
+  contexts = {
+    labspace-workspace-base = "target:workspace-base"
   }
 }
 
