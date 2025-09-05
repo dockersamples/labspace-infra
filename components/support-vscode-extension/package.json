@@ -14,7 +14,18 @@
     "*"
   ],
   "main": "./src/extension.js",
-  "contributes": {},
+  "contributes": {
+    "commands": [
+      {
+        "command": "labspace-support.restartPortRepublisher",
+        "title": "Restart Labspace Support Port Republisher"
+      },
+      {
+        "command": "labspace-support.restartCommandServer",
+        "title": "Restart Labspace Support Command Server"
+      }
+    ]
+  },
   "scripts": {
     "lint": "eslint .",
     "pretest": "npm run lint",
@@ -31,6 +42,7 @@
     "vsce": "^2.15.0"
   },
   "dependencies": {
+    "dockerode": "^4.0.7",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2"
   }

@@ -23,6 +23,10 @@ RUN mkdir -p /home/coder/.config/code-server && \
     chown -R 1000:1000 /home/coder
 
 RUN apt update && \
+    apt install -y socat && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN apt update && \
     apt install -y postgresql-client jq && \
     rm -rf /var/lib/apt/lists/*
 

@@ -19,7 +19,6 @@ group "default" {
     "support-vscode-extension",
     "interface", 
     "workspace", 
-    "host-port-republisher", 
     "labspace-cleaner",
     "launcher",
     "dd-extension",
@@ -71,12 +70,6 @@ target "workspace" {
   contexts = {
     extension = "target:support-vscode-extension"
   }
-}
-
-target "host-port-republisher" {
-  inherits = ["_common"]
-  context = "./components/host-port-republisher"
-  tags = tags(IMAGE_NAMESPACE, "labspace-host-port-republisher", IMAGE_TAG)
 }
 
 target "labspace-cleaner" {
