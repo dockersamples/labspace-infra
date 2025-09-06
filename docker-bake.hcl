@@ -18,10 +18,12 @@ group "default" {
     "configurator", 
     "support-vscode-extension",
     "interface", 
-    "workspaces", 
     "labspace-cleaner",
     "launcher",
     "dd-extension",
+    "workspace-base",
+    "workspace-node", 
+    "workspace-java"
   ]
 }
 
