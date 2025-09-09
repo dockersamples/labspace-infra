@@ -1,20 +1,23 @@
 import { useState } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
+import InputGroup from "react-bootstrap/InputGroup";
+import Form from "react-bootstrap/Form";
 
 export function AddLabspaceModal({ show, onAdd, onCancel }) {
   const [title, setTitle] = useState("");
-  const [repo, setRepo] = useState("");
+  const [location, setLocation] = useState("");
 
   function handleSubmit(e) {
     e.preventDefault();
-    onAdd(title, repo);
+    onAdd(title, location);
     setTitle("");
-    setRepo("");
+    setLocation("");
   }
 
   function handleCancel() {
     setTitle("");
-    setRepo("");
+    setLocation("");
     onCancel();
   }
 
@@ -36,14 +39,20 @@ export function AddLabspaceModal({ show, onAdd, onCancel }) {
             />
           </Form.Group>
 
-          <Form.Group className="mb-3" controlId="labspaceRepo">
-            <Form.Label>Repo</Form.Label>
-            <Form.Control
-              type="text"
-              value={repo}
-              onChange={(e) => setRepo(e.target.value)}
-              required
-            />
+          <Form.Group className="mb-3" controlId="labspaceComposeFile">
+            <Form.Label>Labspace location</Form.Label>
+            <InputGroup>
+              <InputGroup.Text>oci://</InputGroup.Text>
+              <Form.Control
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                required
+              />
+            </InputGroup>
+            <Form.Text muted>
+              Location of the published Compose file for the Labspace
+            </Form.Text>
           </Form.Group>
         </Modal.Body>
         <Modal.Footer>
