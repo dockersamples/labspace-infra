@@ -67,10 +67,6 @@ services:
   # and allowing it to be an additional build context for the workspace service
   vscode-extension:
     build: ./components/support-vscode-extension
-    develop:
-      watch:
-        - path: ./components/support-vscode-extension
-          action: rebuild
 
   workspace:
     build: 
@@ -85,8 +81,6 @@ services:
     ports:
       - 8085:8085 # For the IDE itself
       - 3000:3000 # For the Node application running in the IDE
-    environment:
-      LABEL_FILTER: labspace-resource=true
     volumes:
       - socket-proxy:/var/run
       - ./sample-content-repo:/home/coder/project
@@ -104,6 +98,24 @@ services:
       watch:
         - path: ./components/workspace
           action: rebuild
+
+  host-republisher:
+    build:
+      context: ./components/host-port-republisher
+      target: dev
+    volumes:
+      - socket-proxy:/var/run
+    network_mode: service:workspace
+    environment:
+      LABEL_FILTER: labspace-resource=true
+    depends_on:
+      - workspace
+      - socket-proxy
+    develop:
+      watch:
+        - path: ./src
+          action: sync
+          target: /usr/local/app/src
 
   workspace-cleaner:
     build: ./components/workspace-cleaner

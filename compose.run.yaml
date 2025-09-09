@@ -60,6 +60,20 @@ services:
         volume:
           subpath: socket
 
+
+  host-republisher:
+    image: dockersamples/labspace-host-port-republisher:latest
+    pull_policy: always
+    restart: always
+    volumes:
+      - socket-proxy:/var/run
+    network_mode: service:workspace
+    environment:
+      LABEL_FILTER: labspace-resource=true
+    depends_on:
+      - workspace
+      - socket-proxy
+
   workspace-cleaner:
     image: dockersamples/labspace-cleaner:latest
     pull_policy: always
