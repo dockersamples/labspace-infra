@@ -5,29 +5,29 @@ import { useState } from "react";
 export function UrlHandlingModal({ onLaunchConfirmation }) {
   const searchParams = new URLSearchParams(window.location.search);
   const title = searchParams.get("title");
-  const repo = searchParams.get("repo");
+  const location = searchParams.get("location");
 
-  const [show, setShow] = useState(title && repo);
+  const [show, setShow] = useState(title && location);
 
   const handleConfirm = () => {
     setShow(false);
 
     searchParams.delete("title");
-    searchParams.delete("repo");
+    searchParams.delete("location");
     window.history.replaceState(
       {},
       "",
       `${window.location.pathname}?${searchParams.toString()}`,
     );
 
-    onLaunchConfirmation(title, repo);
+    onLaunchConfirmation(title, location);
   };
 
   const handleCancel = () => {
     setShow(false);
 
     searchParams.delete("title");
-    searchParams.delete("repo");
+    searchParams.delete("location");
     window.history.replaceState(
       {},
       "",
@@ -36,21 +36,21 @@ export function UrlHandlingModal({ onLaunchConfirmation }) {
   };
 
   return (
-    <Modal show={show} onHide={handleCancel} centered>
+    <Modal show={show} onHide={handleCancel} centered size="lg">
       <Modal.Header closeButton>
         <Modal.Title className="mb-0">Confirm Labspace Launch</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>You are about to launch a Labspace with the following details:</p>
+        <p>You have clicked a link to launch the following Labspace:</p>
         <ul>
           <li>
             <strong>Title:</strong> {title}
           </li>
           <li>
-            <strong>Repo:</strong> {repo}
+            <strong>Location:</strong> {location}
           </li>
         </ul>
-        <p>Please verify these details before continuing.</p>
+        <p>Please confirm the details and validate it's a trusted source.</p>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={handleCancel}>

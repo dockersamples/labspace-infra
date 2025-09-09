@@ -56,7 +56,7 @@ export function Home() {
           <Col xs={12} sm={6} md={4} key={labspace.title} className="mb-4">
             <LabspaceCard
               labspace={labspace}
-              onLaunch={() => startLabspace(labspace.repo)}
+              onLaunch={() => startLabspace(labspace.location)}
               starting={startingLabspace}
               running={hasLabspace}
             />
@@ -83,7 +83,7 @@ export function Home() {
             <thead>
               <tr>
                 <th>Title</th>
-                <th>Repo</th>
+                <th>Location</th>
                 <th></th>
               </tr>
             </thead>
@@ -102,25 +102,19 @@ export function Home() {
                 <tr key={labspace.title}>
                   <td className="align-middle">{labspace.title}</td>
                   <td className="align-middle">
-                    <a
-                      href={labspace.repo}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {labspace.repo}
-                    </a>
+                    {labspace.location}
                   </td>
                   <td className="text-end">
                     <Button
                       variant="primary"
-                      onClick={() => startLabspace(labspace.repo)}
+                      onClick={() => startLabspace(labspace.location)}
                       className="me-2"
                     >
                       Launch
                     </Button>
                     <Button
                       variant="danger"
-                      onClick={() => removeLabspace(labspace.repo)}
+                      onClick={() => removeLabspace(labspace.location)}
                     >
                       Remove
                     </Button>
@@ -143,10 +137,10 @@ export function Home() {
       />
 
       <UrlHandlingModal
-        onLaunchConfirmation={(title, repo) => {
-          if (labspaces.find((l) => l.repo === repo) === undefined)
-            addLabspace(title, repo);
-          startLabspace(repo);
+        onLaunchConfirmation={(title, location) => {
+          if (labspaces.find((l) => l.location === location) === undefined)
+            addLabspace(title, location);
+          startLabspace(location);
         }}
       />
     </Container>

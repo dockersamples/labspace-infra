@@ -13,7 +13,7 @@ const HIGHLIGHTED_LABSPACES = [
     title: "Container-supported development",
     description:
       "Use containers to easily run and version databases, debug tools, and more across your entire team with minimal setup.",
-    repo: "http://github.com/mikesir87/labspace-container-supported-development",
+    location: "dockersamples/labspace-container-supported-development",
   },
 ];
 
@@ -22,7 +22,7 @@ const DockerContext = createContext();
 export function DockerContextProvider({ children }) {
   const [hasLabspace, setHasLabspace] = useState(false);
   const [runningLabspace, setRunningLabspace] = useState(null);
-  const [startingLabspace, setStartingLabspace] = useState(false);
+  const [startingLabspace, setStartingLabspace] = useState(null);
   const [stoppingLabspace, setStoppingLabspace] = useState(false);
   const [launchLog, setLaunchLog] = useState("");
   const [forceRefreshCount, setForceRefreshCount] = useState(0);
@@ -79,18 +79,21 @@ export function DockerContextProvider({ children }) {
   }, [setHasLabspace, setStoppingLabspace]);
 
   const startLabspace = useCallback(
-    (repoUrl) => {
+    (location) => {
+      console.log(`Starting Labspace with location ${location}`);
       setLaunchLog("");
-      setStartingLabspace(true);
+      setStartingLabspace(location);
 
       ddClient.docker.cli.exec(
-        "run",
+        "compose",
         [
-          "--rm",
-          "-e",
-          `LABSPACE_CONTENT_REPO=${repoUrl}`,
-          "--use-api-socket",
-          "dockersamples/labspace-launcher",
+          "-f",
+          `oci://${location}`,
+          "-p",
+          "labspace",
+          "up",
+          "-d",
+          "-y",
         ],
         {
           stream: {
@@ -100,7 +103,7 @@ export function DockerContextProvider({ children }) {
             },
             onClose(exitCode) {
               setHasLabspace(true);
-              setStartingLabspace(false);
+              setStartingLabspace(null);
               setForceRefreshCount((c) => c + 1);
             },
           },
@@ -111,16 +114,16 @@ export function DockerContextProvider({ children }) {
   );
 
   const addLabspace = useCallback(
-    (title, repo) => {
-      const newLabspace = { title, repo };
+    (title, location) => {
+      const newLabspace = { title, location };
       setAdditionalLabspaces((labspaces) => [...labspaces, newLabspace]);
     },
     [setAdditionalLabspaces],
   );
 
   const removeLabspace = useCallback(
-    (repo) => {
-      setAdditionalLabspaces((labs) => labs.filter((l) => l.repo !== repo));
+    (location) => {
+      setAdditionalLabspaces((labs) => labs.filter((l) => l.location !== location));
     },
     [setAdditionalLabspaces],
   );
