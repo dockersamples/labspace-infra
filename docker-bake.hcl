@@ -82,7 +82,6 @@ target "workspace-base" {
   }
 }
 
-<<<<<<< HEAD
 target "workspace-node" {
   inherits = ["_common"]
   context = "./components/workspace/node"
@@ -101,12 +100,12 @@ target "workspace-java" {
   contexts = {
     labspace-workspace-base = "target:workspace-base"
   }
-=======
+}
+
 target "host-port-republisher" {
   inherits = ["_common"]
   context = "./components/host-port-republisher"
   tags = tags(IMAGE_NAMESPACE, "labspace-host-port-republisher", IMAGE_TAG)
->>>>>>> parent of 83fbc11 (Move host port republishing from separate service to support extension)
 }
 
 target "labspace-cleaner" {
