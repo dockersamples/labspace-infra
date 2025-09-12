@@ -47,7 +47,7 @@ app.post("/api/sections/:sectionId/save-file", (req, res) => {
     });
 });
 
-app.use(express.static("/project"));
+app.use(express.static("/project", { dotfiles: "allow" }));
 
 // Send all unknown routes to the frontend to handle
 app.get("*splat", (req, res) =>
