@@ -138,7 +138,7 @@ export function Home() {
 
       <UrlHandlingModal
         onLaunchConfirmation={(title, location) => {
-          if (labspaces.find((l) => l.location === location) === undefined)
+          if ([...highlightedLabspaces, ...labspaces].find((l) => l.location === location) === undefined)
             addLabspace(title, location);
           startLabspace(location);
         }}
