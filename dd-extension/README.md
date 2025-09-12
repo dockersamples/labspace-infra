@@ -43,7 +43,7 @@ To develop the extension, run the following steps:
 Once the extension is installed, deep links can be used to launch a Labspace.
 
 ```
-http://open.docker.com/dashboard/extension-tab?extensionId=dockersamples/labspace-extension&url=PUBLISHED_LABSPACE_URL&title=TITLE
+http://open.docker.com/dashboard/extension-tab?extensionId=dockersamples/labspace-extension&location=PUBLISHED_LABSPACE_URL&title=TITLE
 ```
 
-[Click here](http://open.docker.com/dashboard/extension-tab?extensionId=dockersamples/labspace-extension&url=dockersamples/labspace-container-supported-development&title=Demo) to launch a sample Labspace
+[Click here](http://open.docker.com/dashboard/extension-tab?extensionId=dockersamples/labspace-extension&location=dockersamples/labspace-container-supported-development&title=Demo) to launch a sample Labspace
