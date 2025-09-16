@@ -1,0 +1,12 @@
+#external-content-tabs {
+    .nav-link {
+        color: var(--bs-body-color);
+    }
+
+    button {
+        &:hover, &:focus {
+            background-color: var(--bs-secondary);
+            color: var(--bs-white);
+        }
+    }
+}
