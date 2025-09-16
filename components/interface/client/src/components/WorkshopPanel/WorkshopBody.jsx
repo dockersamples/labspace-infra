@@ -59,7 +59,9 @@ export function WorkshopBody() {
                 onClick={() => changeActiveSection(sections[index - 1].id)}
                 className="d-flex align-items-center"
               >
-                <span className="material-symbols-outlined me-1">arrow_back</span>
+                <span className="material-symbols-outlined me-1">
+                  arrow_back
+                </span>
                 <span>Previous</span>
               </Button>
             )}

@@ -57,31 +57,30 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
         {String(children).replace(/\n$/, "")}
       </SyntaxHighlighter>
       <div className="button-container pt-1  bg-light-subtle align-self-stretch d-flex align-items-center">
-          {canCopy && (
-              <CodeBlockAction
-                  icon="content_copy"
-                  onClick={onCopyClick}
-                  completedText="Copied!"
-                  tooltip="Copy to clipboard"
-              />
-          )}
-          {canRun && (
-              <CodeBlockAction
-                  icon="play_circle"
-                  onClick={onRunClick}
-                  tooltip="Run code"
-              />
-          )}
+        {canCopy && (
+          <CodeBlockAction
+            icon="content_copy"
+            onClick={onCopyClick}
+            completedText="Copied!"
+            tooltip="Copy to clipboard"
+          />
+        )}
+        {canRun && (
+          <CodeBlockAction
+            icon="play_circle"
+            onClick={onRunClick}
+            tooltip="Run code"
+          />
+        )}
 
-          {canSaveAsFile && (
-              <CodeBlockAction
-                  icon="save"
-                  onClick={onSaveAsClick}
-                  completedText="Saved!"
-                  tooltip="Save file"
-              />
-          )}
-
+        {canSaveAsFile && (
+          <CodeBlockAction
+            icon="save"
+            onClick={onSaveAsClick}
+            completedText="Saved!"
+            tooltip="Save file"
+          />
+        )}
       </div>
     </div>
   );

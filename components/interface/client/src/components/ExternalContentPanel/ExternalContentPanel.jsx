@@ -5,8 +5,7 @@ import Button from "react-bootstrap/Button";
 import "./ExternalContentPanel.scss";
 
 function getTabTitle(url) {
-  if (url === "http://localhost:8085")
-    return "VS Code";
+  if (url === "http://localhost:8085") return "VS Code";
   return url;
 }
 
@@ -17,7 +16,7 @@ export function ExternalContentPanel() {
     <div className="d-flex flex-fill flex-column">
       <div className="p-3 pt-2 pb-0 bg-secondary-subtle">
         <Nav
-          variant="tabs" 
+          variant="tabs"
           activeKey={activeTab}
           onSelect={(selectedKey) => setActiveTab(selectedKey)}
           id="external-content-tabs"
@@ -25,12 +24,10 @@ export function ExternalContentPanel() {
           {tabs.map((tab) => (
             <Nav.Item key={tab} className="me-2 ms-2">
               <Nav.Link eventKey={tab} className="p-1 ps-3 pe-1">
-                <span className="me-3">
-                  { getTabTitle(tab) }
-                </span>
+                <span className="me-3">{getTabTitle(tab)}</span>
 
-                { !tab.endsWith("localhost:8085") && (
-                  <Button 
+                {!tab.endsWith("localhost:8085") && (
+                  <Button
                     size="sm"
                     variant="default"
                     className="rounded-circle p-1 pt-0 pb-0"
@@ -38,18 +35,17 @@ export function ExternalContentPanel() {
                       e.stopPropagation();
                       removeTab(tab);
                     }}
-                  >&times;</Button>
+                  >
+                    &times;
+                  </Button>
                 )}
               </Nav.Link>
             </Nav.Item>
           ))}
         </Nav>
       </div>
-      { activeTab ? (
-        <iframe
-          style={{ flex: 1, border: "none" }}
-          src={activeTab}
-        />
+      {activeTab ? (
+        <iframe style={{ flex: 1, border: "none" }} src={activeTab} />
       ) : (
         <IdePlaceholder onLaunch={() => addTab("http://localhost:8085")} />
       )}
