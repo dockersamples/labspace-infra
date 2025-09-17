@@ -1,4 +1,4 @@
-import { createContext, use, useCallback, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 
 const TabContext = createContext([]);
 
@@ -7,8 +7,9 @@ export function TabContextProvider({ children }) {
   const [activeTab, setActiveTab] = useState(null);
 
   const addTab = useCallback(
-    (url) => {
-      setTabs((prevTabs) => [...prevTabs, url]);
+    (url, title) => {
+      if (!title) title = url;
+      setTabs((prevTabs) => [...prevTabs, { url, title }]);
       setActiveTab(url);
     },
     [setTabs, setActiveTab],
@@ -16,7 +17,7 @@ export function TabContextProvider({ children }) {
 
   const removeTab = useCallback(
     (url) => {
-      setTabs((prevTabs) => prevTabs.filter((tab) => tab !== url));
+      setTabs((prevTabs) => prevTabs.filter((tab) => tab.url !== url));
       setActiveTab((prevActiveTab) =>
         prevActiveTab === url ? null : prevActiveTab,
       );
@@ -25,10 +26,12 @@ export function TabContextProvider({ children }) {
   );
 
   const displayLink = useCallback(
-    (url) => {
+    (url, title) => {
+      if (!title) title = url;
+
       setTabs((prevTabs) => {
-        if (!prevTabs.includes(url)) {
-          return [...prevTabs, url];
+        if (!prevTabs.find((tab) => tab.url === url)) {
+          return [...prevTabs, { url, title }];
         }
         return prevTabs;
       });
