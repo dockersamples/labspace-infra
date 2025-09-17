@@ -16,6 +16,11 @@ export function ExternalContentPanel() {
           setActiveTab={setActiveTab}
           tabs={tabs}
           onTabRemoval={removeTab}
+          onRefreshClick={() => {
+            const url = new URL(iframeRef.current.src);
+            url.searchParams.set("t", Date.now());
+            iframeRef.current.src = url.toString();
+          }}
         />
       </div>
       {activeTab ? (
