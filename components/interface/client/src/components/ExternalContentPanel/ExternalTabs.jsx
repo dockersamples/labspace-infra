@@ -42,7 +42,7 @@ export function ExternalTabs({
               </Button>
             )}
 
-            {!tab.title !== "Workspace" && (
+            {tab.title !== "Workspace" && (
               <Button
                 size="sm"
                 variant="default"
