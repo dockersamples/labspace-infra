@@ -75,3 +75,15 @@ If a user clicks this "Save file" button, a `compose.yaml` file will be created 
 
 - If the file already exists, the contents will be replaced with what is provided in the code block.
 - All required directories leading up to the file will automatically be created
+
+
+
+## Links
+
+By default, all links are configured to open new browser tabs when clicked.
+
+If you want to add another tab to the right-hand panel, you can use the following directive:
+
+    ::tabLink[Link text]{href="http://localhost:3000" title="Tab title"}
+
+This will render a link with the visible text of "Link text" pointing to "http://localhost:3000". When clicked, a new tab will be created with the title of "Tab title".
