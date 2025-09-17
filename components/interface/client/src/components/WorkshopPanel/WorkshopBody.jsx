@@ -1,17 +1,7 @@
 import { useActiveSection, useWorkshop } from "../../WorkshopContext";
-import { MarkdownHooks } from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeRaw from "rehype-raw";
-import rehypeMermaid from "rehype-mermaid";
-import { rehypeGithubAlerts } from "rehype-github-alerts";
-import { CodeBlock } from "./markdown/CodeBlock";
-import { remarkCodeIndexer } from "./markdown/codeIndexer";
 import { useEffect, useRef } from "react";
-import { ExternalLink } from "./markdown/ExternalLink";
 import Button from "react-bootstrap/Button";
-import Image from "react-bootstrap/Image";
-import { RenderedImage } from "./markdown/RenderedImage";
-import { RenderedSvg } from "./markdown/RenderedSvg";
+import { MarkdownRenderer } from "./markdown/MarkdownRenderer";
 
 export function WorkshopBody() {
   const bodyRef = useRef();
@@ -38,18 +28,7 @@ export function WorkshopBody() {
     <>
       <div className="overflow-auto" ref={bodyRef}>
         <div className="workshop-body p-5 pt-3 pb-3">
-          <MarkdownHooks
-            remarkPlugins={[remarkGfm, remarkCodeIndexer]}
-            rehypePlugins={[rehypeRaw, rehypeMermaid, rehypeGithubAlerts]}
-            components={{
-              code: CodeBlock,
-              a: ExternalLink,
-              img: RenderedImage,
-              svg: RenderedSvg,
-            }}
-          >
-            {activeSection.content}
-          </MarkdownHooks>
+          <MarkdownRenderer>{activeSection.content}</MarkdownRenderer>
         </div>
         <div className="workshop-footer d-flex justify-content-between p-3 border-top">
           <div>
