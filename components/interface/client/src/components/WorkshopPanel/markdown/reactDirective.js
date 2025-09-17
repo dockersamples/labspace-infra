@@ -25,6 +25,12 @@ export function tabDirective() {
       (node) => {
         const data = node.data || (node.data = {});
 
+        if (!isNaN(Number(node.name))) {
+          return;
+        }
+
+        console.log("NODE", node);
+
         // This is what's supposed to work. But "h" was not a function?
         // const { properties } = h(node.name, node.attributes);
 
