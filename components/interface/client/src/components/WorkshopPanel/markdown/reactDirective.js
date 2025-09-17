@@ -1,4 +1,3 @@
-// import {h} from 'hastscript'
 import { visit } from "unist-util-visit";
 
 /**
@@ -26,10 +25,11 @@ export function tabDirective() {
         const data = node.data || (node.data = {});
 
         if (!isNaN(Number(node.name))) {
+          node.children = [{ type: 'text', value: `:${node.name}` }];
+          node.name = node.type === 'textDirective' ? 'span' : 'div';
+          hastify(node, {});
           return;
         }
-
-        console.log("NODE", node);
 
         // This is what's supposed to work. But "h" was not a function?
         // const { properties } = h(node.name, node.attributes);
@@ -41,4 +41,11 @@ export function tabDirective() {
       },
     );
   };
+}
+
+function hastify(directive, extra) {
+  const { attributes, data, name } = directive;
+  directive.data = data || {};
+  directive.data.hName = name;
+  directive.data.hProperties = { ...attributes, ...extra };
 }
