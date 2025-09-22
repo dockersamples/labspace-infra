@@ -4,10 +4,12 @@ import {
   useState,
   useEffect,
   useCallback,
+  useMemo,
 } from "react";
 import Spinner from "react-bootstrap/Spinner";
 
 import { parse } from "yaml";
+import { LogProcessor } from "./logProcessor.js";
 
 const CATALOGS = [
   "https://raw.githubusercontent.com/dockersamples/awesome-labspaces/refs/heads/main/catalog.yaml",
@@ -29,6 +31,8 @@ export function DockerContextProvider({ children }) {
   const [stoppingLabspace, setStoppingLabspace] = useState(false);
   const [launchLog, setLaunchLog] = useState("");
   const [forceRefreshCount, setForceRefreshCount] = useState(0);
+
+  const logProcessor = useMemo(() => new LogProcessor(), []);
 
   useEffect(() => {
     Promise.all(
@@ -92,6 +96,7 @@ export function DockerContextProvider({ children }) {
   const startLabspace = useCallback(
     (location) => {
       console.log(`Starting Labspace with location ${location}`);
+      logProcessor.reset();
       setLaunchLog("");
       setStartingLabspace(location);
 
@@ -110,7 +115,13 @@ export function DockerContextProvider({ children }) {
           stream: {
             onOutput(data) {
               const newData = data.stdout ? data.stdout : data.stderr;
-              setLaunchLog((l) => l + newData);
+              let result;
+              newData.split("\n").forEach((line) => {
+                if (line.trim() === "") return;
+                
+                result = logProcessor.processLine(line.trim());
+              });
+              setLaunchLog(result);
             },
             onClose(exitCode) {
               setHasLabspace(true);
