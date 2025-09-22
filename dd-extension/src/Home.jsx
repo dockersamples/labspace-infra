@@ -56,7 +56,7 @@ export function Home() {
           <Col xs={12} sm={6} md={4} key={labspace.title} className="mb-4">
             <LabspaceCard
               labspace={labspace}
-              onLaunch={() => startLabspace(labspace.location)}
+              onLaunch={() => startLabspace(labspace.publishedRepo)}
               starting={startingLabspace}
               running={hasLabspace}
             />
@@ -102,19 +102,19 @@ export function Home() {
                 <tr key={labspace.title}>
                   <td className="align-middle">{labspace.title}</td>
                   <td className="align-middle">
-                    {labspace.location}
+                    {labspace.publishedRepo}
                   </td>
                   <td className="text-end">
                     <Button
                       variant="primary"
-                      onClick={() => startLabspace(labspace.location)}
+                      onClick={() => startLabspace(labspace.publishedRepo)}
                       className="me-2"
                     >
                       Launch
                     </Button>
                     <Button
                       variant="danger"
-                      onClick={() => removeLabspace(labspace.location)}
+                      onClick={() => removeLabspace(labspace.publishedRepo)}
                     >
                       Remove
                     </Button>
