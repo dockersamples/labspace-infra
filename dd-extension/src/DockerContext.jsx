@@ -5,32 +5,43 @@ import {
   useEffect,
   useCallback,
 } from "react";
+import Spinner from "react-bootstrap/Spinner";
 
 import { parse } from "yaml";
 
-const HIGHLIGHTED_LABSPACES = [
-  {
-    title: "Container-supported development",
-    description:
-      "Use containers to easily run and version databases, debug tools, and more across your entire team with minimal setup.",
-    location: "dockersamples/labspace-container-supported-development",
-  },
+const CATALOGS = [
+  "https://raw.githubusercontent.com/dockersamples/awesome-labspaces/refs/heads/main/catalog.yaml",
 ];
 
 const DockerContext = createContext();
 
 export function DockerContextProvider({ children }) {
+  const [labspaces, setLabspaces] = useState(null);
+  const [additionalLabspaces, setAdditionalLabspaces] = useState(
+    localStorage.getItem("custom-labspaces")
+      ? JSON.parse(localStorage.getItem("custom-labspaces"))
+      : [],
+  );
+ 
   const [hasLabspace, setHasLabspace] = useState(false);
   const [runningLabspace, setRunningLabspace] = useState(null);
   const [startingLabspace, setStartingLabspace] = useState(null);
   const [stoppingLabspace, setStoppingLabspace] = useState(false);
   const [launchLog, setLaunchLog] = useState("");
   const [forceRefreshCount, setForceRefreshCount] = useState(0);
-  const [additionalLabspaces, setAdditionalLabspaces] = useState(
-    localStorage.getItem("labspaces")
-      ? JSON.parse(localStorage.getItem("labspaces"))
-      : [],
-  );
+
+  useEffect(() => {
+    Promise.all(
+      CATALOGS.map((url) =>
+        fetch(url)
+          .then((res) => res.text())
+          .then((text) => parse(text))
+          .then((data) => data.labspaces || []),
+      )
+    ).then((results) => {
+      setLabspaces(results.flat());
+    });
+  }, []);
 
   useEffect(() => {
     function checkIfRunning() {
@@ -114,23 +125,32 @@ export function DockerContextProvider({ children }) {
   );
 
   const addLabspace = useCallback(
-    (title, location) => {
-      const newLabspace = { title, location };
+    (title, publishedRepo) => {
+      const newLabspace = { title, publishedRepo };
       setAdditionalLabspaces((labspaces) => [...labspaces, newLabspace]);
     },
     [setAdditionalLabspaces],
   );
 
   const removeLabspace = useCallback(
-    (location) => {
-      setAdditionalLabspaces((labs) => labs.filter((l) => l.location !== location));
+    (publishedRepo) => {
+      setAdditionalLabspaces((labs) => labs.filter((l) => l.publishedRepo !== publishedRepo));
     },
     [setAdditionalLabspaces],
   );
 
   useEffect(() => {
-    localStorage.setItem("labspaces", JSON.stringify(additionalLabspaces));
+    localStorage.setItem("custom-labspaces", JSON.stringify(additionalLabspaces));
   }, [additionalLabspaces]);
+
+  if (!labspaces) {
+    return (
+      <div className="mt-5 text-center">
+        <Spinner />
+        <p>Loading...</p>
+      </div>
+    )
+  }
 
   return (
     <DockerContext.Provider
@@ -145,7 +165,7 @@ export function DockerContextProvider({ children }) {
         startingLabspace,
         launchLog,
 
-        highlightedLabspaces: HIGHLIGHTED_LABSPACES.slice(0, 3),
+        highlightedLabspaces: labspaces.filter(l => l.highlighted).slice(0, 3),
         labspaces: additionalLabspaces,
         addLabspace,
         removeLabspace,
