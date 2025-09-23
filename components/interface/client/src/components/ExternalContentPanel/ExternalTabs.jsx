@@ -14,6 +14,7 @@ export function ExternalTabs({
       activeKey={activeTab}
       onSelect={(selectedKey) => setActiveTab(selectedKey)}
       id="external-content-tabs"
+      className="align-items-end"
     >
       {tabs.map((tab) => (
         <Nav.Item key={tab.url} className="me-2 ms-2">
