@@ -85,7 +85,7 @@ services:
       - socket-proxy
 
   socket-proxy:
-    image: mikesir87/docker-socket-proxy:v1.2.0
+    image: mikesir87/docker-socket-proxy:v1.2.1
     pull_policy: always
     volumes:
       - socket-proxy:/tmp/proxy
