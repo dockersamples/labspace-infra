@@ -55,6 +55,8 @@ jobs:
           docker compose version
 
           if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
+            sed -i "s/:latest/:dev/g" compose.run.yaml
+            sed -i "s/:latest/:dev/g" compose.content-dev.yaml
             echo "y" | docker compose -f compose.run.yaml publish dockersamples/labspace:dev --with-env -y
             echo "y" | docker compose -f compose.content-dev.yaml publish dockersamples/labspace-content-dev:dev --with-env -y
           else
