@@ -68,53 +68,47 @@ export const WorkshopContextProvider = ({ children }) => {
       });
   }, [activeSectionId, setActiveSection, refreshCounter]);
 
-  const runCommand = useCallback(
-    (codeBlockIndex) => {
-      return fetch(`/api/sections/${activeSection.id}/command`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ codeBlockIndex }),
+  const runCommand = useCallback((activeSectionId, codeBlockIndex) => {
+    return fetch(`/api/sections/${activeSectionId}/command`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ codeBlockIndex }),
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to run command");
+        return response.json();
       })
-        .then((response) => {
-          if (!response.ok) throw new Error("Failed to run command");
-          return response.json();
-        })
-        .then((result) => {
-          console.log("Command result:", result);
-        })
-        .catch((error) => {
-          console.error("Error running command:", error);
-          toast.error("Failed to run command. Please try again.");
-        });
-    },
-    [activeSection],
-  );
+      .then((result) => {
+        console.log("Command result:", result);
+      })
+      .catch((error) => {
+        console.error("Error running command:", error);
+        toast.error("Failed to run command. Please try again.");
+      });
+  }, []);
 
-  const saveFileCommand = useCallback(
-    (codeBlockIndex) => {
-      return fetch(`/api/sections/${activeSection.id}/save-file`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ codeBlockIndex }),
+  const saveFileCommand = useCallback((activeSectionId, codeBlockIndex) => {
+    return fetch(`/api/sections/${activeSectionId}/save-file`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ codeBlockIndex }),
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to save file");
+        return response.json();
       })
-        .then((response) => {
-          if (!response.ok) throw new Error("Failed to save file");
-          return response.json();
-        })
-        .then((result) => {
-          console.log("Save file result:", result);
-        })
-        .catch((error) => {
-          console.error("Error saving file:", error);
-          toast.error("Failed to save file. Please try again.");
-        });
-    },
-    [activeSection],
-  );
+      .then((result) => {
+        console.log("Save file result:", result);
+      })
+      .catch((error) => {
+        console.error("Error saving file:", error);
+        toast.error("Failed to save file. Please try again.");
+      });
+  }, []);
 
   useEffect(() => {
     if (!workshop) return;
