@@ -25,8 +25,8 @@ export function tabDirective() {
         const data = node.data || (node.data = {});
 
         if (!isNaN(Number(node.name))) {
-          node.children = [{ type: 'text', value: `:${node.name}` }];
-          node.name = node.type === 'textDirective' ? 'span' : 'div';
+          node.children = [{ type: "text", value: `:${node.name}` }];
+          node.name = node.type === "textDirective" ? "span" : "div";
           hastify(node, {});
           return;
         }

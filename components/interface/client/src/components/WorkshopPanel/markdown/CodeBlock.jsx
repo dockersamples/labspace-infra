@@ -3,10 +3,15 @@ import { darcula } from "react-syntax-highlighter/dist/cjs/styles/prism";
 
 import copy from "copy-to-clipboard";
 import { useCallback } from "react";
-import { useRunCommand, useSaveFileCommand } from "../../../WorkshopContext";
+import {
+  useActiveSection,
+  useRunCommand,
+  useSaveFileCommand,
+} from "../../../WorkshopContext";
 import { CodeBlockAction } from "./CodeBlockAction";
 
 export function CodeBlock({ node, inline, className, children, ...props }) {
+  const { activeSection } = useActiveSection();
   const runCommand = useRunCommand();
   const saveFileCommand = useSaveFileCommand();
 
@@ -26,13 +31,15 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
     return Promise.resolve();
   }, [children]);
 
+  // This needs `children` as ReactMarkdown seems to re-use the component instance
   const onRunClick = useCallback(() => {
-    return runCommand(codeIndex);
-  }, [codeIndex]);
+    return runCommand(activeSection.id, codeIndex);
+  }, [codeIndex, activeSection]);
 
+  // This needs `children` as ReactMarkdown seems to re-use the component instance
   const onSaveAsClick = useCallback(() => {
-    return saveFileCommand(codeIndex);
-  }, [codeIndex]);
+    return saveFileCommand(activeSection.id, codeIndex);
+  }, [codeIndex, activeSection]);
 
   if (!match || inline) {
     return (
