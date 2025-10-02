@@ -24,7 +24,7 @@ export function DockerContextProvider({ children }) {
       ? JSON.parse(localStorage.getItem("custom-labspaces"))
       : [],
   );
- 
+
   const [hasLabspace, setHasLabspace] = useState(false);
   const [runningLabspace, setRunningLabspace] = useState(null);
   const [startingLabspace, setStartingLabspace] = useState(null);
@@ -41,7 +41,7 @@ export function DockerContextProvider({ children }) {
           .then((res) => res.text())
           .then((text) => parse(text))
           .then((data) => data.labspaces || []),
-      )
+      ),
     ).then((results) => {
       setLabspaces(results.flat());
     });
@@ -102,15 +102,7 @@ export function DockerContextProvider({ children }) {
 
       ddClient.docker.cli.exec(
         "compose",
-        [
-          "-f",
-          `oci://${location}`,
-          "-p",
-          "labspace",
-          "up",
-          "-d",
-          "-y",
-        ],
+        ["-f", `oci://${location}`, "-p", "labspace", "up", "-d", "-y"],
         {
           stream: {
             onOutput(data) {
@@ -118,7 +110,7 @@ export function DockerContextProvider({ children }) {
               let result;
               newData.split("\n").forEach((line) => {
                 if (line.trim() === "") return;
-                
+
                 result = logProcessor.processLine(line.trim());
               });
               setLaunchLog(result);
@@ -145,13 +137,18 @@ export function DockerContextProvider({ children }) {
 
   const removeLabspace = useCallback(
     (publishedRepo) => {
-      setAdditionalLabspaces((labs) => labs.filter((l) => l.publishedRepo !== publishedRepo));
+      setAdditionalLabspaces((labs) =>
+        labs.filter((l) => l.publishedRepo !== publishedRepo),
+      );
     },
     [setAdditionalLabspaces],
   );
 
   useEffect(() => {
-    localStorage.setItem("custom-labspaces", JSON.stringify(additionalLabspaces));
+    localStorage.setItem(
+      "custom-labspaces",
+      JSON.stringify(additionalLabspaces),
+    );
   }, [additionalLabspaces]);
 
   if (!labspaces) {
@@ -160,7 +157,7 @@ export function DockerContextProvider({ children }) {
         <Spinner />
         <p>Loading...</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -176,7 +173,9 @@ export function DockerContextProvider({ children }) {
         startingLabspace,
         launchLog,
 
-        highlightedLabspaces: labspaces.filter(l => l.highlighted).slice(0, 3),
+        highlightedLabspaces: labspaces
+          .filter((l) => l.highlighted)
+          .slice(0, 3),
         labspaces: additionalLabspaces,
         addLabspace,
         removeLabspace,
