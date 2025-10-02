@@ -14,6 +14,17 @@ app.get("/api/labspace", (req, res) => {
   res.json(workshopStore.getWorkshopDetails());
 });
 
+app.post("/api/open-file", (req, res) => {
+  const { filePath, line } = req.body;
+  workshopStore
+    .openFileInIDE(filePath, line)
+    .then(() => res.json({ success: true }))
+    .catch((error) => {
+      console.error("Error opening file:", error);
+      res.status(500).json({ error: "Failed to open file" });
+    });
+});
+
 app.get("/api/sections/:sectionId", (req, res) => {
   const sectionId = req.params.sectionId;
   const content = workshopStore.getSectionDetails(sectionId);

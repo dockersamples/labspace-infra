@@ -119,6 +119,24 @@ export class WorkshopStore {
     fs.writeFileSync(filePath, codeBlock.code, "utf8");
   }
 
+  async openFileInIDE(filePath, line) {
+    return fetch("http://localhost/open", {
+      method: "POST",
+      body: JSON.stringify({ filePath, line }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      dispatcher: new Agent({
+        connect: {
+          socketPath: "/etc/cmd-executor/socket/cmd-executor.sock",
+        },
+      }),
+    }).then((res) => {
+      if (!res.ok)
+        throw new Error(`Failed to execute command: ${res.statusText}`);
+    });
+  }
+
   #getCodeBlock(content, index) {
     const codeBlocks = content.match(/```(.*?)```/gs);
     if (!codeBlocks || codeBlocks[index] === undefined) {
