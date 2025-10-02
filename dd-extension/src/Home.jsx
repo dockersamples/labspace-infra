@@ -101,9 +101,7 @@ export function Home() {
               {labspaces.map((labspace) => (
                 <tr key={labspace.title}>
                   <td className="align-middle">{labspace.title}</td>
-                  <td className="align-middle">
-                    {labspace.publishedRepo}
-                  </td>
+                  <td className="align-middle">{labspace.publishedRepo}</td>
                   <td className="text-end">
                     <Button
                       variant="primary"
@@ -138,7 +136,11 @@ export function Home() {
 
       <UrlHandlingModal
         onLaunchConfirmation={(title, location) => {
-          if ([...highlightedLabspaces, ...labspaces].find((l) => l.location === location) === undefined)
+          if (
+            [...highlightedLabspaces, ...labspaces].find(
+              (l) => l.location === location,
+            ) === undefined
+          )
             addLabspace(title, location);
           startLabspace(location);
         }}

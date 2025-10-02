@@ -196,4 +196,4 @@ export const useSaveFileCommand = () => {
 
 export const useOpenFile = () => {
   return useContext(WorkshopContext).openFile;
-}
+};

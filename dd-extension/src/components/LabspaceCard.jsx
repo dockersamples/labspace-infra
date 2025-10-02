@@ -9,9 +9,7 @@ export function LabspaceCard({ labspace, onLaunch, starting, running }) {
         <Card.Text>{labspace.description}</Card.Text>
       </Card.Body>
       <Card.Footer className="d-flex align-items-center justify-content-between">
-        <div>
-          Created by { labspace.author }
-        </div>
+        <div>Created by {labspace.author}</div>
         <Button onClick={onLaunch} disabled={starting || running}>
           {starting ? "Starting..." : "Launch"}
         </Button>
