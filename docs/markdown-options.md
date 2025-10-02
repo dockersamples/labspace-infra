@@ -82,8 +82,24 @@ If a user clicks this "Save file" button, a `compose.yaml` file will be created 
 
 By default, all links are configured to open new browser tabs when clicked.
 
+### Opening links as a tab
+
 If you want to add another tab to the right-hand panel, you can use the following directive:
 
     ::tabLink[Link text]{href="http://localhost:3000" title="Tab title"}
 
 This will render a link with the visible text of "Link text" pointing to "http://localhost:3000". When clicked, a new tab will be created with the title of "Tab title".
+
+
+### Opening files in the IDE
+
+If you want to create a link that will open a project file in the IDE, you can use the following directive:
+
+    Open the :fileLink[compose.yaml]{path="compose.yaml"} file ...
+
+Directive arguments include:
+
+- **path** - the full path _from the root of the project_ of the file to open
+- **line** (optional) - the line number (1-based) to put the cursor on
+
+The body (text inside the `[]`) is what will be displayed to the user.

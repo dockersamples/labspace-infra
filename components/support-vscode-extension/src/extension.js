@@ -1,17 +1,20 @@
 const vscode = require('vscode');
 const { ExpressSocketServer } = require("./socketServer.js");
 
-let server;
+let server, outputChannel;
 
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
+    outputChannel = vscode.window.createOutputChannel('Labspace Support');
+
 	const start = () => {
         stop();
         server = new ExpressSocketServer(
 			vscode.workspace.getConfiguration('labRunner'), 
-			context.asAbsolutePath('package.json')
+			context.asAbsolutePath('package.json'),
+            outputChannel,
 		);
         server.start();
     };

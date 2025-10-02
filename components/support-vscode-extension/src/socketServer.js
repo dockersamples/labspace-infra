@@ -1,10 +1,11 @@
 const fs = require('fs');
+const path = require('path');
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const vscode = require('vscode');
 
 class SocketServer {
-    constructor(config, packagePath) {
+    constructor(config, packagePath, outputChannel) {
         this.pkgInfo = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
 
         this.cfg = {
@@ -18,34 +19,20 @@ class SocketServer {
 
         this.app = express();
         this.app.use(express.json());
+        this.outputChannel = outputChannel;
 
         this.app.get('/healthz', (req, res) => res.json({ ok: true }));
         this.app.get('/version', (req, res) => res.json({ name: this.pkgInfo.name, version: this.pkgInfo.version }));
 
-        this.app.post('/command', async (req, res) => {
-            try {
-                const token = req.body?.token;
-                if (!token) throw new Error('missing token');
-                
-                const pubKey = fs.readFileSync(this.cfg.publicKeyPath, 'utf8');
-                const payload = jwt.verify(token, pubKey, {
-                    algorithms: ['RS256', 'ES256'],
-                    audience: this.cfg.allowedAud
-                });
+        this.app.post('/command', this.#onCommandRequest.bind(this));
 
-                const cmd = payload.cmd;
-                if (!cmd || typeof cmd !== 'string') throw new Error('missing cmd claim');
-                if (this.cfg.allowedCommandPattern && !new RegExp(this.cfg.allowedCommandPattern).test(cmd)) {
-                    throw new Error('command rejected by allowedCommandPattern');
-                }
-
-                const term = await this.#ensureTerminal(payload.cwd, payload.terminalId);
-                term.sendText(cmd, true);
-                res.json({ ok: true, ran: cmd });
-            } catch (err) {
-                res.status(400).json({ ok: false, error: err?.message || String(err) });
-            }
-        });
+        /**
+         * Open a file in the editor, optionally at a specific line.
+         * Expects JSON body with:
+         * - filePath: string (relative to workspace root)
+         * - line: integer (optional, 1-based line number)
+         */
+        this.app.post("/open", this.#onFileOpenRequest.bind(this));
     }
 
     start() {
@@ -64,6 +51,62 @@ class SocketServer {
             this.server = undefined;
         }
         try { if (fs.existsSync(this.cfg.socketPath)) fs.unlinkSync(this.cfg.socketPath); } catch {}
+    }
+
+    async #onCommandRequest (req, res) {
+        try {
+            const token = req.body?.token;
+            if (!token) throw new Error('missing token');
+            
+            const pubKey = fs.readFileSync(this.cfg.publicKeyPath, 'utf8');
+            const payload = jwt.verify(token, pubKey, {
+                algorithms: ['RS256', 'ES256'],
+                audience: this.cfg.allowedAud
+            });
+
+            const cmd = payload.cmd;
+            if (!cmd || typeof cmd !== 'string') throw new Error('missing cmd claim');
+            if (this.cfg.allowedCommandPattern && !new RegExp(this.cfg.allowedCommandPattern).test(cmd)) {
+                throw new Error('command rejected by allowedCommandPattern');
+            }
+
+            const term = await this.#ensureTerminal(payload.cwd, payload.terminalId);
+            term.sendText(cmd, true);
+            res.json({ ok: true, ran: cmd });
+        } catch (err) {
+            res.status(400).json({ ok: false, error: err?.message || String(err) });
+        }
+    }
+
+    async #onFileOpenRequest (req, res) {
+        this.outputChannel.appendLine(`/open request: ${JSON.stringify(req.body)}`);
+        
+        const { filePath, line } = req.body || {};
+        if (!filePath) {
+            return res.status(400).json({ ok: false, error: 'Missing required filePath' });
+        }
+        
+        try {
+            const absolutePath = path.join(vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || '/', filePath);
+            if (!fs.existsSync(absolutePath)) {
+                return res.status(404).json({ ok: false, error: `Cannot open file ${absolutePath}, as it does not exist` });
+            }
+
+            const fileUri = vscode.Uri.file(absolutePath);
+
+            const doc = await vscode.workspace.openTextDocument(fileUri);
+            const editor = await vscode.window.showTextDocument(doc, { preview: false });
+            if (line && Number.isInteger(line) && line > 0 && line <= doc.lineCount) {
+                const lineIndex = line - 1;
+                const range = new vscode.Range(lineIndex, 0, lineIndex, 0);
+                editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
+                editor.selection = new vscode.Selection(range.start, range.start);
+            }
+            res.json({ success: true });
+        } catch (err) {
+            vscode.window.showErrorMessage(`Failed to open file: ${err?.message || String(err)}`);
+            return res.status(500).json({ ok: false, error: 'failed to open file' });
+        }
     }
 
     async #ensureTerminal(cwd, requestedTerminalName = null) {

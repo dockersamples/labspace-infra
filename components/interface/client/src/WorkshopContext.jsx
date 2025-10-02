@@ -110,6 +110,19 @@ export const WorkshopContextProvider = ({ children }) => {
       });
   }, []);
 
+  const openFile = useCallback((filePath, line) => {
+    fetch(`/api/open-file`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ filePath, line }),
+    }).catch((error) => {
+      console.error("Error opening file:", error);
+      toast.error("Failed to open file. Please try again.");
+    });
+  }, []);
+
   useEffect(() => {
     if (!workshop) return;
     document.title = `${workshop.title} ${activeSection ? `- ${activeSection.title}` : ""}`;
@@ -156,6 +169,7 @@ export const WorkshopContextProvider = ({ children }) => {
         changeActiveSection,
         runCommand,
         saveFileCommand,
+        openFile,
       }}
     >
       {children}
@@ -179,3 +193,7 @@ export const useSaveFileCommand = () => {
   const { saveFileCommand } = useContext(WorkshopContext);
   return saveFileCommand;
 };
+
+export const useOpenFile = () => {
+  return useContext(WorkshopContext).openFile;
+}

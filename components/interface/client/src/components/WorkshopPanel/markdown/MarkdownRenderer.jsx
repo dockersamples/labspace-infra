@@ -11,6 +11,7 @@ import { RenderedImage } from "./RenderedImage";
 import { RenderedSvg } from "./RenderedSvg";
 import { tabDirective } from "./reactDirective";
 import { TabLink } from "./TabLink";
+import { FileLink } from "./FileLink";
 
 export function MarkdownRenderer({ children }) {
   return (
@@ -28,6 +29,7 @@ export function MarkdownRenderer({ children }) {
         img: RenderedImage,
         svg: RenderedSvg,
         tablink: TabLink,
+        filelink: FileLink,
       }}
     >
       {children}
