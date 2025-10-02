@@ -17,10 +17,25 @@ export function TabContextProvider({ children }) {
 
   const removeTab = useCallback(
     (url) => {
-      setTabs((prevTabs) => prevTabs.filter((tab) => tab.url !== url));
-      setActiveTab((prevActiveTab) =>
-        prevActiveTab === url ? null : prevActiveTab,
-      );
+      setTabs((prevTabs) => {
+        const updatedTabs = prevTabs.filter((tab) => tab.url !== url);
+
+        setActiveTab((prevActiveTab) => {
+          if (prevActiveTab === url) {
+            const tabIndex = prevTabs.findIndex((tab) => tab.url === url);
+            if (updatedTabs.length > 0) {
+              const newIndex =
+                tabIndex === 0 ? 0 : Math.min(tabIndex - 1, updatedTabs.length - 1);
+              return updatedTabs[newIndex].url;
+            } else {
+              return null;
+            }
+          }
+          return prevActiveTab;
+        });
+
+        return updatedTabs;
+      });
     },
     [setTabs, setActiveTab],
   );
