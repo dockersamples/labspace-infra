@@ -25,7 +25,9 @@ export function TabContextProvider({ children }) {
             const tabIndex = prevTabs.findIndex((tab) => tab.url === url);
             if (updatedTabs.length > 0) {
               const newIndex =
-                tabIndex === 0 ? 0 : Math.min(tabIndex - 1, updatedTabs.length - 1);
+                tabIndex === 0
+                  ? 0
+                  : Math.min(tabIndex - 1, updatedTabs.length - 1);
               return updatedTabs[newIndex].url;
             } else {
               return null;
