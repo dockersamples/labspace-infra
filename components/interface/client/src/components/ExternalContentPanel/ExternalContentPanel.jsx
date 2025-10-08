@@ -23,12 +23,18 @@ export function ExternalContentPanel() {
           }}
         />
       </div>
-      {activeTab ? (
-        <iframe
-          ref={iframeRef}
-          style={{ flex: 1, border: "none" }}
-          src={activeTab}
-        />
+      {tabs.length > 0 ? (
+        <>
+          {tabs.map((tab) => (
+            <iframe
+              key={tab.url}
+              ref={tab.url === activeTab ? iframeRef : null}
+              style={{ flex: 1, border: "none" }}
+              src={tab.url}
+              className={tab.url === activeTab ? "d-block" : "d-none"}
+            />
+          ))}
+        </>
       ) : (
         <IdePlaceholder
           onLaunch={() => addTab("http://localhost:8085", "Workspace")}
