@@ -13,6 +13,7 @@ setup_project_directory() {
   # Setup project directory
   if [ "$DEV_MODE" = "true" ]; then
     echo "📁 Skipping clone because DEV_MODE is activated (project source will be directly mounted)"
+    run_setup_script
     return
   else
     if [ -z "$PROJECT_CLONE_URL" ]; then
@@ -21,6 +22,7 @@ setup_project_directory() {
     fi
 
     stage_git_repo
+    run_setup_script
   fi
 
   echo "📁 Copying staged files into /project"
@@ -46,7 +48,9 @@ stage_git_repo() {
   echo "🔄 Cloning project repository from $PROJECT_CLONE_URL"
 
   git clone $PROJECT_CLONE_URL /staging
+}
 
+run_setup_script() {
   if [ -n "$SETUP_SCRIPT" ]; then
     if [ -f "$SETUP_SCRIPT" ]; then
       bash "$SETUP_SCRIPT"
