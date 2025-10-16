@@ -1,8 +1,15 @@
 {
+    // NOTE: If making changes to this file, be sure to check the development mode
+    // for Labspaces (this file is overridden in the content development Compose file).
     "remote.autoForwardPorts": false,
     "security.workspace.trust.enabled": false,
     "window.autoDetectColorScheme": true,
     "terminal.integrated.env.linux": {
         "PATH": "${env:PATH}"
+    },
+    "files.exclude": {
+        ".github/workflows/publish-labspace.yaml": true,
+        ".labspace": true,
+        "labspace.yaml": true
     }
 }

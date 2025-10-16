@@ -142,3 +142,17 @@ networks:
   default:
     name: labspace
 
+configs:
+
+  # Show the .labspace directory during content development to make it easier to edit from
+  # inside the Labspace environment
+  workspace-settings:
+    content: |
+      {
+        "remote.autoForwardPorts": false,
+        "security.workspace.trust.enabled": false,
+        "window.autoDetectColorScheme": true,
+        "terminal.integrated.env.linux": {
+            "PATH": "${env:PATH}"
+        }
+      }
