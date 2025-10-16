@@ -61,7 +61,11 @@ services:
         target: /etc/cmd-executor/socket
         volume:
           subpath: socket
-
+    configs:
+      - source: workspace-settings
+        target: /home/coder/.local/share/code-server/User/settings.json
+        uid: "1000"
+        gid: "1000"
 
   host-republisher:
     image: dockersamples/labspace-host-port-republisher:latest
