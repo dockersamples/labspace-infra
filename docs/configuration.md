@@ -120,3 +120,65 @@ services:
       - "8080:8080"
 ```
 
+
+
+### Adding bootstrap tasks
+
+The Labspace configurator (which clones the repo) provides support to run bootstrap tasks to setup the project workspace, perform environment checks, etc.
+
+To specify a setup script, set the `SETUP_SCRIPT` environment variable with a value to the full path of the script to execute.
+
+> [!IMPORTANT]
+> If you are defining a script using Compose `configs`, you will need to escape all environment variables as Compose will replace values at config file creation. See the example below for an example.
+
+The following example adds a setup script that will validate the Labspace is running in a Docker Offload environment with GPU access:
+
+```yaml
+services:
+  configurator:
+    environment:
+      PROJECT_CLONE_URL: https://github.com/dockersamples/labspace-fine-tuning
+      SETUP_SCRIPT: /scripts/validate-environment.sh
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    configs:
+      - source: validation-script
+        target: /scripts/validate-environment.sh
+configs:
+  validation-script:
+    content: |
+      #!/bin/bash
+
+      set -e
+
+      # Get Docker info as JSON
+      DOCKER_INFO=$(curl --unix-socket /var/run/docker.sock http://localhost/info)
+
+      # Check if running in Docker Offload environment
+      echo "Checking Docker Offload environment..."
+      OFFLOAD_LABEL=$(echo "$$DOCKER_INFO" | jq -r '.Labels[]? | select(startswith("cloud.docker.run.version="))')
+
+      if [ -z "$$OFFLOAD_LABEL" ]; then
+          echo "Error: Not running in a Docker Offload environment."
+          echo "Please enable Docker Offload and restart this Labspace"
+          exit 1
+      fi
+
+      echo "✓ Docker Offload environment detected"
+
+      # Check if GPU (nvidia runtime) is available
+      echo "Checking GPU availability..."
+      NVIDIA_RUNTIME=$(echo "$$DOCKER_INFO" | jq -r '.Runtimes.nvidia.path // empty')
+
+      if [ -z "$$NVIDIA_RUNTIME" ]; then
+          echo "Error: GPU not available."
+          echo "Docker Offload environment is not configured with GPUs. Please enable the GPU setting and try again."
+          exit 1
+      fi
+
+      echo "✓ GPU available: nvidia runtime found"
+
+      echo ""
+      echo "All checks passed! Environment is ready."
+      exit 0
+```
