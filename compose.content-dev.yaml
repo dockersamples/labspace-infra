@@ -157,6 +157,6 @@ configs:
         "security.workspace.trust.enabled": false,
         "window.autoDetectColorScheme": true,
         "terminal.integrated.env.linux": {
-            "PATH": "${env:PATH}"
+            "PATH": "$${env:PATH}"
         }
       }
