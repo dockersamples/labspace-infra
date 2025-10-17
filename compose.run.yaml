@@ -7,8 +7,10 @@
 services:
   configurator:
     image: dockersamples/labspace-configurator:latest
+    use_api_socket: true
     volumes:
       - content:/project
+      - docker-creds:/docker-creds
       - support-vscode-extension:/etc/support-extension
     environment:
       PROJECT_CLONE_URL: ${CONTENT_REPO_URL}
@@ -49,6 +51,7 @@ services:
     volumes:
       - socket-proxy:/var/run
       - content:/home/coder/project
+      - docker-creds:/docker-creds
       - type: volume
         source: support-vscode-extension
         target: /etc/cmd-executor/public-key
@@ -138,6 +141,7 @@ volumes:
     name: labspace-socket-proxy
   content:
     name: labspace-content
+  docker-creds:
   support-vscode-extension:
 
 networks:
