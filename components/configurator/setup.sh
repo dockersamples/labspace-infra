@@ -73,6 +73,16 @@ create_keypair() {
   openssl ec -in /etc/support-extension/private-key/cmd-executor.key -pubout -out /etc/support-extension/public-key/cmd-executor.pem
 }
 
+copy_docker_credentials() {
+  echo "📋 Copying Docker credentials"
+
+  if [ -f /run/secrets/docker/config.json ]; then
+    cp /run/secrets/docker/config.json /docker-creds/config.json
+  else
+    echo "⚠️ No Docker credentials found to copy"
+  fi
+}
+
 setup_directories() {
   echo "📁 Creating necessary directories"
   mkdir -p /etc/support-extension/private-key
@@ -86,9 +96,11 @@ update_permissions() {
   chown 1000:1000 -R /etc/support-extension/socket
   chown 1000:1000 -R /etc/support-extension/public-key
   chown 1000:1000 -R /etc/support-extension/private-key
+  chown 1000:1000 -R /docker-creds
 }
 
 setup_directories
 setup_project_directory
 create_keypair
+copy_docker_credentials
 update_permissions
