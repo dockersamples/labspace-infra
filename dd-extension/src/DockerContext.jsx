@@ -40,10 +40,16 @@ export function DockerContextProvider({ children }) {
         fetch(url)
           .then((res) => res.text())
           .then((text) => parse(text))
-          .then((data) => data.labspaces || []),
+          .then((data) => data.labspaces || [])
+          .then((labs) => labs.map(l => ({...l, catalog: url}))),
       ),
     ).then((results) => {
-      setLabspaces(results.flat());
+      setLabspaces(results.flat()
+        .sort((a, b) => {
+          if (a.highlighted && !b.highlighted) return -1;
+          if (!a.highlighted && b.highlighted) return 1;
+          return a.title.localeCompare(b.title);
+        }));
     });
   }, []);
 
@@ -176,7 +182,7 @@ export function DockerContextProvider({ children }) {
         highlightedLabspaces: labspaces
           .filter((l) => l.highlighted)
           .slice(0, 3),
-        labspaces: additionalLabspaces,
+        labspaces: [...additionalLabspaces, ...labspaces.slice(3)],
         addLabspace,
         removeLabspace,
       }}
