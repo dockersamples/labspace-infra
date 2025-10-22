@@ -110,12 +110,14 @@ export function Home() {
                     >
                       Launch
                     </Button>
-                    <Button
-                      variant="danger"
-                      onClick={() => removeLabspace(labspace.publishedRepo)}
-                    >
-                      Remove
-                    </Button>
+                    { !labspace.catalog && (
+                      <Button
+                        variant="danger"
+                        onClick={() => removeLabspace(labspace.publishedRepo)}
+                      >
+                        Remove
+                      </Button>
+                    )}
                   </td>
                 </tr>
               ))}
