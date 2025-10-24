@@ -89,6 +89,7 @@ This project currently provides the following images:
 
 - `dockersamples/labspace-workspace-node` - [Docker Hub](https://hub.docker.com/r/dockersamples/labspace-workspace-node) | [Dockerfile](../components/workspace/node/Dockerfile) - a Node-based environment
 - `dockersamples/labspace-workspace-java` - [Docker Hub](https://hub.docker.com/r/dockersamples/labspace-workspace-java) | [Dockerfile](../components/workspace/java/Dockerfile) - a Java-based environment with a JDK and Maven
+- `dockersamples/labspace-workspace-python` - [Docker Hub](https://hub.docker.com/r/dockersamples/labspace-workspace-python) | [Dockerfile](../components/workspace/python/Dockerfile) - a Python-based environment with poetry, pip, and pytest
 
 If you need to create your own environment, it is recommended to begin with the `dockersamples/labspace-workspace-base` image. This image includes the Docker tooling, extensions, and default VS Code configuration.
 
