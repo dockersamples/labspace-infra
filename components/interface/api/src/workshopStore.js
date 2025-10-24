@@ -7,6 +7,7 @@ import { fetch, Agent } from "undici";
 export class WorkshopStore {
   constructor() {
     this.sections = [];
+    this.variables = {};
     this.signingKey = fs.readFileSync(
       "/etc/cmd-executor/private-key/cmd-executor.key",
     );
@@ -60,7 +61,17 @@ export class WorkshopStore {
     }
 
     const filePath = path.join("/project", section.contentPath);
-    const content = fs.readFileSync(filePath, "utf8");
+    const content = fs
+      .readFileSync(filePath, "utf8")
+      .replace(/\$\$([^\$]+)\$\$/g, (_, varName) => {
+        const key = varName.trim();
+        const has =
+          this.variables &&
+          Object.prototype.hasOwnProperty.call(this.variables, key);
+        const value = has ? this.variables[key] : undefined;
+        if (value === undefined || value === null) return key;
+        return String(value);
+      });
 
     return {
       id: section.id,
@@ -135,6 +146,14 @@ export class WorkshopStore {
       if (!res.ok)
         throw new Error(`Failed to execute command: ${res.statusText}`);
     });
+  }
+
+  setVariable(key, value) {
+    this.variables[key] = value;
+  }
+
+  getVariables() {
+    return this.variables;
   }
 
   #getCodeBlock(content, index) {

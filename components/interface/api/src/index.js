@@ -10,6 +10,16 @@ const workshopStore = new WorkshopStore();
 app.use(express.json());
 app.use(express.static("public"));
 
+app.get("/api/variables", (req, res) => {
+  res.json(workshopStore.getVariables());
+});
+
+app.post("/api/variables", (req, res) => {
+  const { key, value } = req.body;
+  workshopStore.setVariable(key, value);
+  res.json({ success: true });
+});
+
 app.get("/api/labspace", (req, res) => {
   res.json(workshopStore.getWorkshopDetails());
 });
