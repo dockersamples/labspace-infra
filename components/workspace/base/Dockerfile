@@ -6,10 +6,10 @@ EXPOSE 8085
 
 RUN mkdir -p ~/.docker/cli-plugins && chown -R 1000:1000 ~/.docker
 COPY --link --from=docker /usr/local/bin/docker /usr/local/bin/docker
-COPY --link --chown=1000:1000 --from=docker:28.4.0 /usr/local/libexec/docker/cli-plugins /home/coder/.docker/cli-plugins
+COPY --link --chown=1000:1000 --from=docker:28.5.1 /usr/local/libexec/docker/cli-plugins /home/coder/.docker/cli-plugins
 COPY --link --chown=1000:1000 --from=docker/scout-cli:1.18.4 /docker-scout /home/coder/.docker/cli-plugins/docker-scout
-COPY --link --chown=1000:1000 --from=docker/docker-model-cli-desktop-module:v0.1.42 /cli-plugins/model/linux/docker-model /home/coder/.docker/cli-plugins/docker-model
-COPY --link --chown=1000:1000 --from=docker/docker-mcp-cli-desktop-module:v0.21.0 /cli-plugins/mcp/linux/docker-mcp /home/coder/.docker/cli-plugins/docker-mcp
+COPY --link --chown=1000:1000 --from=docker/docker-model-cli-desktop-module:v0.1.46 /cli-plugins/model/linux/docker-model /home/coder/.docker/cli-plugins/docker-model
+COPY --link --chown=1000:1000 --from=docker/docker-mcp-cli-desktop-module:v0.24.0 /cli-plugins/mcp/linux/docker-mcp /home/coder/.docker/cli-plugins/docker-mcp
 
 USER root
 
