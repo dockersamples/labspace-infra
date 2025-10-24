@@ -18,6 +18,7 @@ export const WorkshopContextProvider = ({ children }) => {
   const [activeSection, setActiveSection] = useState(null);
   const [activeSectionId, setActiveSectionId] = useState(sectionId);
   const [refreshCounter, setRefreshCounter] = useState(0);
+  const [variables, setVariables] = useState(null);
 
   useEffect(() => {
     setActiveSectionId(sectionId);
@@ -67,6 +68,20 @@ export const WorkshopContextProvider = ({ children }) => {
         );
       });
   }, [activeSectionId, setActiveSection, refreshCounter]);
+
+  useEffect(() => {
+    fetch("/api/variables")
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to fetch variables");
+        return response.json();
+      })
+      .then((data) => {
+        setVariables(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching variables:", error);
+      });
+  }, []);
 
   const runCommand = useCallback((activeSectionId, codeBlockIndex) => {
     return fetch(`/api/sections/${activeSectionId}/command`, {
@@ -152,7 +167,30 @@ export const WorkshopContextProvider = ({ children }) => {
     setActiveSectionId((id) => id || workshop?.sections?.[0]?.id);
   }, [workshop, setActiveSectionId]);
 
-  if (!workshop || !activeSection) {
+  const setVariable = useCallback(
+    (key, value) => {
+      fetch(`/api/variables`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ key, value }),
+      })
+        .then(() => {
+          setVariables((vars) => ({
+            ...vars,
+            [key]: value ? value : undefined,
+          }));
+        })
+        .catch((error) => {
+          console.error("Error opening file:", error);
+          toast.error("Failed to open file. Please try again.");
+        });
+    },
+    [setVariables],
+  );
+
+  if (!workshop || !activeSection || variables === null) {
     return (
       <div className="loading text-center mt-5 w-100">
         <Spinner />
@@ -170,6 +208,8 @@ export const WorkshopContextProvider = ({ children }) => {
         runCommand,
         saveFileCommand,
         openFile,
+        variables,
+        setVariable,
       }}
     >
       {children}
@@ -196,4 +236,9 @@ export const useSaveFileCommand = () => {
 
 export const useOpenFile = () => {
   return useContext(WorkshopContext).openFile;
+};
+
+export const useVariables = () => {
+  const { variables, setVariable } = useContext(WorkshopContext);
+  return { variables, setVariable };
 };

@@ -103,3 +103,41 @@ Directive arguments include:
 - **line** (optional) - the line number (1-based) to put the cursor on
 
 The body (text inside the `[]`) is what will be displayed to the user.
+
+
+
+## Custom variables
+
+Labspaces provide the ability to ask the user for a value for a variable, which will be used throughout the documentation. This prevents the need to have instructions such as "Replace USERNAME with your username before running the command." Now, you can simply ask them for it up front and the command will have the value.
+
+### Defining variables
+
+To define a variable, use the `::variableDefinition` directive. The directive requires the variable name and a prompt. Example:
+
+    ::variableDefinition[username]{prompt="What is your Docker username?"}
+
+This will display a card that will ask the user for their Docker username.
+
+![Screenshot of the input asking for the Docker username](./images/variable-input.png)
+
+The variable values are stored in memory in the interface backend. This ensures the values are interpolated for all file saves and command executions. Note that because they are stored in memory, if the Labspace is restarted, all values will be lost.
+
+### Using the variables
+
+Once a variable is defined, it can be used anywhere in the markdown files using the syntax `$$VAR_NAME$$`.
+
+For example, to use the variable defined in the previous example, you can have the following markdown:
+
+    1. Build an image with the `docker build` command, tagging it with your username:
+
+        ```bash
+        docker build -t $$username$$/my-first-image .
+        ```
+
+    2. Run your new image with the `docker run` command:
+
+        ```bash
+        docker run -dp 80:80 $$username$$/my-first-image
+        ```
+
+Both of these commands will have the user-specified username both displayed in the interface and executed if they press the run button.
