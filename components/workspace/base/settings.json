@@ -7,6 +7,7 @@
     "terminal.integrated.env.linux": {
         "PATH": "${env:PATH}"
     },
+    "terminal.integrated.scrollback": 10000,
     "files.exclude": {
         ".github/workflows/publish-labspace.yaml": true,
         ".labspace": true,
