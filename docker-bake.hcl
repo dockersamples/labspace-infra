@@ -23,7 +23,8 @@ group "default" {
     "dd-extension",
     "workspace-base",
     "workspace-node", 
-    "workspace-java"
+    "workspace-java",
+    "workspace-python"
   ]
 }
 
@@ -31,7 +32,8 @@ target "workspaces" {
   targets = [
     "workspace-base",
     "workspace-node", 
-    "workspace-java"
+    "workspace-java",
+    "workspace-python"
   ]
 }
 
@@ -96,6 +98,16 @@ target "workspace-java" {
   inherits = ["_common"]
   context = "./components/workspace/java"
   tags = tags(IMAGE_NAMESPACE, "labspace-workspace-java", IMAGE_TAG)
+
+  contexts = {
+    labspace-workspace-base = "target:workspace-base"
+  }
+}
+
+target "workspace-python" {
+  inherits = ["_common"]
+  context = "./components/workspace/python"
+  tags = tags(IMAGE_NAMESPACE, "labspace-workspace-python", IMAGE_TAG)
 
   contexts = {
     labspace-workspace-base = "target:workspace-base"
