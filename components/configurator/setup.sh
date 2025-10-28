@@ -78,6 +78,7 @@ copy_docker_credentials() {
 
   if [ -f /run/secrets/docker/config.json ]; then
     cp /run/secrets/docker/config.json /docker-creds/config.json
+    echo "✅ Docker credentials copied successfully"
   else
     echo "⚠️ No Docker credentials found to copy"
   fi

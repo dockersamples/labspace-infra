@@ -40,8 +40,9 @@ ENV TESTCONTAINERS_HOST_OVERRIDE=localhost
 ENV MODEL_RUNNER_HOST=http://model-runner.docker.internal
 ENV LAB_RUNNER_PUBLIC_KEY_PATH=/etc/lab-runner/public-key/runner.pem
 
-# Making this a symlink because the file is being provided via a volume and there isn't a 
-# way to mount a single file out of a volume (don't want to overwrite the whole .docker dir)
-RUN ln -s /docker-creds/config.json /home/coder/.docker/config.json
+USER root
+COPY ./entrypoint.d /entrypoint.d
+
+USER 1000
 
 CMD ["/home/coder/project"]
