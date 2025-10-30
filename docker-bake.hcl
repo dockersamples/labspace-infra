@@ -20,7 +20,6 @@ group "default" {
     "interface",
     "host-port-republisher",
     "labspace-cleaner",
-    "dd-extension",
     "workspace-base",
     "workspace-node", 
     "workspace-java",
@@ -124,10 +123,4 @@ target "labspace-cleaner" {
   inherits = ["_common"]
   context = "./components/workspace-cleaner"
   tags = tags(IMAGE_NAMESPACE, "labspace-cleaner", IMAGE_TAG)
-}
-
-target "dd-extension" {
-  inherits = ["_common"]
-  context = "./dd-extension"
-  tags = tags(IMAGE_NAMESPACE, "labspace-extension", IMAGE_TAG)
 }
