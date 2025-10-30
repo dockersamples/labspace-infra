@@ -8,6 +8,18 @@ If you are making a Labspace and find gaps, feel free to update these docs and s
 
 ## Getting started
 
+### Quick path
+
+The easiest way to get started is to use the [Labspace Starter repo template](https://github.com/dockersamples/labspace-starter).
+
+1. Open the repo template
+
+2. Click the **Use this template** in the top-right corner
+
+3. Follow the instructions in the starter README to make the Labpsace your own
+
+### Manual setup
+
 1. Create a repository that will host your content
 
 2. At the root of the repository, create a `labspace.yaml` file. That file should have content similar to the following:
@@ -56,7 +68,7 @@ If you are making a Labspace and find gaps, feel free to update these docs and s
 
     Once the stack starts, you can open the app at [http://localhost:3030](http://localhost:3030). 
 
-    The files are bind mounted into the container environment
+    The files are bind mounted into the container environment, making your changes immediately visible in the running Labspace.
 
 
 
