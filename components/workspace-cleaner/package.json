@@ -10,6 +10,6 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "dockerode": "^4.0.7"
+    "dockerode": "^4.0.9"
   }
 }
