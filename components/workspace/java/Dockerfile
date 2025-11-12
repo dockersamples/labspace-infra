@@ -18,7 +18,7 @@ RUN set -eux; \
     echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen; \
     locale-gen en_US.UTF-8; \
     rm -rf /var/lib/apt/lists/*
-COPY --from=eclipse-temurin:21.0.8_9-jdk /opt/java/openjdk /opt/java/openjdk
+COPY --from=eclipse-temurin:21.0.9_10-jdk /opt/java/openjdk /opt/java/openjdk
 RUN find "$JAVA_HOME/lib" -name '*.so' -exec dirname '{}' ';' | sort -u > /etc/ld.so.conf.d/docker-openjdk.conf; \
     ldconfig; \
     java -Xshare:dump;
