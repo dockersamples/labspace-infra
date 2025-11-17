@@ -29,7 +29,7 @@ export function CodeBlockAction({ icon, onClick, completedText, tooltip }) {
     >
       <Button
         className="m-2"
-        variant="secondary"
+        variant="outline-light"
         size="sm"
         onClick={() => {
           setRunning(true);
