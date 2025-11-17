@@ -10,7 +10,7 @@ export function ExternalContentPanel() {
 
   return (
     <div className="d-flex flex-fill flex-column">
-      <div className="p-3 pt-2 pb-0 bg-secondary-subtle">
+      <div className="p-3 pt-2 pb-0 bg-light-subtle">
         <ExternalTabs
           activeTab={activeTab}
           setActiveTab={setActiveTab}
