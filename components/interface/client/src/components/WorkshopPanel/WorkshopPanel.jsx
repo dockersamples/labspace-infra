@@ -35,37 +35,36 @@ export function WorkshopPanel() {
       </div>
 
       <div
+        id="workshop-footer"
         style={{ borderColor: "#E5E5E5 !Important" }}
-        className="workshop-footer d-flex justify-content-between p-3 border-top bg-light-subtle"
+        className="workshop-footer d-flex justify-content-between p-3 border-top bg-light-subtle align-items-center"
       >
         <div>
-          {hasPrev && (
-            <Button
-              size="sm"
-              variant="outline-secondary"
-              onClick={() => changeActiveSection(sections[index - 1].id)}
-              className="d-flex align-items-center"
-            >
-              <span className="material-symbols-outlined">arrow_back</span>
-              <span>Previous</span>
-            </Button>
-          )}
+          <Button
+            size="sm"
+            variant="outline-secondary"
+            onClick={() => changeActiveSection(sections[index - 1].id)}
+            className="d-flex align-items-center"
+            style={{ visibility: hasPrev ? "visible" : "hidden" }}
+          >
+            <span className="material-symbols-outlined">arrow_back</span>
+            <span>Previous</span>
+          </Button>
         </div>
-        <div>
+        <div style={{ maxWidth: "calc(100% - 175px)" }}>
           <WorkshopNav />
         </div>
         <div>
-          {hasNext && (
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => changeActiveSection(sections[index + 1].id)}
-              className="d-flex align-items-center"
-            >
-              <span className="me-1">Next</span>
-              <span className="material-symbols-outlined">arrow_forward</span>
-            </Button>
-          )}
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => changeActiveSection(sections[index + 1].id)}
+            className="d-flex align-items-center"
+            style={{ visibility: hasNext ? "visible" : "hidden" }}
+          >
+            <span className="me-1">Next</span>
+            <span className="material-symbols-outlined">arrow_forward</span>
+          </Button>
         </div>
       </div>
     </div>
