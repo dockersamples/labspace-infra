@@ -2,7 +2,7 @@
   "name": "labspace-support",
   "displayName": "Labspace Support",
   "description": "Provides support for the Labspace environment",
-  "publisher": "Docker Labspaces",
+  "publisher": "docker-labspaces",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.101.2"
@@ -19,7 +19,7 @@
     "lint": "eslint .",
     "pretest": "npm run lint",
     "test": "vscode-test",
-    "package": "vsce package --allow-missing-repository"
+    "package": "vsce package --allow-missing-repository --allow-star-activation"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
@@ -27,8 +27,8 @@
     "@types/vscode": "^1.101.2",
     "@vscode/test-cli": "^0.0.11",
     "@vscode/test-electron": "^2.5.2",
-    "eslint": "^9.32.0",
-    "vsce": "^2.15.0"
+    "@vscode/vsce": "^3.7.0",
+    "eslint": "^9.32.0"
   },
   "dependencies": {
     "express": "^5.1.0",
