@@ -51,7 +51,7 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
 
   return (
     <div
-      className="position-relative code-block d-flex align-items-center"
+      className="position-relative rounded code-block d-flex align-items-center"
       style={{ background: "rgb(43, 43, 43)" }}
     >
       <SyntaxHighlighter
@@ -63,7 +63,7 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
       >
         {String(children).replace(/\n$/, "")}
       </SyntaxHighlighter>
-      <div className="button-container pt-1  bg-light-subtle align-self-stretch d-flex align-items-center">
+      <div className="button-container align-self-stretch d-flex align-items-center">
         {canCopy && (
           <CodeBlockAction
             icon="content_copy"
