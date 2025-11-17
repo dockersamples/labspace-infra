@@ -7,7 +7,7 @@ export function WorkshopNav() {
 
   return (
     <div className="workshop-nav">
-      <Dropdown align="end">
+      <Dropdown className="dropdown-center">
         <Dropdown.Toggle variant="outline-secondary">
           {(activeSection && (
             <>
@@ -18,7 +18,7 @@ export function WorkshopNav() {
             "Sections"}
         </Dropdown.Toggle>
 
-        <Dropdown.Menu>
+        <Dropdown.Menu align="center">
           {sections.map((section, index) => (
             <Dropdown.Item
               key={section.id}
