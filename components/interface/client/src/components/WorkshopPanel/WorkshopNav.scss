@@ -1,0 +1,16 @@
+#workshop-footer {
+  .material-symbols-outlined {
+    font-size: 0.7rem;
+  }
+}
+
+#labspace-nav-dropdown {
+  position: relative;
+  padding-right: 17px;
+
+  &::after {
+    position: absolute;
+    right: 6px;
+    top: 42%;
+  }
+}
