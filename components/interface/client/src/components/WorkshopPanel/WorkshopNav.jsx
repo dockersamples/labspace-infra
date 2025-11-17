@@ -8,7 +8,7 @@ export function WorkshopNav() {
   return (
     <div className="workshop-nav">
       <Dropdown align="end">
-        <Dropdown.Toggle variant="secondary" size="sm">
+        <Dropdown.Toggle variant="outline-secondary">
           {(activeSection && (
             <>
               {sections.findIndex((s) => s.id === activeSection.id) + 1}.{" "}

@@ -5,8 +5,7 @@ import "./WorkshopPanel.scss";
 export function WorkshopPanel() {
   return (
     <div className="d-flex flex-column h-100">
-      <WorkshopHeader />
-      <WorkshopBody />
+       <WorkshopBody />
     </div>
   );
 }
