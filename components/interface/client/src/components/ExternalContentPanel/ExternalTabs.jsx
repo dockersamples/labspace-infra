@@ -9,6 +9,8 @@ export function ExternalTabs({
   onRefreshClick,
 }) {
   return (
+<>
+    {tabs.length > 1 && (
     <Nav
       variant="tabs"
       activeKey={activeTab}
@@ -61,5 +63,8 @@ export function ExternalTabs({
         </Nav.Item>
       ))}
     </Nav>
+
+    )}
+    </>
   );
 }
