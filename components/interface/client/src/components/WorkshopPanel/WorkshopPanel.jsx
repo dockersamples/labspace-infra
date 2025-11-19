@@ -28,7 +28,7 @@ export function WorkshopPanel() {
 
   return (
     <div className="d-flex flex-column h-100">
-      <div className="overflow-auto" ref={bodyRef}>
+      <div className="overflow-auto flex-grow-1" ref={bodyRef}>
         <div className="workshop-body p-5 pt-3 pb-3">
           <MarkdownRenderer>{activeSection.content}</MarkdownRenderer>
         </div>

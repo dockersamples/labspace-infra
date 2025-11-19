@@ -18,7 +18,7 @@ export function WorkshopNav() {
           {(activeSection && (
             <>
               {sections.findIndex((s) => s.id === activeSection.id) + 1}.{" "}
-              {activeSection.title} and a little more
+              {activeSection.title}
             </>
           )) ||
             "Sections"}
