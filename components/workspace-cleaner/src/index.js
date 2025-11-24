@@ -7,14 +7,17 @@ const labelFilterExpr = {
 };
 
 async function cleanup() {
-    const containersToRemove = await docker.listContainers({ filters: labelFilterExpr });;
+    const containersToRemove = await docker.listContainers({ filters: labelFilterExpr, all: true });
 
     if (containersToRemove.length > 0) {
         console.log(`Found ${containersToRemove.length} containers to remove.`);
         for (const containerInfo of containersToRemove) {
             const container = docker.getContainer(containerInfo.Id);
+            const containerDetails = await container.inspect();
             try {
-                await container.stop();
+                if (containerDetails.State.Running) {
+                    await container.stop();
+                }
                 await container.remove();
                 console.log(`Removed container ${containerInfo.Id}`);
             } catch (error) {
