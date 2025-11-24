@@ -77,6 +77,9 @@ clear_staging_directory() {
     rm -rf /staging
     mkdir /staging
   fi
+  if [ ! -d /staging ]; then
+    mkdir /staging
+  fi
 }
 
 clear_project_directory() {
