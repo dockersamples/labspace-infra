@@ -183,3 +183,28 @@ configs:
       echo "All checks passed! Environment is ready."
       exit 0
 ```
+
+
+### Using locally defined Labspace content
+
+When a Labspace starts, it will, by default, clone the content from the content repo. However, there may be situations in which you want to skip this and use locally cloned content, such as running demos.
+
+To do so, you need to:
+
+1. Set the `LOCAL_MODE` environment variable for the `configurator` service to `true`
+2. Mount your content into the `configurator` service
+3. Specify the content location with the `LOCAL_CONTENT_PATH` environment variable in the `configurator` service
+
+When the configurator runs, it will copy all files located at `LOCAL_CONTENT_PATH` into the volume used by the Labspace. Any defined setup scripts will still execute as configured. Since the content is copied, changes to files in the Labspace will change the copied files, making it easy to restart the Labspace from a known and valid state.
+
+The following `compose.override.yaml` will mount the parent directory (since this is in the `.labspace` directory) into the configurator.
+
+```yaml
+services:
+  configurator:
+    volumes:
+      - ../:/custom-content
+    environment:
+      LOCAL_MODE: "true"
+      LOCAL_CONTENT_PATH: /custom-content
+```

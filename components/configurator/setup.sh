@@ -6,8 +6,7 @@ setup_project_directory() {
   echo "📁 Setting up project directory"
 
   clear_project_directory
-  rm -rf /staging
-  mkdir /staging
+  clear_staging_directory
   cd /staging
 
   # Setup project directory
@@ -15,6 +14,19 @@ setup_project_directory() {
     echo "📁 Skipping clone because DEV_MODE is activated (project source will be directly mounted)"
     run_setup_script
     return
+  elif [ "$LOCAL_MODE" = "true" ]; then
+    echo "📁 Local mode enabled."
+    if [ -z "$LOCAL_CONTENT_PATH" ]; then
+      echo "Error: LOCAL_CONTENT_PATH environment variable is not set."
+      exit 1
+    fi
+
+    echo "📁 Using content in ${LOCAL_CONTENT_PATH} as source material"
+    shopt -s dotglob
+    cp -r "${LOCAL_CONTENT_PATH}/"* /staging
+    shopt -u dotglob
+
+    run_setup_script
   else
     if [ -z "$PROJECT_CLONE_URL" ]; then
       echo "Error: PROJECT_CLONE_URL environment variable is not set."
@@ -57,6 +69,13 @@ run_setup_script() {
     else
       echo "Warning: SETUP_SCRIPT defined ('$SETUP_SCRIPT'), but not found."
     fi
+  fi
+}
+
+clear_staging_directory() {
+  if [ "$DEV_MODE" != "true" ]; then
+    rm -rf /staging
+    mkdir /staging
   fi
 }
 
