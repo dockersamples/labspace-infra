@@ -1,0 +1,33 @@
+// Place your key bindings in this file to override the defaults
+[
+    {
+        "key": "shift+cmd+v",
+        "command": "notebook.cell.paste",
+        "when": "notebookEditorFocused && !inputFocus"
+    },
+    {
+        "key": "cmd+v",
+        "command": "-notebook.cell.paste",
+        "when": "notebookEditorFocused && !inputFocus"
+    },
+    {
+        "key": "shift+cmd+v",
+        "command": "workbench.action.terminal.paste",
+        "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
+    },
+    {
+        "key": "cmd+v",
+        "command": "-workbench.action.terminal.paste",
+        "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
+    },
+    {
+        "key": "shift+cmd+v",
+        "command": "filesExplorer.paste",
+        "when": "filesExplorerFocus && foldersViewVisible && !explorerResourceReadonly && !inputFocus"
+    },
+    {
+        "key": "cmd+v",
+        "command": "-filesExplorer.paste",
+        "when": "filesExplorerFocus && foldersViewVisible && !explorerResourceReadonly && !inputFocus"
+    }
+]

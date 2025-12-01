@@ -38,6 +38,7 @@ RUN --mount=from=extension,target=/extension \
 
 COPY --chown=1000:1000 ./config.yaml /home/coder/.config/code-server/config.yaml
 COPY --chown=1000:1000 ./settings.json /home/coder/.local/share/code-server/User/settings.json
+COPY --chown=1000:1000 ./keybindings.json /home/coder/.local/share/code-server/User/keybindings.json
 
 ENV TESTCONTAINERS_HOST_OVERRIDE=localhost
 ENV MODEL_RUNNER_HOST=http://model-runner.docker.internal
