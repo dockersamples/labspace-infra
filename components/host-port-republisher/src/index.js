@@ -101,9 +101,9 @@ docker.getEvents({ filters: { event: ['start', 'die'], ...labelFilterExpr } }, (
       const event = JSON.parse(chunk.toString());
       if (event.Type === 'container') {
         if (event.Action === 'start')
-          onContainerStart(event.id);
+          onContainerStart(event.Actor.ID);
         else if (event.Action === 'die')
-          onContainerDie(event.id);
+          onContainerDie(event.Actor.ID);
       }
     } catch (e) {
       console.error('Error parsing Docker event:', e.message);
