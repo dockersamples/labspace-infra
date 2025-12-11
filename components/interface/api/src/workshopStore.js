@@ -125,9 +125,22 @@ export class WorkshopStore {
       throw new Error("Code block is missing 'save-as' metadata");
     }
 
-    const filePath = path.join("/project", fileName);
-    fs.mkdirSync(path.dirname(filePath), { recursive: true });
-    fs.writeFileSync(filePath, codeBlock.code, "utf8");
+    return fetch("http://localhost/save", {
+      method: "POST",
+      body: JSON.stringify({ filePath: fileName, body: codeBlock.code }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      dispatcher: new Agent({
+        connect: {
+          socketPath: "/etc/cmd-executor/socket/cmd-executor.sock",
+        },
+      }),
+    }).then((res) => {
+      if (!res.ok) {
+        throw new Error(`Failed to save file: ${res.statusText}`);
+      }
+    });
   }
 
   async openFileInIDE(filePath, line) {

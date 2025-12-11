@@ -27,6 +27,14 @@ class SocketServer {
         this.app.post('/command', this.#onCommandRequest.bind(this));
 
         /**
+         * Save a file with provided content.
+         * Expects JSON body with:
+         * - filePath: string (relative to workspace root)
+         * - body: string (file content)
+         */
+        this.app.post('/save', this.#onFileSaveRequest.bind(this));
+
+        /**
          * Open a file in the editor, optionally at a specific line.
          * Expects JSON body with:
          * - filePath: string (relative to workspace root)
@@ -78,6 +86,25 @@ class SocketServer {
         }
     }
 
+    async #onFileSaveRequest(req, res) {
+        this.outputChannel.appendLine(`/save request: ${JSON.stringify(req.body)}`);
+        
+        const { filePath, body } = req.body || {};
+        if (!filePath) {
+            return res.status(400).json({ ok: false, error: 'Missing required filePath' });
+        }
+        
+        try {
+            const absolutePath = this.#getAbsolutePath(filePath);
+            fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
+            fs.writeFileSync(absolutePath, body || '', 'utf8');
+            return res.json({ ok: true });
+        } catch (err) {
+            vscode.window.showErrorMessage(`Failed to save file: ${err?.message || String(err)}`);
+            return res.status(500).json({ ok: false, error: 'failed to save file' });
+        }
+    }
+
     async #onFileOpenRequest (req, res) {
         this.outputChannel.appendLine(`/open request: ${JSON.stringify(req.body)}`);
         
@@ -87,7 +114,7 @@ class SocketServer {
         }
         
         try {
-            const absolutePath = path.join(vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || '/', filePath);
+            const absolutePath = this.#getAbsolutePath(filePath);
             if (!fs.existsSync(absolutePath)) {
                 return res.status(404).json({ ok: false, error: `Cannot open file ${absolutePath}, as it does not exist` });
             }
@@ -144,6 +171,21 @@ class SocketServer {
 
     #escapePath(p) {
         return `'${p.replace(/'/g, "'\\''")}'`;
+    }
+    
+    /**
+     * Get an absolute path for the provided file path.
+     * If the path starts with ~, it is expanded to the user's home directory.
+     * Otherwise, it is treated as relative to the workspace root.
+     * @param {string} filePath The file path to convert
+     * @returns The absolute file path
+     */
+    #getAbsolutePath(filePath) {
+        if (filePath.startsWith("~")) {
+            const homeDir = process.env.HOME || process.env.USERPROFILE || '/';
+            return path.join(homeDir, filePath.slice(1));
+        }
+        return path.join(vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || '/', filePath);
     }
 }
 
