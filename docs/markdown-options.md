@@ -76,6 +76,8 @@ If a user clicks this "Save file" button, a `compose.yaml` file will be created 
 - If the file already exists, the contents will be replaced with what is provided in the code block.
 - All required directories leading up to the file will automatically be created
 
+Note that the path is anchored to the workspace directory. However, special handling is provided for paths that start with `~` in the case a file needs to be saved in the user's home directory.
+
 
 
 ## Links
@@ -104,6 +106,7 @@ Directive arguments include:
 
 The body (text inside the `[]`) is what will be displayed to the user.
 
+Note that the path is anchored to the workspace directory. However, special handling is provided for paths that start with `~` in the case a file needs to be saved in the user's home directory.
 
 
 ## Custom variables
