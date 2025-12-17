@@ -1,4 +1,4 @@
-FROM debian:stable-slim
+FROM dhi.io/debian-base:trixie
 
 RUN apt update && \
     apt install -y curl jq openssl git && \

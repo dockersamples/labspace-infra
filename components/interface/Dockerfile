@@ -1,4 +1,4 @@
-FROM node:lts-slim AS base
+FROM dhi.io/node:24-dev AS base
 WORKDIR /usr/local/app
 
 # Build the client
@@ -28,11 +28,15 @@ COPY api/src ./src
 CMD ["npm", "run", "dev"]
 
 # Build the API
-FROM base AS server-build
+FROM base AS prod-deps
+WORKDIR /usr/local/app
 COPY api/package* ./
 ENV NODE_ENV=production
 RUN npm ci 
 
+FROM dhi.io/node:24 AS production
+WORKDIR /usr/local/app
+COPY --from=prod-deps /usr/local/app/node_modules ./node_modules
 COPY api/src ./src
 COPY --from=client-build /usr/local/app/dist ./public
 
