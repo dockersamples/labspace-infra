@@ -1,8 +1,5 @@
-FROM node:lts-slim AS base
+FROM dhi.io/node:24-dev AS base
 WORKDIR /usr/local/app
-RUN apt update && \
-    apt install -y socat && \
-    rm -rf /var/lib/apt/lists/*
 
 COPY package* ./
 RUN npm install --omit=dev
@@ -13,6 +10,8 @@ ENV NODE_ENV=development
 RUN npm install
 CMD ["npm", "run", "dev"]
 
-FROM base AS final
+FROM dhi.io/node:24 AS production
+WORKDIR /usr/local/app
+COPY --from=base /usr/local/app ./
 ENV NODE_ENV=production
 CMD ["node", "src/index.js"]

@@ -1,4 +1,4 @@
-FROM node:lts-slim AS build
+FROM dhi.io/node:24-dev AS build
 WORKDIR /usr/local/app
 COPY package* ./
 RUN npm install
@@ -13,6 +13,6 @@ RUN npm run package
 # by Compose. While the workspace service can define an additional build context, the
 # referenced service needs to still be a service that runs something. And since Compose
 # doesn't have "build-only" services, this stage is simply a no-op alpine image.
-FROM alpine AS final
+FROM dhi.io/alpine-base:3.22 AS final
 COPY --from=build /usr/local/app/*.vsix /support-extension.vsix
 CMD ["echo", "'no op'"]
