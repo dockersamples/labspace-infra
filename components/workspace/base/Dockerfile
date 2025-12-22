@@ -10,7 +10,7 @@ COPY --link --from=docker /usr/local/bin/docker /usr/local/bin/docker
 # Pinning this to < 29 for now, as version 29+ requires Engine API v1.44+. Some Testcontainers libraries
 # are pinned to older versions of the API.
 COPY --link --chown=1000:1000 --from=docker:28.5.1 /usr/local/libexec/docker/cli-plugins /home/coder/.docker/cli-plugins
-COPY --link --chown=1000:1000 --from=docker/scout-cli:1.18.4 /docker-scout /home/coder/.docker/cli-plugins/docker-scout
+COPY --link --chown=1000:1000 --from=docker/scout-cli:1.19.0 /docker-scout /home/coder/.docker/cli-plugins/docker-scout
 COPY --link --chown=1000:1000 --from=docker/docker-model-cli-desktop-module:v1.0.4 /cli-plugins/model/linux/docker-model /home/coder/.docker/cli-plugins/docker-model
 COPY --link --chown=1000:1000 --from=docker/docker-mcp-cli-desktop-module:v0.32.0 /cli-plugins/mcp/linux/docker-mcp /home/coder/.docker/cli-plugins/docker-mcp
 
