@@ -37,6 +37,7 @@ services:
           subpath: socket
     environment:
       CONTENT_DEV_MODE: true
+      MARLIN_ENDPOINT: http://marlin-mock:3030/events/v1/track
     depends_on:
       workspace:
         condition: service_started
@@ -180,6 +181,19 @@ services:
             requiredLabels:
               labspace-resource: "true"
       LISTEN_SOCKET_PATH: /tmp/proxy/docker.sock
+  
+  marlin-mock:
+    build: ./components/marlin-mock
+    ports:
+      - 3030:3000
+    develop:
+      watch:
+        - path: ./components/marlin-mock/src
+          action: sync
+          target: /usr/local/app/src
+          initial_sync: true
+        - path: ./components/marlin-mock/package-lock.json
+          action: rebuild
 
 volumes:
   socket-proxy:
