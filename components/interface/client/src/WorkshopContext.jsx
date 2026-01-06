@@ -44,7 +44,7 @@ export const WorkshopContextProvider = ({ children }) => {
     if (!activeSectionId) return;
 
     console.log("Fetching section data for ID:", activeSectionId);
-    fetch(`/api/sections/${activeSectionId}`)
+    fetch(`/api/labspace/sections/${activeSectionId}`)
       .then((response) => {
         if (!response.ok) throw new Error("Section not found");
         return response.json();
@@ -84,7 +84,7 @@ export const WorkshopContextProvider = ({ children }) => {
   }, []);
 
   const runCommand = useCallback((activeSectionId, codeBlockIndex) => {
-    return fetch(`/api/sections/${activeSectionId}/command`, {
+    return fetch(`/api/labspace/sections/${activeSectionId}/command`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -105,7 +105,7 @@ export const WorkshopContextProvider = ({ children }) => {
   }, []);
 
   const saveFileCommand = useCallback((activeSectionId, codeBlockIndex) => {
-    return fetch(`/api/sections/${activeSectionId}/save-file`, {
+    return fetch(`/api/labspace/sections/${activeSectionId}/save-file`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -126,7 +126,7 @@ export const WorkshopContextProvider = ({ children }) => {
   }, []);
 
   const openFile = useCallback((filePath, line) => {
-    fetch(`/api/open-file`, {
+    fetch(`/api/labspace/open-file`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
