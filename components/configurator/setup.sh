@@ -126,6 +126,32 @@ update_permissions() {
   chown 1000:1000 -R /docker-creds
 }
 
+populate_docker_desktop_metadata() {
+  echo "📋 Retrieving Docker Desktop configuration"
+
+  IMAGE=$(docker inspect $HOSTNAME --format='{{.Config.Image}}' 2>/dev/null || echo "")
+
+  if [ -z "$IMAGE" ]; then
+    echo "⚠️ Unable to determine Docker image name for running container"
+    return
+  fi
+
+  set +e
+  DOCKER_CONFIG=$(docker run --rm -v /run/host-services/backend.sock:/backend.sock $IMAGE /usr/local/app/get-details.sh 2>/dev/null)
+  EXIT_CODE=$?
+  set -e
+
+
+  if [ $EXIT_CODE -ne 0 ]; then
+    echo "⚠️ Unable to retrieve Docker Desktop configuration: $DOCKER_CONFIG"
+    echo -n '{"uuids": {"dd": null, "hub": null}, "analytics_enabled": null }' > /etc/labspace-support/metadata/metadata.json
+    return
+  fi
+
+  echo "✅ Retrieved Docker Desktop configuration"
+  echo -n $DOCKER_CONFIG > /etc/labspace-support/metadata/metadata.json
+}
+
 setup_support_directories
 setup_project_directory
 create_keypair
