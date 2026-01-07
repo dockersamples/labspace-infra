@@ -44,6 +44,7 @@ services:
     environment:
       CONTENT_DEV_MODE: true
       MARLIN_ENDPOINT: http://marlin-mock:3000/events/v1/track
+      MARLIN_API_KEY: dev-marlin-api-key
     depends_on:
       workspace:
         condition: service_started
@@ -192,6 +193,8 @@ services:
     build: ./components/marlin-mock
     ports:
       - 3030:3000
+    environment:
+      MARLIN_API_KEY: dev-marlin-api-key
     develop:
       watch:
         - path: ./components/marlin-mock/src

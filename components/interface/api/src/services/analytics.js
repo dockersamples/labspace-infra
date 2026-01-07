@@ -85,12 +85,17 @@ export class AnalyticsPublisher {
     enhancedEvent.properties.desktop_instance_uuid = this.ddUserId;
 
     this.queuedEvents.push(enhancedEvent);
+    const headers = {
+      "Content-Type": "application/json",
+    };
+
+    if (process.env.MARLIN_API_KEY) {
+      headers["x-api-key"] = process.env.MARLIN_API_KEY;
+    }
 
     return fetch(process.env.MARLIN_ENDPOINT, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({
         records: [ enhancedEvent ]
       }),

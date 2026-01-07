@@ -12,6 +12,10 @@ app.use(express.json());
 
 // SendGrid API endpoint
 app.post('/events/v1/track', (req, res) => {
+  if (req.headers['x-api-key'] !== process.env.MARLIN_API_KEY) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
   const payload = req.body;
 
   if (!payload || !payload.records) {

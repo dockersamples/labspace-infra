@@ -40,6 +40,11 @@ COPY --from=prod-deps /usr/local/app/node_modules ./node_modules
 COPY api/src ./src
 COPY --from=client-build /usr/local/app/dist ./public
 
+# This is pointing to stage until we validate the analytics.
+# The key is known to be a publicly viewable key.
+ENV MARLIN_ENDPOINT=https://api-stage.docker.com/events/v1/track
+ENV MARLIN_API_KEY=2vZTBp5lAS2lYocaHlWuW4c2GL3ydGhudkBZwqth
+
 EXPOSE 3000
 USER 1000
 CMD ["node", "src/index.js"]
