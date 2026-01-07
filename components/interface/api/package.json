@@ -16,7 +16,6 @@
   "dependencies": {
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "node-graceful-shutdown": "^1.1.5",
     "undici": "^7.13.0",
     "yaml": "^2.8.0"
   },

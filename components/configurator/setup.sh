@@ -2,6 +2,10 @@
 
 set -e
 
+LABSPACE_MODE="standard"
+LABSPACE_CONTENT_VERSION=""
+HOSTNAME=$(cat /etc/hostname)
+
 setup_project_directory() {
   echo "📁 Setting up project directory"
 
@@ -12,6 +16,7 @@ setup_project_directory() {
   # Setup project directory
   if [ "$DEV_MODE" = "true" ]; then
     echo "📁 Skipping clone because DEV_MODE is activated (project source will be directly mounted)"
+    LABSPACE_MODE="dev"
     run_setup_script
     return
   elif [ "$LOCAL_MODE" = "true" ]; then
@@ -27,14 +32,13 @@ setup_project_directory() {
     shopt -u dotglob
 
     run_setup_script
-  else
-    if [ -z "$PROJECT_CLONE_URL" ]; then
-      echo "Error: PROJECT_CLONE_URL environment variable is not set."
-      exit 1
-    fi
-
+  elif [ -n "$PROJECT_CLONE_URL" ]; then
     stage_git_repo
     run_setup_script
+    LABSPACE_CONTENT_VERSION=$(git -C /staging rev-parse --short HEAD || echo "")
+  else
+    echo "📁 No project source specified."
+    exit 1
   fi
 
   echo "📁 Copying staged files into /project"
@@ -152,8 +156,25 @@ populate_docker_desktop_metadata() {
   echo -n $DOCKER_CONFIG > /etc/labspace-support/metadata/metadata.json
 }
 
+create_labspace_metadata() {
+  echo "📋 Creating Labspace metadata"
+
+  populate_docker_desktop_metadata
+
+  IMAGE=$(docker inspect $HOSTNAME --format='{{.Config.Image}}'   2>/dev/null || echo "")
+  IMAGE_TAG=$(echo "$IMAGE" | grep -o ':[^:]*$' | sed 's/://' || echo "unknown")
+  jq --arg tag "$IMAGE_TAG" '. + {infra_version: $tag}' /etc/labspace-support/metadata/metadata.json > /tmp/config.json.tmp && mv /tmp/config.json.tmp /etc/labspace-support/metadata/metadata.json
+
+  LABSPACE_ID=$(yq .id /staging/labspace.yaml 2>/dev/null || echo "unknown")
+  LABSPACE_CONTENT_VERSION=$(yq .content_version /staging/labspace.yaml 2>/dev/null || echo "unknown")
+  jq --arg mode "$LABSPACE_MODE" '. + {labspace_mode: $mode}' /etc/labspace-support/metadata/metadata.json > /tmp/config.json.tmp && mv /tmp/config.json.tmp /etc/labspace-support/metadata/metadata.json
+  jq --arg id "$LABSPACE_ID" '. + {labspace_id: $id}' /etc/labspace-support/metadata/metadata.json > /tmp/config.json.tmp && mv /tmp/config.json.tmp /etc/labspace-support/metadata/metadata.json
+  jq --arg version "$LABSPACE_CONTENT_VERSION" '. + {content_version: $version}' /etc/labspace-support/metadata/metadata.json > /tmp/config.json.tmp && mv /tmp/config.json.tmp /etc/labspace-support/metadata/metadata.json
+}
+
 setup_support_directories
 setup_project_directory
 create_keypair
 copy_docker_credentials
 update_permissions
+create_labspace_metadata
