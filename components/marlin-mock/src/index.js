@@ -48,7 +48,7 @@ app.get('/', (req, res) => {
       return `
       <div style="border: 1px solid #ddd; margin: 10px 0; padding: 15px; border-radius: 5px;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-          <strong>Event: ${eventPayload.event}</strong>
+          <strong>Event: <code>${eventPayload.event}</code> | Action: <code>${eventPayload.properties.action || 'N/A'}</code></strong>
           <small style="color: #666;">${new Date(timestamp).toLocaleString()}</small>
         </div>
         <div style="background: #f5f5f5; padding: 10px; border-radius: 3px; max-height: 200px; overflow-y: auto;">

@@ -43,7 +43,7 @@ services:
           subpath: metadata
     environment:
       CONTENT_DEV_MODE: true
-      MARLIN_ENDPOINT: http://marlin-mock:3030/events/v1/track
+      MARLIN_ENDPOINT: http://marlin-mock:3000/events/v1/track
     depends_on:
       workspace:
         condition: service_started
