@@ -6,7 +6,7 @@ import { labspaceService } from "./labspace.js";
 export class VsCodeService {
   constructor() {
     this.signingKey = fs.readFileSync(
-      "/etc/cmd-executor/private-key/cmd-executor.key",
+      "/etc/labspace-support/private-key/labspace.key",
     );
   }
 
@@ -18,7 +18,7 @@ export class VsCodeService {
 
     const payload = {
       cmd: code,
-      aud: "cmd-executor",
+      aud: "labspace",
       exp: Math.floor(Date.now() / 1000) + 15, // 15 seconds
       iat: Math.floor(Date.now() / 1000),
       jti: crypto.randomUUID(),
@@ -38,7 +38,7 @@ export class VsCodeService {
       },
       dispatcher: new Agent({
         connect: {
-          socketPath: "/etc/cmd-executor/socket/cmd-executor.sock",
+          socketPath: "/etc/labspace-support/socket/labspace.sock",
         },
       }),
     });
@@ -62,7 +62,7 @@ export class VsCodeService {
       },
       dispatcher: new Agent({
         connect: {
-          socketPath: "/etc/cmd-executor/socket/cmd-executor.sock",
+          socketPath: "/etc/labspace-support/socket/labspace.sock",
         },
       }),
     });
@@ -80,7 +80,7 @@ export class VsCodeService {
       },
       dispatcher: new Agent({
         connect: {
-          socketPath: "/etc/cmd-executor/socket/cmd-executor.sock",
+          socketPath: "/etc/labspace-support/socket/labspace.sock",
         },
       }),
     });

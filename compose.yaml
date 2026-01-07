@@ -11,7 +11,8 @@ services:
     volumes:
       - content:/project
       - docker-creds:/docker-creds
-      - support-vscode-extension:/etc/support-extension
+      - labspace-support:/etc/labspace-support
+      - ./sample-content-repo:/staging
     environment:
       DEV_MODE: true
     develop:
@@ -26,15 +27,20 @@ services:
     volumes:
       - ./sample-content-repo:/project
       - type: volume
-        source: support-vscode-extension
-        target: /etc/cmd-executor/private-key
+        source: labspace-support
+        target: /etc/labspace-support/private-key
         volume:
           subpath: private-key
       - type: volume
-        source: support-vscode-extension
-        target: /etc/cmd-executor/socket
+        source: labspace-support
+        target: /etc/labspace-support/socket
         volume:
           subpath: socket
+      - type: volume
+        source: labspace-support
+        target: /etc/labspace-support/metadata
+        volume:
+          subpath: metadata
     environment:
       CONTENT_DEV_MODE: true
       MARLIN_ENDPOINT: http://marlin-mock:3030/events/v1/track
@@ -89,13 +95,13 @@ services:
       - docker-creds:/docker-creds
       - ./sample-content-repo:/home/coder/project
       - type: volume
-        source: support-vscode-extension
-        target: /etc/cmd-executor/public-key
+        source: labspace-support
+        target: /etc/labspace-support/public-key
         volume:
           subpath: public-key
       - type: volume
-        source: support-vscode-extension
-        target: /etc/cmd-executor/socket
+        source: labspace-support
+        target: /etc/labspace-support/socket
         volume:
           subpath: socket
     develop:
@@ -201,7 +207,7 @@ volumes:
   content:
     name: labspace-content
   docker-creds:
-  support-vscode-extension:
+  labspace-support:
 
 networks:
   default:

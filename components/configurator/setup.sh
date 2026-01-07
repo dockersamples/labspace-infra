@@ -91,8 +91,8 @@ clear_project_directory() {
 
 create_keypair() {
   echo "🔑 Generating public/private key pair"
-  openssl ecparam -name prime256v1 -genkey -noout -out /etc/support-extension/private-key/cmd-executor.key
-  openssl ec -in /etc/support-extension/private-key/cmd-executor.key -pubout -out /etc/support-extension/public-key/cmd-executor.pem
+  openssl ecparam -name prime256v1 -genkey -noout -out /etc/labspace-support/private-key/labspace.key
+  openssl ec -in /etc/labspace-support/private-key/labspace.key -pubout -out /etc/labspace-support/public-key/labspace.pem
 }
 
 copy_docker_credentials() {
@@ -106,23 +106,22 @@ copy_docker_credentials() {
   fi
 }
 
-setup_directories() {
+setup_support_directories() {
   echo "📁 Creating necessary directories"
-  mkdir -p /etc/support-extension/private-key
-  mkdir -p /etc/support-extension/public-key
-  mkdir -p /etc/support-extension/socket
+  mkdir -p /etc/labspace-support/private-key
+  mkdir -p /etc/labspace-support/public-key
+  mkdir -p /etc/labspace-support/socket
+  mkdir -p /etc/labspace-support/metadata
 }
 
 update_permissions() {
   echo "🔒 Setting file and directory permissions for coder user"
   chown 1000:1000 -R /project
-  chown 1000:1000 -R /etc/support-extension/socket
-  chown 1000:1000 -R /etc/support-extension/public-key
-  chown 1000:1000 -R /etc/support-extension/private-key
+  chown 1000:1000 -R /etc/labspace-support
   chown 1000:1000 -R /docker-creds
 }
 
-setup_directories
+setup_support_directories
 setup_project_directory
 create_keypair
 copy_docker_credentials

@@ -11,7 +11,7 @@ services:
     volumes:
       - content:/project
       - docker-creds:/docker-creds
-      - support-vscode-extension:/etc/support-extension
+      - labspace-support:/etc/labspace-support
     environment:
       PROJECT_CLONE_URL: ${CONTENT_REPO_URL}
 
@@ -22,13 +22,13 @@ services:
     volumes:
       - content:/project
       - type: volume
-        source: support-vscode-extension
-        target: /etc/cmd-executor/private-key
+        source: labspace-support
+        target: /etc/labspace-support/private-key
         volume:
           subpath: private-key
       - type: volume
-        source: support-vscode-extension
-        target: /etc/cmd-executor/socket
+        source: labspace-support
+        target: /etc/labspace-support/socket
         volume:
           subpath: socket
     depends_on:
@@ -53,13 +53,13 @@ services:
       - content:/home/coder/project
       - docker-creds:/docker-creds
       - type: volume
-        source: support-vscode-extension
-        target: /etc/cmd-executor/public-key
+        source: labspace-support
+        target: /etc/labspace-support/public-key
         volume:
           subpath: public-key
       - type: volume
-        source: support-vscode-extension
-        target: /etc/cmd-executor/socket
+        source: labspace-support
+        target: /etc/labspace-support/socket
         volume:
           subpath: socket
 
@@ -141,7 +141,7 @@ volumes:
   content:
     name: labspace-content
   docker-creds:
-  support-vscode-extension:
+  labspace-support:
 
 networks:
   default:
