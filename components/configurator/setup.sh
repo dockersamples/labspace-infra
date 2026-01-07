@@ -90,6 +90,11 @@ clear_project_directory() {
 }
 
 create_keypair() {
+  if [ -f /etc/labspace-support/private-key/labspace.key ] && [ -f /etc/labspace-support/public-key/labspace.pem ]; then
+    echo "🔑 Key pair already exists, skipping generation"
+    return
+  fi
+
   echo "🔑 Generating public/private key pair"
   openssl ecparam -name prime256v1 -genkey -noout -out /etc/labspace-support/private-key/labspace.key
   openssl ec -in /etc/labspace-support/private-key/labspace.key -pubout -out /etc/labspace-support/public-key/labspace.pem
