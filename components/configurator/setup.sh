@@ -167,14 +167,17 @@ create_labspace_metadata() {
   IMAGE_TAG=$(echo "$IMAGE" | grep -o ':[^:]*$' | sed 's/://' || echo "unknown")
   jq --arg tag "$IMAGE_TAG" '. + {infra_version: $tag}' /etc/labspace-support/metadata/metadata.json > /tmp/config.json.tmp && mv /tmp/config.json.tmp /etc/labspace-support/metadata/metadata.json
 
-  LABSPACE_ID=$(yq .metadata.id /staging/labspace.yaml 2>/dev/null || echo "unknown")
-  jq --arg id "$LABSPACE_ID" '. + {labspace_id: $id}' /etc/labspace-support/metadata/metadata.json > /tmp/config.json.tmp && mv /tmp/config.json.tmp /etc/labspace-support/metadata/metadata.json
+  get_and_store_from_labspace_yaml metadata.id labspace_id
+  get_and_store_from_labspace_yaml metadata.sourceRepo source_repo
+  get_and_store_from_labspace_yaml metadata.contentVersion content_version
+}
 
-  LABSPACE_SOURCE_REPO=$(yq .metadata.sourceRepo /staging/labspace.yaml 2>/dev/null || echo "unknown")
-  jq --arg sourceRepo "$LABSPACE_SOURCE_REPO" '. + {source_repo: $sourceRepo}' /etc/labspace-support/metadata/metadata.json > /tmp/config.json.tmp && mv /tmp/config.json.tmp /etc/labspace-support/metadata/metadata.json
-  
-  LABSPACE_CONTENT_VERSION=$(yq .metadata.contentVersion /staging/labspace.yaml 2>/dev/null || echo "unknown")
-  jq --arg version "$LABSPACE_CONTENT_VERSION" '. + {content_version: $version}' /etc/labspace-support/metadata/metadata.json > /tmp/config.json.tmp && mv /tmp/config.json.tmp /etc/labspace-support/metadata/metadata.json
+get_and_store_from_labspace_yaml() {
+  VALUE=$(yq ."$1" /staging/labspace.yaml 2>/dev/null || echo "")
+  if [ -n "$VALUE" ] || [ "$VALUE" == "null" ]; then
+    VALUE="unknown"
+  fi
+  jq --arg val "$VALUE" ". + {$2: \$val}" /etc/labspace-support/metadata/metadata.json > /tmp/config.json.tmp && mv /tmp/config.json.tmp /etc/labspace-support/metadata/metadata.json
 }
 
 setup_support_directories
