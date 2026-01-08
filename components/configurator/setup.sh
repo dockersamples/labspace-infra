@@ -32,6 +32,16 @@ setup_project_directory() {
     shopt -u dotglob
 
     run_setup_script
+  elif [ -n "$PROJECT_TAR_PATH" ]; then
+    if [ ! -f "$PROJECT_TAR_PATH" ]; then
+      echo "Error: PROJECT_TAR_PATH set, but '$PROJECT_TAR_PATH' not found."
+      exit 1
+    fi
+
+    echo "📁 Using tarball at $PROJECT_TAR_PATH as source material"
+    base64 -d "$PROJECT_TAR_PATH" | tar -xzf - -C /staging
+
+    run_setup_script
   elif [ -n "$PROJECT_CLONE_URL" ]; then
     stage_git_repo
     run_setup_script
