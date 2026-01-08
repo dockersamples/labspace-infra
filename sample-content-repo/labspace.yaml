@@ -2,9 +2,10 @@ metadata:
   id: demo
   sourceRepo: github.com/dockersamples/labspace-infra#sample-content-repo
   contentVersion: 10.0.0
-  title: About Labspaces
-  description: >
-    This Labspace is intended to help you learn about the capabilities of Labspaces and how you can use them for your own training setups.
+
+title: About Labspaces
+description: >
+  This Labspace is intended to help you learn about the capabilities of Labspaces and how you can use them for your own training setups.
 
 sections:
   - title: What is a Labspace?

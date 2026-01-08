@@ -29,9 +29,10 @@ The easiest way to get started is to use the [Labspace Starter repo template](ht
       id: dockersamples/my-first-labspace # Should be the name of the published OCI artifact
       sourceRepo: github.com/dockersamples/my-first-labspace
       contentVersion: abcd123 # Usually the short commit sha
-      title: Labspace title
-      description: |
-        The description of the Labspace, generally in 100 characters or less
+
+    title: Labspace title
+    description: |
+      The description of the Labspace, generally in 100 characters or less
 
     sections:
       - title: Section One

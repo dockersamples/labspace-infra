@@ -167,14 +167,6 @@ create_labspace_metadata() {
   IMAGE_TAG=$(echo "$IMAGE" | grep -o ':[^:]*$' | sed 's/://' || echo "unknown")
   jq --arg tag "$IMAGE_TAG" '. + {infra_version: $tag}' /etc/labspace-support/metadata/metadata.json > /tmp/config.json.tmp && mv /tmp/config.json.tmp /etc/labspace-support/metadata/metadata.json
 
-  TITLE=$(yq .title /staging/labspace.yaml 2>/dev/null || echo "unknown")
-  if [ "$TITLE" != "null" ]; then
-    echo -e "\e[0;31mWARNING:\e[0m labspace.yaml needs to be updated to use the new top-level metadata block. Will perform a migration to provide compatibility, but please update labspace.yaml as soon as possible."
-
-    yq -i '.metadata.title = .title' /staging/labspace.yaml
-    yq -i '.metadata.description = .description' /staging/labspace.yaml
-  fi
-
   LABSPACE_ID=$(yq .metadata.id /staging/labspace.yaml 2>/dev/null || echo "unknown")
   jq --arg id "$LABSPACE_ID" '. + {labspace_id: $id}' /etc/labspace-support/metadata/metadata.json > /tmp/config.json.tmp && mv /tmp/config.json.tmp /etc/labspace-support/metadata/metadata.json
 

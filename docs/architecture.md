@@ -59,9 +59,10 @@ metadata:
   id: dockersamples/sample-labspace
   sourceRepo: github.com/dockersamples/sample-labspace
   contentVersion: abcd123
-  title: Sample Labspace
-  description: >
-    This Labspace is an example and this description would appear in the header under the title.
+
+title: Sample Labspace
+description: >
+  This Labspace is an example and this description would appear in the header under the title.
 
 sections:
 # - title: The name/title of the section. This will appear in the dropdowns and used to generate an "id" of the section (for navigation, etc.)
