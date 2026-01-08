@@ -31,6 +31,11 @@ services:
         target: /etc/labspace-support/socket
         volume:
           subpath: socket
+      - type: volume
+        source: labspace-support
+        target: /etc/labspace-support/metadata
+        volume:
+          subpath: metadata
     environment:
       CONTENT_DEV_MODE: true
     depends_on:
