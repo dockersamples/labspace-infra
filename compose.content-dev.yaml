@@ -11,7 +11,7 @@ services:
     volumes:
       - content:/project
       - docker-creds:/docker-creds
-      - support-vscode-extension:/etc/support-extension
+      - labspace-support:/etc/labspace-support
     environment:
       DEV_MODE: true
 
@@ -22,12 +22,12 @@ services:
     volumes:
       - ${CONTENT_PATH}:/project
       - type: volume
-        source: support-vscode-extension
+        source: labspace-support
         target: /etc/labspace-support/private-key
         volume:
           subpath: private-key
       - type: volume
-        source: support-vscode-extension
+        source: labspace-support
         target: /etc/labspace-support/socket
         volume:
           subpath: socket
