@@ -11,7 +11,8 @@ services:
     volumes:
       - content:/project
       - docker-creds:/docker-creds
-      - support-vscode-extension:/etc/support-extension
+      - labspace-support:/etc/labspace-support
+      - ./sample-content-repo:/staging
     environment:
       DEV_MODE: true
     develop:
@@ -26,17 +27,24 @@ services:
     volumes:
       - ./sample-content-repo:/project
       - type: volume
-        source: support-vscode-extension
-        target: /etc/cmd-executor/private-key
+        source: labspace-support
+        target: /etc/labspace-support/private-key
         volume:
           subpath: private-key
       - type: volume
-        source: support-vscode-extension
-        target: /etc/cmd-executor/socket
+        source: labspace-support
+        target: /etc/labspace-support/socket
         volume:
           subpath: socket
+      - type: volume
+        source: labspace-support
+        target: /etc/labspace-support/metadata
+        volume:
+          subpath: metadata
     environment:
       CONTENT_DEV_MODE: true
+      MARLIN_ENDPOINT: http://marlin-mock:3000/events/v1/track
+      MARLIN_API_KEY: dev-marlin-api-key
     depends_on:
       workspace:
         condition: service_started
@@ -88,13 +96,13 @@ services:
       - docker-creds:/docker-creds
       - ./sample-content-repo:/home/coder/project
       - type: volume
-        source: support-vscode-extension
-        target: /etc/cmd-executor/public-key
+        source: labspace-support
+        target: /etc/labspace-support/public-key
         volume:
           subpath: public-key
       - type: volume
-        source: support-vscode-extension
-        target: /etc/cmd-executor/socket
+        source: labspace-support
+        target: /etc/labspace-support/socket
         volume:
           subpath: socket
     develop:
@@ -180,6 +188,21 @@ services:
             requiredLabels:
               labspace-resource: "true"
       LISTEN_SOCKET_PATH: /tmp/proxy/docker.sock
+  
+  marlin-mock:
+    build: ./components/marlin-mock
+    ports:
+      - 3030:3000
+    environment:
+      MARLIN_API_KEY: dev-marlin-api-key
+    develop:
+      watch:
+        - path: ./components/marlin-mock/src
+          action: sync
+          target: /usr/local/app/src
+          initial_sync: true
+        - path: ./components/marlin-mock/package-lock.json
+          action: rebuild
 
 volumes:
   socket-proxy:
@@ -187,7 +210,7 @@ volumes:
   content:
     name: labspace-content
   docker-creds:
-  support-vscode-extension:
+  labspace-support:
 
 networks:
   default:

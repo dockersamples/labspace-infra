@@ -1,16 +1,11 @@
 import { parse } from "yaml";
 import fs from "fs";
 import path from "path";
-import jwt from "jsonwebtoken";
-import { fetch, Agent } from "undici";
 
-export class WorkshopStore {
+export class LabspaceService {
   constructor() {
     this.sections = [];
     this.variables = {};
-    this.signingKey = fs.readFileSync(
-      "/etc/cmd-executor/private-key/cmd-executor.key",
-    );
   }
 
   async bootstrap() {
@@ -29,7 +24,7 @@ export class WorkshopStore {
     }));
   }
 
-  getWorkshopDetails() {
+  getLabspaceDetails() {
     if (process.env.CONTENT_DEV_MODE) this.bootstrap();
 
     const details = {
@@ -80,87 +75,6 @@ export class WorkshopStore {
     };
   }
 
-  executeCommand(sectionId, codeBlockIndex) {
-    const { content } = this.getSectionDetails(sectionId);
-
-    const { code, meta } = this.#getCodeBlock(content, codeBlockIndex);
-
-    const payload = {
-      cmd: code,
-      aud: "cmd-executor",
-      exp: Math.floor(Date.now() / 1000) + 15, // 15 seconds
-      iat: Math.floor(Date.now() / 1000),
-      jti: crypto.randomUUID(),
-    };
-
-    if (meta["terminal-id"]) {
-      payload.terminalId = meta["terminal-id"];
-    }
-
-    const token = jwt.sign(payload, this.signingKey, { algorithm: "ES256" });
-
-    return fetch("http://localhost/command", {
-      method: "POST",
-      body: JSON.stringify({ token }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-      dispatcher: new Agent({
-        connect: {
-          socketPath: "/etc/cmd-executor/socket/cmd-executor.sock",
-        },
-      }),
-    }).then((res) => {
-      if (!res.ok)
-        throw new Error(`Failed to execute command: ${res.statusText}`);
-    });
-  }
-
-  async saveFile(sectionId, codeBlockIndex) {
-    const { content } = this.getSectionDetails(sectionId);
-
-    const codeBlock = this.#getCodeBlock(content, codeBlockIndex);
-    const fileName = codeBlock.meta["save-as"];
-    if (!fileName) {
-      throw new Error("Code block is missing 'save-as' metadata");
-    }
-
-    return fetch("http://localhost/save", {
-      method: "POST",
-      body: JSON.stringify({ filePath: fileName, body: codeBlock.code }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-      dispatcher: new Agent({
-        connect: {
-          socketPath: "/etc/cmd-executor/socket/cmd-executor.sock",
-        },
-      }),
-    }).then((res) => {
-      if (!res.ok) {
-        throw new Error(`Failed to save file: ${res.statusText}`);
-      }
-    });
-  }
-
-  async openFileInIDE(filePath, line) {
-    return fetch("http://localhost/open", {
-      method: "POST",
-      body: JSON.stringify({ filePath, line }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-      dispatcher: new Agent({
-        connect: {
-          socketPath: "/etc/cmd-executor/socket/cmd-executor.sock",
-        },
-      }),
-    }).then((res) => {
-      if (!res.ok)
-        throw new Error(`Failed to execute command: ${res.statusText}`);
-    });
-  }
-
   setVariable(key, value) {
     this.variables[key] = value;
   }
@@ -169,7 +83,8 @@ export class WorkshopStore {
     return this.variables;
   }
 
-  #getCodeBlock(content, index) {
+  getCodeBlock(sectionId, index) {
+    const { content } = this.getSectionDetails(sectionId);
     const codeBlocks = content.match(/```(.*?)```/gs);
     if (!codeBlocks || codeBlocks[index] === undefined) {
       throw new Error(
@@ -200,3 +115,5 @@ export class WorkshopStore {
     };
   }
 }
+
+export const labspaceService = new LabspaceService();

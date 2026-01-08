@@ -25,6 +25,11 @@ The easiest way to get started is to use the [Labspace Starter repo template](ht
 2. At the root of the repository, create a `labspace.yaml` file. That file should have content similar to the following:
 
     ```yaml
+    metadata:
+      id: dockersamples/my-first-labspace # Should be the name of the published OCI artifact
+      sourceRepo: github.com/dockersamples/my-first-labspace
+      contentVersion: abcd123 # Usually the short commit sha
+
     title: Labspace title
     description: |
       The description of the Labspace, generally in 100 characters or less

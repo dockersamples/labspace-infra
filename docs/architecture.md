@@ -55,6 +55,11 @@ The _content_ for a Labspace is sourced from a git repository.
 At the root of the repository is a `labspace.yaml` that defines the Labspace. The following is an example:
 
 ```yaml
+metadata:
+  id: dockersamples/sample-labspace
+  sourceRepo: github.com/dockersamples/sample-labspace
+  contentVersion: abcd123
+
 title: Sample Labspace
 description: >
   This Labspace is an example and this description would appear in the header under the title.

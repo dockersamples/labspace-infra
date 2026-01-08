@@ -16,10 +16,14 @@ The `labspace.yaml` file defines the configuration for the Labspace. It **must b
 
 The file consists of the following items:
 
-```yaml
-title: The Labspace title
-description: >
-  The subtitle or description of the Labspace
+```yaml save-as=labspace.yaml
+metadata:
+  id: dockersamples/my-first-labspace # Should be the name of the published OCI artifact
+  sourceRepo: github.com/dockersamples/my-first-labspace
+  contentVersion: abcd123 # Usually the short commit sha
+  title: Labspace title
+  description: |
+    The description of the Labspace, generally in 100 characters or less
 
 sections:
   - title: Section One

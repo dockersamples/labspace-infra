@@ -9,9 +9,9 @@ class SocketServer {
         this.pkgInfo = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
 
         this.cfg = {
-            socketPath: config.socketPath || '/etc/cmd-executor/socket/cmd-executor.sock',
-            publicKeyPath: config.publicKeyPath || '/etc/cmd-executor/public-key/cmd-executor.pem',
-            allowedAudiences: "cmd-executor",
+            socketPath: config.socketPath || '/etc/labspace-support/socket/labspace.sock',
+            publicKeyPath: config.publicKeyPath || '/etc/labspace-support/public-key/labspace.pem',
+            allowedAudiences: "labspace",
             terminalName: config.terminalName || 'labspace',
             runInExistingTerminal: true,
             allowedCommandPattern: null,
