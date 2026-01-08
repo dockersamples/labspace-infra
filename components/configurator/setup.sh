@@ -179,7 +179,7 @@ create_labspace_metadata() {
 
 get_and_store_from_labspace_yaml() {
   VALUE=$(yq ."$1" /staging/labspace.yaml 2>/dev/null || echo "")
-  if [ -n "$VALUE" ] || [ "$VALUE" == "null" ]; then
+  if [ -z "$VALUE" ] || [ "$VALUE" == "null" ]; then
     VALUE="unknown"
   fi
   jq --arg val "$VALUE" ". + {$2: \$val}" /etc/labspace-support/metadata/metadata.json > /tmp/config.json.tmp && mv /tmp/config.json.tmp /etc/labspace-support/metadata/metadata.json
