@@ -161,14 +161,19 @@ create_labspace_metadata() {
 
   populate_docker_desktop_metadata
 
+  jq --arg mode "$LABSPACE_MODE" '. + {labspace_mode: $mode}' /etc/labspace-support/metadata/metadata.json > /tmp/config.json.tmp && mv /tmp/config.json.tmp /etc/labspace-support/metadata/metadata.json
+  
   IMAGE=$(docker inspect $HOSTNAME --format='{{.Config.Image}}'   2>/dev/null || echo "")
   IMAGE_TAG=$(echo "$IMAGE" | grep -o ':[^:]*$' | sed 's/://' || echo "unknown")
   jq --arg tag "$IMAGE_TAG" '. + {infra_version: $tag}' /etc/labspace-support/metadata/metadata.json > /tmp/config.json.tmp && mv /tmp/config.json.tmp /etc/labspace-support/metadata/metadata.json
 
-  LABSPACE_ID=$(yq .id /staging/labspace.yaml 2>/dev/null || echo "unknown")
-  LABSPACE_CONTENT_VERSION=$(yq .content_version /staging/labspace.yaml 2>/dev/null || echo "unknown")
-  jq --arg mode "$LABSPACE_MODE" '. + {labspace_mode: $mode}' /etc/labspace-support/metadata/metadata.json > /tmp/config.json.tmp && mv /tmp/config.json.tmp /etc/labspace-support/metadata/metadata.json
+  LABSPACE_ID=$(yq .metadata.id /staging/labspace.yaml 2>/dev/null || echo "unknown")
   jq --arg id "$LABSPACE_ID" '. + {labspace_id: $id}' /etc/labspace-support/metadata/metadata.json > /tmp/config.json.tmp && mv /tmp/config.json.tmp /etc/labspace-support/metadata/metadata.json
+
+  LABSPACE_SOURCE_REPO=$(yq .metadata.sourceRepo /staging/labspace.yaml 2>/dev/null || echo "unknown")
+  jq --arg sourceRepo "$LABSPACE_SOURCE_REPO" '. + {source_repo: $sourceRepo}' /etc/labspace-support/metadata/metadata.json > /tmp/config.json.tmp && mv /tmp/config.json.tmp /etc/labspace-support/metadata/metadata.json
+  
+  LABSPACE_CONTENT_VERSION=$(yq .metadata.contentVersion /staging/labspace.yaml 2>/dev/null || echo "unknown")
   jq --arg version "$LABSPACE_CONTENT_VERSION" '. + {content_version: $version}' /etc/labspace-support/metadata/metadata.json > /tmp/config.json.tmp && mv /tmp/config.json.tmp /etc/labspace-support/metadata/metadata.json
 }
 

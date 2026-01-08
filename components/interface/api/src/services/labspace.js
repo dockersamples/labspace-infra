@@ -28,8 +28,8 @@ export class LabspaceService {
     if (process.env.CONTENT_DEV_MODE) this.bootstrap();
 
     const details = {
-      title: this.config.title,
-      subtitle: this.config.description,
+      title: this.config.metadata.title,
+      subtitle: this.config.metadata.description,
       sections: this.config.sections.map((section) => ({
         id: section.id,
         title: section.title,
