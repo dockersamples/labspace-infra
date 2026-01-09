@@ -42,8 +42,8 @@ COPY --from=client-build /usr/local/app/dist ./public
 
 # This is pointing to stage until we validate the analytics.
 # The key is known to be a publicly viewable key.
-ENV MARLIN_ENDPOINT=https://api-stage.docker.com/events/v1/track
-ENV MARLIN_API_KEY=2vZTBp5lAS2lYocaHlWuW4c2GL3ydGhudkBZwqth
+ENV MARLIN_ENDPOINT=https://api.docker.com/events/v1/track
+ENV MARLIN_API_KEY=SI7YliKTll5lLPOqPxtJZ49oZ7LgVcqG5sv11bkt
 
 EXPOSE 3000
 USER 1000

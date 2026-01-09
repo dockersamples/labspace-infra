@@ -14,12 +14,15 @@ export class AnalyticsPublisher {
     this.hubUserId = labspaceMetadata.uuids.hub;
     this.ddUserId = labspaceMetadata.uuids.dd;
     this.infraVersion = labspaceMetadata.infra_version;
+    this.sourceRepo = labspaceMetadata.source_repo;
     this.contentVersion = labspaceMetadata.content_version;
     
     this.queuedEvents = [];
     this.startTimestamp = Date.now();
     this.previousSectionId = null;
     this.sectionsVisited = new Set();
+
+    console.log(`AnalyticsPublisher initialized. ${this.optIn ? "Analytics enabled" : "Analytics disabled"}`);
   }
 
   publishStartEvent() {
@@ -71,13 +74,14 @@ export class AnalyticsPublisher {
     const enhancedEvent = {
       event,
       source: "labspace",
+      event_timestamp: Date.now(),
       properties: {
         ...eventProperties,
         labspace_id: this.labspaceId,
+        labspace_source_repo: this.sourceRepo,
         labspace_content_version: this.contentVersion,
         labspace_mode: this.labspaceMode,
         labspace_infra_version: this.infraVersion,
-        timestamp: Date.now(),
       },
     };
 
@@ -99,6 +103,11 @@ export class AnalyticsPublisher {
       body: JSON.stringify({
         records: [ enhancedEvent ]
       }),
+    }).then(async (res) => {
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Non-200 response from analytics endpoint: ${res.status} - ${text}`);
+      }
     }).catch((err) => {
       console.error("Failed to send analytics event:", err);
     });
