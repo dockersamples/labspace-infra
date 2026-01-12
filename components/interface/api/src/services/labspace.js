@@ -75,6 +75,12 @@ export class LabspaceService {
     };
   }
 
+  getSectionIndex(sectionId) {
+    return this.config.sections.findIndex(
+      (section) => section.id === sectionId,
+    );
+  }
+
   setVariable(key, value) {
     this.variables[key] = value;
   }

@@ -47,6 +47,7 @@ export class AnalyticsPublisher {
     return this.#sendEvent("user_action", {
       action,
       section_id: sectionId,
+      section_index: labspaceService.getSectionIndex(sectionId),
       code_block_index: codeBlockIndex,
       is_success: isSuccess,
     });
@@ -64,7 +65,9 @@ export class AnalyticsPublisher {
     return this.#sendEvent("user_action", {
       action: "section_change",
       section_id: sectionId,
+      section_index: labspaceService.getSectionIndex(sectionId),
       prev_section: prevSection,
+      prev_section_index: prevSection ? labspaceService.getSectionIndex(prevSection) : null,
     });
   }
 
