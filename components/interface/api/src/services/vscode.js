@@ -67,8 +67,11 @@ export class VsCodeService {
       }),
     });
     if (!res.ok) {
-      throw new Error(`Failed to save file: ${res.statusText}`);
+      const e = new Error(`Failed to save file: ${res.statusText}`);
+      e.fileName = fileName;
+      throw e;
     }
+    return fileName;
   }
 
   async openFileInIDE(filePath, line) {

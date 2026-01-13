@@ -13,9 +13,13 @@ router.post("/open-file", (req, res) => {
   const { filePath, line } = req.body;
   vscodeService
     .openFileInIDE(filePath, line)
-    .then(() => res.json({ success: true }))
+    .then(() => {
+      analyticsPublisher.publishUserActionEvent("open_file", sectionId, null, true, filePath);
+      res.json({ success: true })
+    })
     .catch((error) => {
       console.error("Error opening file:", error);
+      analyticsPublisher.publishUserActionEvent("open_file", sectionId, null, false, filePath);
       res.status(500).json({ error: "Failed to open file" });
     });
 });
@@ -55,13 +59,13 @@ router.post("/sections/:sectionId/save-file", (req, res) => {
   
   vscodeService
     .saveFile(sectionId, codeBlockIndex)
-    .then(() => {
-      analyticsPublisher.publishUserActionEvent("save_file", sectionId, codeBlockIndex, true);
+    .then((filename) => {
+      analyticsPublisher.publishUserActionEvent("save_file", sectionId, codeBlockIndex, true, filename);
       res.json({ success: true, message: "File saved" })
     })
     .catch((error) => {
       console.error("Error saving file:", error);
-      analyticsPublisher.publishUserActionEvent("save_file", sectionId, codeBlockIndex, false);
+      analyticsPublisher.publishUserActionEvent("save_file", sectionId, codeBlockIndex, false, error.fileName);
       res.status(500).json({ error: "Failed to save file" });
     });
 });

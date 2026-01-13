@@ -183,7 +183,7 @@ create_labspace_metadata() {
   if [ -n "$LABSPACE_CONTENT_VERSION" ]; then
     jq --arg version "$LABSPACE_CONTENT_VERSION" '. + {contentVersion: $version}' /etc/labspace-support/metadata/metadata.json > /tmp/config.json.tmp && mv /tmp/config.json.tmp /etc/labspace-support/metadata/metadata.json
   else
-    get_and_store_from_labspace_yaml metadata.contentVersion contentVersion
+    get_and_store_from_labspace_yaml metadata.contentVersion content_version
   fi
 }
 
