@@ -43,13 +43,14 @@ export class AnalyticsPublisher {
     });
   }
 
-  publishUserActionEvent(action, sectionId, codeBlockIndex, isSuccess) {
+  publishUserActionEvent(action, sectionId, codeBlockIndex, isSuccess, filename) {
     return this.#sendEvent("user_action", {
       action,
       section_id: sectionId,
       section_index: labspaceService.getSectionIndex(sectionId),
       code_block_index: codeBlockIndex,
       is_success: isSuccess,
+      filename,
     });
   }
 
