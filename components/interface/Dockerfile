@@ -34,7 +34,15 @@ COPY api/package* ./
 ENV NODE_ENV=production
 RUN npm ci 
 
+##################################################
+#                 FINAL STAGE                    #
+##################################################
+
 FROM dhi.io/node:24 AS production
+
+# cat is used by the extension to get the contents of the labspace.yaml file
+COPY --link --from=base /bin/cat /bin/cat
+
 WORKDIR /usr/local/app
 COPY --from=prod-deps /usr/local/app/node_modules ./node_modules
 COPY api/src ./src
