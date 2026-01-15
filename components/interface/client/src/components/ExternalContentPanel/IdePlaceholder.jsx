@@ -1,7 +1,7 @@
 import Button from "react-bootstrap/Button";
 import "./IdePlaceholder.scss";
 
-export function IdePlaceholder({ onLaunch }) {
+export function IdePlaceholder({ onLaunch, vscodeUrl }) {
   return (
     <div className="vscode-placeholder" id="vscode-placeholder">
       <svg viewBox="0 0 24 24" fill="currentColor">
@@ -22,12 +22,7 @@ export function IdePlaceholder({ onLaunch }) {
           Load VS Code here
         </Button>
 
-        <Button
-          as="a"
-          href="http://localhost:8085"
-          target="_blank"
-          variant="secondary"
-        >
+        <Button as="a" href={vscodeUrl} target="_blank" variant="secondary">
           Open VS Code in New Tab
         </Button>
       </div>

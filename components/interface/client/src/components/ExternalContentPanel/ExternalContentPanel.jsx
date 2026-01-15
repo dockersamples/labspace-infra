@@ -3,8 +3,10 @@ import { useTabs } from "../../TabContext";
 import "./ExternalContentPanel.scss";
 import { ExternalTabs } from "./ExternalTabs";
 import { useRef } from "react";
+import { useConfig } from "../../ConfigContext";
 
 export function ExternalContentPanel() {
+  const config = useConfig();
   const { tabs, setActiveTab, activeTab, addTab, removeTab } = useTabs();
   const iframeRef = useRef();
 
@@ -37,7 +39,8 @@ export function ExternalContentPanel() {
         </>
       ) : (
         <IdePlaceholder
-          onLaunch={() => addTab("http://localhost:8085", "Workspace")}
+          onLaunch={() => addTab(config.vscodeEndpoint, "Workspace")}
+          vscodeUrl={config.vscodeEndpoint}
         />
       )}
     </div>

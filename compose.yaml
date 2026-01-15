@@ -5,6 +5,22 @@
 # If you are trying to develop a Labspace, use the `compose.content-dev.yaml` file.
 ##################################################################################################
 services:
+  traefik:
+    image: traefik:3.6.7
+    command:
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+    ports:
+      - 3030:80
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      traefik.enable: true
+      traefik.http.routers.traefik.rule: Host(`traefik.localhost`)
+      traefik.http.services.traefik.loadbalancer.server.port: 8080
+
   configurator:
     build: ./components/configurator
     use_api_socket: true
@@ -63,8 +79,6 @@ services:
     build:
       context: ./components/interface
       target: client-dev
-    ports:
-      - 5173:5173
     develop:
       watch:
         - path: ./components/interface/client/src
@@ -72,6 +86,10 @@ services:
           target: /usr/local/app/src
         - path: ./components/interface/client/package-lock.json
           action: rebuild
+    labels:
+      traefik.enable: true
+      traefik.http.routers.interface.rule: Host(`localhost`)
+      traefik.http.services.interface.loadbalancer.server.port: 5173
 
   # This service is not running anything, but simply building the extension
   # and allowing it to be an additional build context for the workspace service
@@ -89,7 +107,6 @@ services:
       socket-proxy:
         condition: service_started
     ports:
-      - 8085:8085 # For the IDE itself
       - 3000:3000 # For the Node application running in the IDE
     volumes:
       - socket-proxy:/var/run
@@ -105,6 +122,10 @@ services:
         target: /etc/labspace-support/socket
         volume:
           subpath: socket
+    labels:
+      traefik.enable: true
+      traefik.http.routers.vscode.rule: Host(`vscode.localhost`)
+      traefik.http.services.vscode.loadbalancer.server.port: 8085
     develop:
       watch:
         - path: ./components/workspace
@@ -191,10 +212,12 @@ services:
   
   marlin-mock:
     build: ./components/marlin-mock
-    ports:
-      - 3030:3000
     environment:
       MARLIN_API_KEY: dev-marlin-api-key
+    labels:
+      traefik.enable: true
+      traefik.http.routers.marlin-mock.rule: Host(`marlin.localhost`)
+      traefik.http.services.marlin-mock.loadbalancer.server.port: 3000
     develop:
       watch:
         - path: ./components/marlin-mock/src
