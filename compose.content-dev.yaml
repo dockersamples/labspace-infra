@@ -5,6 +5,22 @@
 ##################################################################################################
 
 services:
+  traefik:
+    image: traefik:3.6.7
+    command:
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+    ports:
+      - 3030:80
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      traefik.enable: true
+      traefik.http.routers.traefik.rule: Host(`traefik.localhost`)
+      traefik.http.services.traefik.loadbalancer.server.port: 8080
+
   configurator:
     image: dockersamples/labspace-configurator:latest
     use_api_socket: true
@@ -17,8 +33,6 @@ services:
 
   interface:
     image: dockersamples/labspace-interface:latest
-    ports:
-      - "3030:3030"
     volumes:
       - ${CONTENT_PATH}:/project
       - type: volume
@@ -38,6 +52,10 @@ services:
           subpath: metadata
     environment:
       CONTENT_DEV_MODE: true
+    labels:
+      traefik.enable: true
+      traefik.http.routers.interface.rule: Host(`localhost`)
+      traefik.http.services.interface.loadbalancer.server.port: 3030
     depends_on:
       workspace:
         condition: service_started
@@ -53,7 +71,6 @@ services:
       socket-proxy:
         condition: service_started
     ports:
-      - 8085:8085 # For the IDE itself
       - 3000:3000 # For the Node application running in the IDE
     volumes:
       - socket-proxy:/var/run
@@ -74,6 +91,10 @@ services:
         target: /home/coder/.local/share/code-server/User/settings.json
         uid: "1000"
         gid: "1000"
+    labels:
+      traefik.enable: true
+      traefik.http.routers.vscode.rule: Host(`vscode.localhost`)
+      traefik.http.services.vscode.loadbalancer.server.port: 8085
 
   host-republisher:
     image: dockersamples/labspace-host-port-republisher:latest

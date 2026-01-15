@@ -5,6 +5,20 @@
 ##################################################################################################
 
 services:
+  traefik:
+    image: traefik:3.6.7
+    command:
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+    ports:
+      - 3030:80
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      traefik.enable: true
+
   configurator:
     image: dockersamples/labspace-configurator:latest
     use_api_socket: true
@@ -36,6 +50,10 @@ services:
         target: /etc/labspace-support/metadata
         volume:
           subpath: metadata
+    labels:
+      traefik.enable: true
+      traefik.http.routers.interface.rule: Host(`localhost`)
+      traefik.http.services.interface.loadbalancer.server.port: 3030
     depends_on:
       workspace:
         condition: service_started
@@ -51,7 +69,6 @@ services:
       socket-proxy:
         condition: service_started
     ports:
-      - 8085:8085 # For the IDE itself
       - 3000:3000 # For the Node application running in the IDE
     volumes:
       - socket-proxy:/var/run
@@ -67,6 +84,10 @@ services:
         target: /etc/labspace-support/socket
         volume:
           subpath: socket
+    labels:
+      traefik.enable: true
+      traefik.http.routers.vscode.rule: Host(`vscode.localhost`)
+      traefik.http.services.vscode.loadbalancer.server.port: 8085
 
 
   host-republisher:
