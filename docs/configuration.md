@@ -127,7 +127,7 @@ services:
 
 The Labspace configurator (which clones the repo) provides support to run bootstrap tasks to setup the project workspace, perform environment checks, etc.
 
-To specify a setup script, set the `SETUP_SCRIPT` environment variable with a value to the full path of the script to execute.
+To do so, simply add setup scripts into `/init-scripts`.
 
 > [!IMPORTANT]
 > If you are defining a script using Compose `configs`, you will need to escape all environment variables as Compose will replace values at config file creation. See the example below for an example.
@@ -139,12 +139,11 @@ services:
   configurator:
     environment:
       PROJECT_CLONE_URL: https://github.com/dockersamples/labspace-fine-tuning
-      SETUP_SCRIPT: /scripts/validate-environment.sh
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     configs:
       - source: validation-script
-        target: /scripts/validate-environment.sh
+        target: /init-scripts/validate-environment.sh
 configs:
   validation-script:
     content: |

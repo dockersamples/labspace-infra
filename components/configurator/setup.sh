@@ -77,12 +77,13 @@ stage_git_repo() {
 }
 
 run_setup_script() {
-  if [ -n "$SETUP_SCRIPT" ]; then
-    if [ -f "$SETUP_SCRIPT" ]; then
-      bash "$SETUP_SCRIPT"
-    else
-      echo "Warning: SETUP_SCRIPT defined ('$SETUP_SCRIPT'), but not found."
-    fi
+  if [ -d "/init-scripts" ]; then
+    for script in /init-scripts/*; do
+      if [ -f "$script" ] && [ -x "$script" ]; then
+        echo "⚙️ Running setup script: $script"
+        bash "$script"
+      fi
+    done
   fi
 }
 
