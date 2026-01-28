@@ -10,16 +10,16 @@ router.get("/", (req, res) => {
 });
 
 router.post("/open-file", (req, res) => {
-  const { filePath, line } = req.body;
+  const { filePath, line, sectionId } = req.body;
   vscodeService
     .openFileInIDE(filePath, line)
     .then(() => {
-      analyticsPublisher.publishUserActionEvent("open_file", sectionId, null, true, filePath);
+      analyticsPublisher.publishUserActionEvent("open_file", sectionId || null, null, true, filePath);
       res.json({ success: true })
     })
     .catch((error) => {
       console.error("Error opening file:", error);
-      analyticsPublisher.publishUserActionEvent("open_file", sectionId, null, false, filePath);
+      analyticsPublisher.publishUserActionEvent("open_file", sectionId || null, null, false, filePath);
       res.status(500).json({ error: "Failed to open file" });
     });
 });

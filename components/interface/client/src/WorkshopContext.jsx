@@ -131,12 +131,12 @@ export const WorkshopContextProvider = ({ children }) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ filePath, line }),
+      body: JSON.stringify({ filePath, line, sectionId: activeSectionId }),
     }).catch((error) => {
       console.error("Error opening file:", error);
       toast.error("Failed to open file. Please try again.");
     });
-  }, []);
+  }, [activeSectionId]);
 
   useEffect(() => {
     if (!workshop) return;
