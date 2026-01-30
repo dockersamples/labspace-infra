@@ -262,6 +262,39 @@ Or with a specific content repo:
 CONTENT_REPO_URL=https://github.com/user/repo docker compose -f compose.run.yaml up
 ```
 
+## SDLC Labspace Variant
+
+The SDLC (Software Development Lifecycle) variant extends the standard Labspace with a complete development and deployment pipeline, providing a "SDLC-in-a-box" environment. This variant is defined in `compose.sdlc.yaml`.
+
+**Additional Services:**
+- **Traefik**: Reverse proxy for HTTP/HTTPS routing with automatic service discovery
+- **Gitea**: Self-hosted Git server with package registry and CI/CD (Gitea Actions)
+- **Gitea Runner**: Act runner for executing CI/CD pipelines
+- **k3s**: Lightweight Kubernetes cluster for deployment targets
+
+**Key Features:**
+- Runs each service on a different domain name (git.dockerlabs.xyz, k8s.dockerlabs.xyz, app.dockerlabs.xyz)
+- Gitea has a pre-configured user: `moby` / `moby1234` with admin access
+- Default repository: `moby/demo-app` (automatically created and populated with Labspace content)
+- Automatic workspace setup: git configuration, SSH keys, kubectl CLI, Docker Hub credentials
+- CI/CD secrets pre-configured for both Gitea registry and Docker Hub
+- Kubernetes deployments accessible via Traefik at `app.dockerlabs.xyz`
+  - Labspaces need to actually define the workflows and k8s manifests to deploy
+
+**Use Cases:**
+- End-to-end development workflows (code → commit → CI → deploy)
+- Container registry workflows (build → push → pull → deploy)
+- Kubernetes deployment demonstrations
+- CI/CD pipeline development and testing
+
+**Socket Proxy Extensions:**
+The SDLC variant extends the socket proxy mount allowlist to support:
+- BuildKit builders (`buildx_buildkit_*`)
+- Gitea Actions runner cache (`act-toolcache`)
+- Gitea volumes (`GITEA*`)
+
+For complete documentation including service URLs, credentials, setup process, and examples, see **[docs/sdlc.md](docs/sdlc.md)**.
+
 ## Directory Structure
 
 ```

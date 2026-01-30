@@ -1,0 +1,340 @@
+#########################################################################
+# This Compose file extends the default Labspace setup by adding the following elements:
+#
+# - A Traefik reverse proxy to route traffic to Gitea and k3s
+# - A Gitea server for Git hosting and CI/CD
+# - A Gitea self-hosted runner for executing CI jobs
+# - A k3s Kubernetes cluster
+#
+# This provides a "SDLC-in-a-box" environment for end-to-end labs.
+#
+# Additional documentation is found in the docs/sdlc-labspace.md file.
+#########################################################################
+
+services:
+  ############################################################
+  # Overrides to Labspace default services
+  ############################################################
+  workspace:
+    volumes:
+      - gitea-outputs:/gitea-outputs:ro
+      - k3s-output:/kubeconfig:ro
+    configs:
+      - source: workspace-git-setup
+        target: /entrypoint.d/95-git-setup.sh
+        mode: 0755
+      - source: workspace-hub-credentials
+        target: /entrypoint.d/90-hub-credentials.sh
+        mode: 0755
+      - source: workspace-kubeconfig-secret-setup
+        target: /entrypoint.d/90-kubeconfig-secret-setup.sh
+        mode: 0755
+    depends_on:
+      git:
+        condition: service_healthy
+      k3s:
+        condition: service_healthy
+
+  ############################################################
+  # New services
+  ############################################################
+  
+  traefik:
+    image: traefik:3.6.5
+    command:
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.ssh.address=:22
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.http.tls=true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "22:22"
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    networks:
+      default:
+        aliases:
+          - git.dockerlabs.xyz
+
+  git:
+    image: gitea/gitea:1.25.3
+    volumes:
+      - gitea-data:/data
+      - gitea-outputs:/gitea-outputs
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    configs:
+      - source: gitea-bootstrap
+        target: /etc/gitea/bootstrap.sh
+        mode: 0755
+    environment:
+      GITEA__server__ROOT_URL: http://git.dockerlabs.xyz/
+      GITEA__server__SSH_DOMAIN: git.dockerlabs.xyz
+      GITEA__server__SSH_LISTEN_PORT: 22
+      GITEA__database__DB_TYPE: sqlite3
+
+      # This prevents the first-time install page from showing (setup is done via script/env vars)
+      GITEA__security__INSTALL_LOCK: "true"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.git.rule: Host(`git.dockerlabs.xyz`)
+      traefik.http.routers.git.entrypoints: web
+      traefik.http.routers.git.service: git
+      traefik.http.services.git.loadbalancer.server.port: "3000"
+      traefik.http.routers.git-secure.rule: Host(`git.dockerlabs.xyz`)
+      traefik.http.routers.git-secure.entrypoints: websecure
+      traefik.http.routers.git-secure.service: git
+      traefik.tcp.routers.git-ssh.rule: HostSNI(`*`)
+      traefik.tcp.routers.git-ssh.entrypoints: ssh
+      traefik.tcp.routers.git-ssh.service: git-ssh
+      traefik.tcp.services.git-ssh.loadbalancer.server.port: "22"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/healthz"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    post_start:
+      - command: bash /etc/gitea/bootstrap.sh
+        user: root
+
+  gitea-runner:
+    image: gitea/act_runner:0.2.13
+    entrypoint: []
+    command: bash -c "GITEA_RUNNER_REGISTRATION_TOKEN=$(cat /gitea-outputs/runner_token.txt) /sbin/tini -- run.sh"
+    volumes:
+      - type: volume
+        source: socket-proxy
+        target: /var/run/docker.sock
+        volume:
+          subpath: docker.sock
+      - gitea-outputs:/gitea-outputs
+    environment:
+      GITEA_INSTANCE_URL: http://git.dockerlabs.xyz
+      GITEA_RUNNER_NAME: labspace-runner
+
+      # The runner uses 1.41 Docker API by default, but we need 1.45+ when using the socket proxy
+      # due to volume rewrites using volume subpaths
+      DOCKER_API_VERSION: "1.45"
+    depends_on:
+      git:
+        condition: service_healthy
+
+  k3s:
+    # When updating the k8s version, ensure the kubectl version in workspace-kubeconfig-secret-setup matches
+    image: rancher/k3s:v1.35.0-k3s1
+    command: server --tls-san k8s.dockerlabs.xyz
+    privileged: true
+    volumes:
+      - k3s-server:/var/lib/rancher/k3s
+      - k3s-output:/output
+    environment:
+      - K3S_TOKEN=labspace-k3s-token
+      - K3S_KUBECONFIG_OUTPUT=/output/kubeconfig.yaml
+      - K3S_KUBECONFIG_MODE=666
+    tmpfs:
+      - /run
+      - /var/run
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 65535
+        hard: 65535
+    networks:
+      default:
+        aliases:
+          - k8s.dockerlabs.xyz
+    configs:
+      - source: k3s-registry-config
+        target: /etc/rancher/k3s/registries.yaml
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prod-app.rule=Host(`app.dockerlabs.xyz`)"
+      - "traefik.http.routers.prod-app.entrypoints=web"
+      - "traefik.http.routers.prod-app.service=prod-app"
+      - "traefik.http.services.prod-app.loadbalancer.server.port=80"
+    healthcheck:
+      test: ["CMD", "kubectl", "get", "--raw", "/readyz"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 20s
+
+
+volumes:
+  gitea-data:
+  gitea-outputs:
+  k3s-server:
+  k3s-output: 
+
+
+configs:
+  # Override the default allow list to add buildkit builders and the gitea volumes
+  docker-proxy-mount-allowlist:
+    content: |
+      gates:
+        - type: mountSource
+          allowedSources:
+            - labspace-content
+            - labspace-socket-proxy
+            - buildx_buildkit_default_state
+            - buildx_buildkit_builder-*
+            - label:labspace-resource=true
+            - act-toolcache
+            - GITEA*
+
+  # Configure secrets in Gitea for Docker Hub credentials using the currently logged in user (to support access to DHI, etc.)
+  workspace-hub-credentials:
+    content: |
+      #!/bin/bash
+
+      SECRETS_JSON=$(curl -s -u 'moby:moby1234' http://git.dockerlabs.xyz/api/v1/repos/moby/demo-app/actions/secrets)
+      if echo "$$keys" | grep -q "DOCKERHUB_USERNAME"; then
+        echo "Hub credentials already exist. Skipping secret creation."
+      else
+        HUB_AUTH=$(jq '.auths."https://index.docker.io/v1/".auth' -r ~/.docker/config.json | base64 -d -)
+        USERNAME=$(echo $$HUB_AUTH | cut -d: -f1)
+        TOKEN=$(echo $$HUB_AUTH | cut -d: -f2)
+
+        curl -s -u 'moby:moby1234' -X PUT http://git.dockerlabs.xyz/api/v1/repos/moby/demo-app/actions/secrets/DOCKERHUB_USERNAME -H "Content-Type: application/json" -d '{"data":"'"$$USERNAME"'"}'
+        curl -s -u 'moby:moby1234' -X PUT http://git.dockerlabs.xyz/api/v1/repos/moby/demo-app/actions/secrets/DOCKERHUB_PASSWORD -H "Content-Type: application/json" -d '{"data":"'"$$TOKEN"'"}'
+        echo "CI secrets created."
+
+        unset HUB_AUTH
+        unset USERNAME
+        unset TOKEN
+      fi
+
+  workspace-git-setup:
+    content: |
+      #!/bin/bash
+
+      # Configure the SSH key for git access
+      sudo mkdir -p /home/coder/.ssh
+      sudo cp /gitea-outputs/id_rsa /home/coder/.ssh/id_rsa 
+      sudo cp /gitea-outputs/id_rsa.pub /home/coder/.ssh/id_rsa.pub
+      sudo chown -R coder:coder /home/coder/.ssh
+
+      # Setup git config
+      ssh-keyscan -H git.dockerlabs.xyz >> /home/coder/.ssh/known_hosts
+      git config --global init.defaultBranch main
+      git config --global user.name 'Moby'
+      git config --global user.email 'moby@local'
+      
+      # Commit the initial Labspace project to the git repo
+      cd /home/coder/project
+      echo ".labspace" >> .gitignore
+      echo "labspace.yaml" >> .gitignore
+      rm -rf .git
+      git init
+      git remote add origin git@git.dockerlabs.xyz:moby/demo-app.git
+      git add -A
+      git commit -m 'Initial commit'
+      git push -u origin main
+
+  gitea-bootstrap:
+    content: |
+      #!/bin/bash
+
+      echo "Running"
+      while ! curl -sL http://localhost:3000/user/login > /dev/null; do
+        sleep 2
+      done
+      echo "Gitea is up - proceeding with bootstrap"
+
+      # Create the 'moby' user if it doesn't exist
+      users=$(su-exec git /usr/local/bin/gitea admin user list)
+      if echo "$$users" | grep -q '^moby '; then
+          echo "User 'moby' already exists. Skipping account creation."
+      else
+          su-exec git /usr/local/bin/gitea admin user create --username moby --password 'moby1234' --email admin@local --admin --must-change-password=false
+
+          while ! curl -sL -u 'moby:moby1234' http://localhost:3000/api/v1/user > /dev/null; do
+            echo "Waiting for user to be fully ready to use..."
+            sleep 2
+          done          
+      fi
+      
+      # Check if demo-app repo exists. Create it if it doesn't.
+      repo_status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/api/v1/repos/moby/demo-app)
+      if [ "$$repo_status" = "404" ]; then
+          echo "Repository 'moby/demo-app' not found. Creating it..."
+          curl -s -H "Content-type: application/json" -u 'moby:moby1234' -d '{"name":"demo-app","private":false}' http://localhost:3000/api/v1/user/repos
+          echo "Repository 'moby/demo-app' created."
+      else
+          echo "Repository 'moby/demo-app' already exists. Skipping creation."
+      fi
+
+      # Create CI secrets for the Gitea registry if they don't exist
+      SECRETS_JSON=$(curl -s -u 'moby:moby1234' http://localhost:3000/api/v1/repos/moby/demo-app/actions/secrets)
+      if echo "$$keys" | grep -q "DOCKER_USERNAME"; then
+        echo "CI secrets already exist. Skipping secret creation."
+      else
+        curl -s -u 'moby:moby1234' -X PUT http://localhost:3000/api/v1/repos/moby/demo-app/actions/secrets/DOCKER_USERNAME -H "Content-Type: application/json" -d '{"data":"moby"}'
+        curl -s -u 'moby:moby1234' -X PUT http://localhost:3000/api/v1/repos/moby/demo-app/actions/secrets/DOCKER_PASSWORD -H "Content-Type: application/json" -d '{"data":"moby1234"}'
+        curl -s -u 'moby:moby1234' -X PUT http://localhost:3000/api/v1/repos/moby/demo-app/actions/secrets/DOCKER_REGISTRY -H "Content-Type: application/json" -d '{"data":"git.dockerlabs.xyz"}'
+        echo "CI secrets created."
+      fi
+
+      # Get and store registration token for the runner
+      TOKEN_JSON=$(curl -s -u 'moby:moby1234' http://localhost:3000/api/v1/repos/moby/demo-app/actions/runners/registration-token)
+      REGISTRATION_TOKEN=$(echo $$TOKEN_JSON | grep -o '"token":"[^"]*"' | cut -d'"' -f4)
+      echo -n $$REGISTRATION_TOKEN > /gitea-outputs/runner_token.txt
+
+      # Create SSH key for user 'moby' if it doesn't exist
+      if [ ! -f /gitea-outputs/id_rsa ]; then
+          ssh-keygen -t rsa -b 4096 -N "" -f /gitea-outputs/id_rsa
+          echo "SSH key generated for user 'moby'."
+      fi
+
+      # Add the public key to the user's SSH keys via Gitea API if not already added
+      keys=$(curl -s -u 'moby:moby1234' http://localhost:3000/api/v1/user/keys)
+      if echo "$$keys" | grep -q "moby-key"; then
+          echo "SSH key already added to user 'moby'. Skipping key addition."
+      else
+        pub_key=$(cat /gitea-outputs/id_rsa.pub)
+        curl -s -u 'moby:moby1234' http://localhost:3000/api/v1/user/keys -H "Content-Type: application/json" -d "{\"title\":\"moby-key\",\"key\":\"$$pub_key\"}"
+        echo "SSH key added to user 'moby'."
+      fi
+
+  # Configure k3s with credentials and TLS settings for the Gitea registry
+  k3s-registry-config:
+    content: |
+      configs:
+        "git.dockerlabs.xyz":
+          auth:
+            username: moby
+            password: moby1234
+          tls:
+            insecure_skip_verify: true
+
+  workspace-kubeconfig-secret-setup:
+    content: |
+      #!/bin/bash
+
+      set -e
+
+      # Add the KUBECONFIG as a secret to the Gitea repo if it doesn't exist
+      SECRETS_JSON=$(curl -s -u 'moby:moby1234' http://git.dockerlabs.xyz/api/v1/repos/moby/demo-app/actions/secrets)
+      if echo "$$keys" | grep -q "KUBECONFIG"; then
+        echo "CI secrets already exist. Skipping secret creation."
+      else
+        KUBE_CONFIG=$(cat /kubeconfig/kubeconfig.yaml | sed 's/127.0.0.1/k8s.dockerlabs.xyz/g')
+        curl -s -u 'moby:moby1234' -X PUT http://git.dockerlabs.xyz/api/v1/repos/moby/demo-app/actions/secrets/KUBECONFIG -H "Content-Type: application/json" -d '{"data":"'"$(echo -n "$$KUBE_CONFIG")"'"}'
+      fi
+      
+      # Setup kubectl (with an alias of `k`) and the kubeconfig for the coder user
+      if [ ! -f /usr/local/bin/kubectl ]; then
+        echo "kubectl not found, installing..."
+        sudo curl -L "https://dl.k8s.io/release/v1.35.0/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl
+        sudo chmod +x /usr/local/bin/kubectl
+        sudo ln -s /usr/local/bin/kubectl /usr/local/bin/k
+
+        mkdir -p ~/.kube
+        cat /kubeconfig/kubeconfig.yaml | sed 's/127.0.0.1/k8s.dockerlabs.xyz/g' > ~/.kube/config
+      fi
