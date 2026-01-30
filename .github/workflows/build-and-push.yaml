@@ -67,6 +67,7 @@ jobs:
             echo "y" | docker compose -f compose.run.yaml publish dockersamples/labspace:dev --with-env -y
             echo "y" | docker compose -f compose.run.yaml -f compose.sdlc.yaml publish dockersamples/labspace:dev-sdlc --with-env -y
             echo "y" | docker compose -f compose.content-dev.yaml publish dockersamples/labspace-content-dev:dev --with-env -y
+            echo "y" | docker compose -f compose.content-dev.yaml -f compose.sdlc.yaml publish dockersamples/labspace-content-dev:dev-sdlc --with-env -y
           else
             TAG="${GITHUB_REF#refs/tags/}"
 
@@ -79,4 +80,6 @@ jobs:
             echo "y" | docker compose -f compose.run.yaml -f compose.sdlc.yaml publish dockersamples/labspace:${TAG}-sdlc --with-env -y
             echo "y" | docker compose -f compose.content-dev.yaml publish dockersamples/labspace-content-dev:latest --with-env -y
             echo "y" | docker compose -f compose.content-dev.yaml publish dockersamples/labspace-content-dev:${TAG} --with-env -y
+            echo "y" | docker compose -f compose.content-dev.yaml -f compose.sdlc.yaml publish dockersamples/labspace-content-dev:latest-sdlc --with-env -y
+            echo "y" | docker compose -f compose.content-dev.yaml -f compose.sdlc.yaml publish dockersamples/labspace-content-dev:${TAG}-sdlc --with-env -y
           fi
