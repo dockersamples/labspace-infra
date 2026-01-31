@@ -65,15 +65,15 @@ The easiest way to get started is to use the [Labspace Starter repo template](ht
 
     ```console
     # Mac/Linux
-    CONTENT_PATH=$PWD docker compose -f oci://dockersamples/labspace-content-dev -f .labspace/compose.override.yaml up
+    CONTENT_PATH=$PWD docker compose -f oci://dockersamples/labspace-content-dev -f .labspace/compose.override.yaml up --watch
 
     # On Windows with PowerShell
-    $Env:CONTENT_PATH = (Get-Location).Path; docker compose -f oci://dockersamples/labspace-content-dev -f .labspace/compose.override.yaml up
+    $Env:CONTENT_PATH = (Get-Location).Path; docker compose -f oci://dockersamples/labspace-content-dev -f .labspace/compose.override.yaml up --watch
     ```
 
-    Once the stack starts, you can open the app at [http://localhost:3030](http://localhost:3030). 
+    Once the stack starts, you can open the app at [http://localhost:3030](http://localhost:3030).
 
-    The files are bind mounted into the container environment, making your changes immediately visible in the running Labspace.
+    Compose Watch will automatically sync your content changes to the running Labspace in real-time.
 
 
 

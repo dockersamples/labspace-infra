@@ -64,7 +64,7 @@ The configurator service runs once at startup and is responsible for loading con
 
 The configurator supports multiple ways to load content:
 
-1. **DEV_MODE=true**: Content is directly mounted (no copying). Used by `compose.yaml` for infrastructure development.
+1. **DEV_MODE=true**: Content is initially copied from `/dev-content`, then Compose Watch syncs subsequent changes. Used by `compose.yaml` for infrastructure development.
 
 2. **LOCAL_MODE=true + LOCAL_CONTENT_PATH**: Copies content from a local path. Used when content is bind-mounted.
 
@@ -245,11 +245,11 @@ docker compose up --watch --build
 ### Content Development (creating labspace content)
 
 ```bash
-CONTENT_PATH=./your-content docker compose -f compose.content-dev.yaml up
+CONTENT_PATH=./your-content docker compose -f compose.content-dev.yaml up --watch
 ```
 
 - Access at http://localhost:3030
-- Bind-mounts your content for live editing
+- Compose Watch syncs content changes to the workspace in real-time
 
 ### Running a Published Labspace
 
@@ -614,7 +614,7 @@ docker compose up --watch --build
 | `MARLIN_ENDPOINT` | interface | Analytics endpoint URL |
 | `MARLIN_API_KEY` | interface, marlin-mock | Analytics API key |
 | `LABEL_FILTER` | host-republisher, cleaner | Label selector for resources |
-| `DEV_MODE` | configurator | Use staging directory instead of cloning |
+| `DEV_MODE` | configurator | Copy from `/dev-content` and enable Compose Watch sync |
 
 ## Important Patterns
 

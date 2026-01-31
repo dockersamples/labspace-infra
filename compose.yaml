@@ -12,7 +12,7 @@ services:
       - content:/project
       - docker-creds:/docker-creds
       - labspace-support:/etc/labspace-support
-      - ./sample-content-repo:/staging
+      - ./sample-content-repo:/dev-content:ro
     environment:
       DEV_MODE: true
     develop:
@@ -94,7 +94,7 @@ services:
     volumes:
       - socket-proxy:/var/run
       - docker-creds:/docker-creds
-      - ./sample-content-repo:/home/coder/project
+      - content:/home/coder/project
       - type: volume
         source: labspace-support
         target: /etc/labspace-support/public-key
@@ -109,6 +109,9 @@ services:
       watch:
         - path: ./components/workspace
           action: rebuild
+        - path: ./sample-content-repo
+          action: sync
+          target: /home/coder/project
 
   host-republisher:
     build:

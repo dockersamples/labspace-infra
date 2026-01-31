@@ -30,7 +30,7 @@ To work on the Labspace infrastructure, you can utilize the `compose.yaml` file.
 docker compose up --watch --build
 ```
 
-After it starts, open the interface at http://localhost:5173.
+After it starts, open the interface at http://localhost:5173. The Compose Watch feature will automatically sync code changes and rebuild components as needed.
 
 
 ## Known limitations
