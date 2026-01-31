@@ -15,10 +15,15 @@ setup_project_directory() {
 
   # Setup project directory
   if [ "$DEV_MODE" = "true" ]; then
-    echo "📁 Skipping clone because DEV_MODE is activated (project source will be directly mounted)"
+    echo "📁 DEV_MODE is activated (project source will be copied and Compose watch will sync future changes)"
     LABSPACE_MODE="dev"
+
+    echo "📁 Using content in /dev-content as source material"
+    shopt -s dotglob
+    cp -r /dev-content/* /staging
+    shopt -u dotglob
+
     run_setup_script
-    return
   elif [ "$LOCAL_MODE" = "true" ]; then
     echo "📁 Local mode enabled."
     if [ -z "$LOCAL_CONTENT_PATH" ]; then
@@ -88,13 +93,8 @@ run_setup_script() {
 }
 
 clear_staging_directory() {
-  if [ "$DEV_MODE" != "true" ]; then
-    rm -rf /staging
-    mkdir /staging
-  fi
-  if [ ! -d /staging ]; then
-    mkdir /staging
-  fi
+  rm -rf /staging
+  mkdir /staging
 }
 
 clear_project_directory() {

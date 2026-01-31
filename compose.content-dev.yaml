@@ -9,6 +9,7 @@ services:
     image: dockersamples/labspace-configurator:latest
     use_api_socket: true
     volumes:
+      - ${CONTENT_PATH}:/dev-content:ro
       - content:/project
       - docker-creds:/docker-creds
       - labspace-support:/etc/labspace-support
@@ -57,7 +58,7 @@ services:
       - 3000:3000 # For the Node application running in the IDE
     volumes:
       - socket-proxy:/var/run
-      - ${CONTENT_PATH}:/home/coder/project
+      - content:/home/coder/project
       - docker-creds:/docker-creds
       - type: volume
         source: labspace-support
@@ -74,6 +75,11 @@ services:
         target: /home/coder/.local/share/code-server/User/settings.json
         uid: "1000"
         gid: "1000"
+    develop:
+      watch:
+        - path: $CONTENT_PATH
+          action: sync
+          target: /home/coder/project
 
   host-republisher:
     image: dockersamples/labspace-host-port-republisher:latest

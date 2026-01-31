@@ -9,6 +9,8 @@ Now that you've got an idea of what a Labspace _is_ technically, it's important 
 - The Labspace content is packaged as a standalone Git repository and cloned during the Labspace bootstrapping
 - The Labspace content repo can also include additional sample app code, starting materials, or other resources
 
+Open the :fileLink[test.txt]{path="test.txt"} to see what's inside
+
 
 ## The `labspace.yaml` file
 
@@ -41,5 +43,5 @@ The paths for each section defined in `contentPath` are anchored at the root of 
 
 While developing a Labspace, it's helpful to spin up the Labspace in **development mode.** In dev mode, the following adjustments are made:
 
-- The files are mounted instead of cloned, making it easier to see the changes
+- Compose Watch automatically syncs file changes to the running containers
 - The interface periodically polls for changes to the content making it faster to see the changes
