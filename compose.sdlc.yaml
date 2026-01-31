@@ -228,8 +228,31 @@ configs:
       
       # Commit the initial Labspace project to the git repo
       cd /home/coder/project
-      echo ".labspace" >> .gitignore
-      echo "labspace.yaml" >> .gitignore
+
+      # Ensure .gitignore exists
+      touch .gitignore
+
+      # Function to safely append to gitignore
+      add_to_gitignore() {
+        local entry="$1"
+
+        # Skip if entry already exists
+        if grep -qxF "$entry" .gitignore 2>/dev/null; then
+          return
+        fi
+
+        # Ensure file ends with newline before appending (sed adds it if missing)
+        sed -i -e '$a\' .gitignore 2>/dev/null || true
+
+        # Now append the entry
+        echo "$entry" >> .gitignore
+      }
+
+      # Add entries to gitignore
+      add_to_gitignore ".labspace"
+      add_to_gitignore "labspace.yaml"
+      add_to_gitignore ".github/"
+
       rm -rf .git
       git init
       git remote add origin git@git.dockerlabs.xyz:moby/demo-app.git
