@@ -32,7 +32,7 @@ RUN set -eux; \
 
 # Setup Maven
 ENV MAVEN_HOME=/usr/share/maven
-COPY --from=maven:3.9.11-eclipse-temurin-21 ${MAVEN_HOME} ${MAVEN_HOME}
+COPY --from=maven:3.9.12-eclipse-temurin-21 ${MAVEN_HOME} ${MAVEN_HOME}
 RUN ln -s ${MAVEN_HOME}/bin/mvn /usr/bin/mvn
 
 
