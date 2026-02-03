@@ -245,7 +245,7 @@ docker compose up --watch --build
 ### Content Development (creating labspace content)
 
 ```bash
-CONTENT_PATH=./your-content docker compose -f compose.content-dev.yaml up --watch
+docker compose -f compose.run.yaml -f compose.override.content-dev.yaml up --watch
 ```
 
 - Access at http://localhost:3030
@@ -264,7 +264,7 @@ CONTENT_REPO_URL=https://github.com/user/repo docker compose -f compose.run.yaml
 
 ## SDLC Labspace Variant
 
-The SDLC (Software Development Lifecycle) variant extends the standard Labspace with a complete development and deployment pipeline, providing a "SDLC-in-a-box" environment. This variant is defined in `compose.sdlc.yaml`.
+The SDLC (Software Development Lifecycle) variant extends the standard Labspace with a complete development and deployment pipeline, providing a "SDLC-in-a-box" environment. This variant is defined in `compose.override.sdlc.yaml`.
 
 **Additional Services:**
 - **Traefik**: Reverse proxy for HTTP/HTTPS routing with automatic service discovery
@@ -610,7 +610,6 @@ docker compose up --watch --build
 |----------|---------|---------|
 | `CONTENT_DEV_MODE` | interface | Enable hot-reload for content |
 | `CONTENT_REPO_URL` | configurator | Git URL to clone content from |
-| `CONTENT_PATH` | compose.content-dev.yaml | Local path for content development |
 | `MARLIN_ENDPOINT` | interface | Analytics endpoint URL |
 | `MARLIN_API_KEY` | interface, marlin-mock | Analytics API key |
 | `LABEL_FILTER` | host-republisher, cleaner | Label selector for resources |

@@ -63,23 +63,23 @@ jobs:
 
           if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
             sed -i "s/:latest/:dev/g" compose.run.yaml
-            sed -i "s/:latest/:dev/g" compose.content-dev.yaml
+            sed -i "s/:latest/:dev/g" compose.override.content-dev.yaml
             echo "y" | docker compose -f compose.run.yaml publish dockersamples/labspace:dev --with-env -y
-            echo "y" | docker compose -f compose.run.yaml -f compose.sdlc.yaml publish dockersamples/labspace:dev-sdlc --with-env -y
-            echo "y" | docker compose -f compose.content-dev.yaml publish dockersamples/labspace-content-dev:dev --with-env -y
-            echo "y" | docker compose -f compose.content-dev.yaml -f compose.sdlc.yaml publish dockersamples/labspace-content-dev:dev-sdlc --with-env -y
+            echo "y" | docker compose -f compose.run.yaml -f compose.override.sdlc.yaml publish dockersamples/labspace:dev-sdlc --with-env -y
+            echo "y" | docker compose -f compose.run.yaml -f compose.override.content-dev.yaml publish dockersamples/labspace-content-dev:dev --with-env -y
+            echo "y" | docker compose -f compose.run.yaml -f compose.override.content-dev.yaml -f compose.override.sdlc.yaml publish dockersamples/labspace-content-dev:dev-sdlc --with-env -y
           else
             TAG="${GITHUB_REF#refs/tags/}"
 
             sed -i "s/:latest/:${TAG}/g" compose.run.yaml
-            sed -i "s/:latest/:${TAG}/g" compose.content-dev.yaml
+            sed -i "s/:latest/:${TAG}/g" compose.override.content-dev.yaml
 
             echo "y" | docker compose -f compose.run.yaml publish dockersamples/labspace:latest --with-env -y
             echo "y" | docker compose -f compose.run.yaml publish dockersamples/labspace:${TAG} --with-env -y
-            echo "y" | docker compose -f compose.run.yaml -f compose.sdlc.yaml publish dockersamples/labspace:latest-sdlc --with-env -y
-            echo "y" | docker compose -f compose.run.yaml -f compose.sdlc.yaml publish dockersamples/labspace:${TAG}-sdlc --with-env -y
-            echo "y" | docker compose -f compose.content-dev.yaml publish dockersamples/labspace-content-dev:latest --with-env -y
-            echo "y" | docker compose -f compose.content-dev.yaml publish dockersamples/labspace-content-dev:${TAG} --with-env -y
-            echo "y" | docker compose -f compose.content-dev.yaml -f compose.sdlc.yaml publish dockersamples/labspace-content-dev:latest-sdlc --with-env -y
-            echo "y" | docker compose -f compose.content-dev.yaml -f compose.sdlc.yaml publish dockersamples/labspace-content-dev:${TAG}-sdlc --with-env -y
+            echo "y" | docker compose -f compose.run.yaml -f compose.override.sdlc.yaml publish dockersamples/labspace:latest-sdlc --with-env -y
+            echo "y" | docker compose -f compose.run.yaml -f compose.override.sdlc.yaml publish dockersamples/labspace:${TAG}-sdlc --with-env -y
+            echo "y" | docker compose -f compose.run.yaml -f compose.override.content-dev.yaml publish dockersamples/labspace-content-dev:latest --with-env -y
+            echo "y" | docker compose -f compose.run.yaml -f compose.override.content-dev.yaml publish dockersamples/labspace-content-dev:${TAG} --with-env -y
+            echo "y" | docker compose -f compose.run.yaml -f compose.override.content-dev.yaml -f compose.override.sdlc.yaml publish dockersamples/labspace-content-dev:latest-sdlc --with-env -y
+            echo "y" | docker compose -f compose.run.yaml -f compose.override.content-dev.yaml -f compose.override.sdlc.yaml publish dockersamples/labspace-content-dev:${TAG}-sdlc --with-env -y
           fi
