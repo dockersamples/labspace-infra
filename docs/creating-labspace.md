@@ -64,11 +64,7 @@ The easiest way to get started is to use the [Labspace Starter repo template](ht
 5. To start the development environment, run the following command from the root of your repo:
 
     ```console
-    # Mac/Linux
-    CONTENT_PATH=$PWD docker compose -f oci://dockersamples/labspace-content-dev -f .labspace/compose.override.yaml up --watch
-
-    # On Windows with PowerShell
-    $Env:CONTENT_PATH = (Get-Location).Path; docker compose -f oci://dockersamples/labspace-content-dev -f .labspace/compose.override.yaml up --watch
+    docker compose -f oci://dockersamples/labspace-content-dev -f .labspace/compose.override.yaml up --watch
     ```
 
     Once the stack starts, you can open the app at [http://localhost:3030](http://localhost:3030).

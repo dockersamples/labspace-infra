@@ -2,7 +2,7 @@
 # This Compose file is intended to setup a development environment for the Labspace infrastructure,
 # NOT for the development of Labspace content.
 #
-# If you are trying to develop a Labspace, use the `compose.content-dev.yaml` file.
+# If you are trying to develop a Labspace, use the `compose.override.content-dev.yaml` file.
 ##################################################################################################
 services:
   configurator:

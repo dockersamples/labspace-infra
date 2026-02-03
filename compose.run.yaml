@@ -12,8 +12,6 @@ services:
       - content:/project
       - docker-creds:/docker-creds
       - labspace-support:/etc/labspace-support
-    environment:
-      PROJECT_CLONE_URL: ${CONTENT_REPO_URL}
 
   interface:
     image: dockersamples/labspace-interface:latest

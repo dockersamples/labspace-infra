@@ -1,0 +1,23 @@
+##################################################################################################
+# This Compose file provides the overrides needed to develop Labspace content.
+#
+# It is intended that this Compose file is launched from the root of the Labspace project content,
+# as this content will be initially mounted in to be copied and then use Compose Watch for syncing
+# changes.
+##################################################################################################
+
+services:
+  configurator:
+    environment:
+      DEV_MODE: true
+
+  interface:
+    environment:
+      CONTENT_DEV_MODE: true
+
+  workspace:
+    develop:
+      watch:
+        - path: ./
+          action: sync
+          target: /home/coder/project
