@@ -1,15 +1,22 @@
 ##################################################################################################
 # This Compose file provides the overrides needed to develop Labspace content.
 #
-# It is intended that this Compose file is launched from the root of the Labspace project content,
-# as this content will be initially mounted in to be copied and then use Compose Watch for syncing
-# changes.
+# This variant will mount in the source content into the configurator, where it will then be
+# copied into the volume that is shared with the rest of the labspace. This allows you to run through
+# the lab, making changes to files, running startup scripts, and more without polluting the actual
+# content. Compose Watch will monitor the content directory for changes and sync them into the
+# workspace, which shares the volume with the interface.
+#
+# The CONTENT_PATH environment variable is being used here because we are unable to simply use
+# a relative path (such as "./"). When running the Compose stack via a published OCI artifact,
+# the working directory is not the same as the location of the Compose files, which is its cached
+# location on the host filesystem. Therefore, the paths would not resolve correctly.
 ##################################################################################################
 
 services:
   configurator:
     volumes:
-      - ./.:/dev-content:ro
+      - $CONTENT_PATH:/dev-content:ro
     environment:
       DEV_MODE: true
 
@@ -20,6 +27,6 @@ services:
   workspace:
     develop:
       watch:
-        - path: ./
+        - path: $CONTENT_PATH
           action: sync
           target: /home/coder/project
