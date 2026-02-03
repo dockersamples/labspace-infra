@@ -8,6 +8,8 @@
 
 services:
   configurator:
+    volumes:
+      - ./.:/dev-content:ro
     environment:
       DEV_MODE: true
 
