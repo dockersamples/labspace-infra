@@ -202,7 +202,7 @@ jobs:
         
       - name: Update Kubernetes manifests
         run: |
-          sed -i "s|moby/demo-app:latest|moby/demo-app:${{ needs.build-and-push.outputs.image-tag }}|g" k8s/deployment.yaml
+          sed -i "s|moby/demo-app:latest|moby/demo-app:${{ needs.build-and-push.outputs.image-tag }}|g" k8s/app.yaml
 
       - name: Setup kubectl
         uses: azure/setup-kubectl@v4
