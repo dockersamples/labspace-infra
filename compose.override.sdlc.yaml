@@ -47,6 +47,16 @@ services:
   # New services
   ############################################################
   
+  cert-creator:
+    image: alpine
+    command: /generate-certs.sh
+    configs:
+      - source: generate-traefik-certs
+        target: /generate-certs.sh
+        mode: 0755
+    volumes:
+      - labspace-traefik-certs:/certs
+
   traefik:
     image: traefik:3.6.5
     command:
@@ -57,17 +67,25 @@ services:
       - --entrypoints.ssh.address=:22
       - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.http.tls=true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - --providers.file.filename=/etc/traefik/cert-config.yaml
     ports:
       - "22:22"
       - "80:80"
       - "443:443"
       - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - labspace-traefik-certs:/certs:ro
+    configs:
+      - source: traefik-cert-config
+        target: /etc/traefik/cert-config.yaml
     networks:
       default:
         aliases:
           - git.dockerlabs.xyz
+    depends_on:
+      cert-creator:
+        condition: service_completed_successfully
 
   git:
     image: gitea/gitea:1.25.3
@@ -181,9 +199,77 @@ volumes:
   gitea-outputs:
   k3s-server:
   k3s-output: 
+  labspace-traefik-certs:
 
 
 configs:
+  # Generate the certs for Traefik to use
+  generate-traefik-certs:
+    content: |
+      #!/bin/sh
+
+      apk add --no-cache openssl >/dev/null 2>&1 || true;
+      if [ -f /certs/dockerlabs.crt ] && [ -f /certs/dockerlabs.key ]; then
+        echo 'Certs already exist, skipping generation';
+        return
+      fi
+
+      # Create CA (one-time)
+      if [ ! -f /certs/ca/ca.crt ] || [ ! -f /certs/ca/ca.key ]; then
+        openssl genrsa -out /certs/ca/ca.key 4096
+        openssl req -x509 -new -nodes -key /certs/ca/ca.key -sha256 -days 3650 \
+          -subj "/CN=dockerlabs-local-ca" \
+          -out /certs/ca/ca.crt
+      fi
+
+      # Create leaf key + CSR
+      openssl genrsa -out /certs/dockerlabs.key 4096
+      cat > /tmp/leaf.cnf <<'CNF'
+      [req]
+      distinguished_name = req_distinguished_name
+      req_extensions = v3_req
+      prompt = no
+
+      [req_distinguished_name]
+      CN = dockerlabs.xyz
+
+      [v3_req]
+      subjectAltName = @alt_names
+      keyUsage = critical, digitalSignature, keyEncipherment
+      extendedKeyUsage = serverAuth
+
+      [alt_names]
+      DNS.1 = dockerlabs.xyz
+      DNS.2 = *.dockerlabs.xyz
+      CNF
+
+      openssl req -new -key /certs/dockerlabs.key -out /tmp/dockerlabs.csr -config /tmp/leaf.cnf
+
+      # Sign leaf cert with CA
+      openssl x509 -req -in /tmp/dockerlabs.csr \
+        -CA /certs/ca/ca.crt -CAkey /certs/ca/ca.key -CAcreateserial \
+        -out /certs/dockerlabs.crt -days 825 -sha256 \
+        -extfile /tmp/leaf.cnf -extensions v3_req
+
+      # combine cert & key into a PEM (optional)
+      cat /certs/dockerlabs.crt /certs/dockerlabs.key > /certs/dockerlabs.pem || true;
+
+      echo 'Generated CA and certificates';
+      find /certs -type f
+
+  # Traefik configuration to use the generated certs
+  traefik-cert-config:
+    content: |
+      tls:
+        certificates:
+          - certFile: /certs/dockerlabs.crt
+            keyFile: /certs/dockerlabs.key
+        stores:
+          default:
+            defaultCertificate:
+              certFile: /certs/dockerlabs.crt
+              keyFile: /certs/dockerlabs.key
+
   # Override the default allow list to add buildkit builders and the gitea volumes
   docker-proxy-mount-allowlist:
     content: |
