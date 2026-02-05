@@ -35,6 +35,14 @@ services:
       k3s:
         condition: service_healthy
 
+  interface:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.interface.rule=Host(`dockerlabs.xyz`)"
+      - "traefik.http.routers.interface.entrypoints=web"
+      - "traefik.http.routers.interface.service=interface"
+      - "traefik.http.services.interface.loadbalancer.server.port=3030"
+
   ############################################################
   # New services
   ############################################################
@@ -86,6 +94,8 @@ services:
       traefik.http.routers.git.entrypoints: web
       traefik.http.routers.git.service: git
       traefik.http.services.git.loadbalancer.server.port: "3000"
+      traefik.http.middlewares.remove-frame-headers.headers.customresponseheaders.X-Frame-Options: ""
+      traefik.http.routers.git.middlewares: remove-frame-headers
       traefik.http.routers.git-secure.rule: Host(`git.dockerlabs.xyz`)
       traefik.http.routers.git-secure.entrypoints: websecure
       traefik.http.routers.git-secure.service: git
