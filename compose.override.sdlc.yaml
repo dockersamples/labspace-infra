@@ -20,14 +20,20 @@ services:
       - gitea-outputs:/gitea-outputs:ro
       - k3s-output:/kubeconfig:ro
     configs:
-      - source: workspace-git-setup
-        target: /entrypoint.d/95-git-setup.sh
+      - source: workspace-entrypoint-script
+        target: /entrypoint.d/50-entrypoint-script.sh
         mode: 0755
       - source: workspace-hub-credentials
-        target: /entrypoint.d/90-hub-credentials.sh
+        target: /startup-scripts/10-hub-credentials.sh
         mode: 0755
       - source: workspace-kubeconfig-secret-setup
-        target: /entrypoint.d/90-kubeconfig-secret-setup.sh
+        target: /startup-scripts/10-kubeconfig-secret-setup.sh
+        mode: 0755
+      - source: workspace-git-setup
+        target: /startup-scripts/20-git-setup.sh
+        mode: 0755
+      - source: workspace-configure-k3s-coredns
+        target: /startup-scripts/15-configure-k3s-coredns.sh
         mode: 0755
     depends_on:
       git:
@@ -286,6 +292,27 @@ configs:
             - act-toolcache
             - GITEA*
 
+  # The /entrypoint.d hook in code-server does not guarantee order of execution, as it simply uses `find` to get files in the 
+  # directory. To ensure our scripts run in the correct order, we prefix them with numbers and use a custom entrypoint script 
+  # to sort and execute the scripts in order.
+  workspace-entrypoint-script:
+    content: |
+      #!/bin/sh
+      set -eu
+
+      CUSTOM_DIR="/startup-scripts"
+
+      # Nothing to do if the directory doesn't exist
+      [ -d "$$CUSTOM_DIR" ] || exit 0
+
+      # Find executable regular files, sort them, and run one by one
+      find "$$CUSTOM_DIR" -type f -executable -print \
+        | sort \
+        | while IFS= read -r script; do
+            echo "→ Running $$script"
+            "$$script"
+          done
+
   # Configure secrets in Gitea for Docker Hub credentials using the currently logged in user (to support access to DHI, etc.)
   workspace-hub-credentials:
     content: |
@@ -459,3 +486,47 @@ configs:
         mkdir -p ~/.kube
         cat /kubeconfig/kubeconfig.yaml | sed 's/127.0.0.1/k8s.dockerlabs.xyz/g' > ~/.kube/config
       fi
+
+  workspace-configure-k3s-coredns:
+    content: |
+      #!/bin/bash
+
+      set -e
+
+      sudo apt update && sudo apt install dnsutils -y
+
+      IP=$$(dig +short git.dockerlabs.xyz A | grep -E '^[0-9.]+$$' | head -n 1)
+
+      cat << EOF | kubectl apply -f -
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: coredns-custom
+        namespace: kube-system
+      data:
+        dockerlabs-xyz.server: |
+          dockerlabs.xyz:53 {
+            log
+            errors
+            file /etc/coredns/custom/dockerlabs.xyz
+          }
+        dockerlabs.xyz: |
+          \$$ORIGIN dockerlabs.xyz.
+          \$$TTL 3600
+
+          @   IN  SOA ns1.dockerlabs.xyz. hostmaster.dockerlabs.xyz. (
+                  2026020601 ; serial (YYYYMMDDnn)
+                  3600       ; refresh
+                  900        ; retry
+                  1209600    ; expire
+                  3600       ; minimum
+          )
+
+              IN  NS  ns1.dockerlabs.xyz.
+
+          ; A records
+          @   IN  A   $$IP
+          *   IN  A   $$IP
+      EOF
+
+      kubectl -n kube-system rollout restart deployment/coredns
