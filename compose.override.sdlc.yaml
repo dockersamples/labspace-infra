@@ -209,6 +209,8 @@ configs:
       #!/bin/sh
 
       apk add --no-cache openssl >/dev/null 2>&1 || true;
+      mkdir -p /certs/ca
+
       if [ -f /certs/dockerlabs.crt ] && [ -f /certs/dockerlabs.key ]; then
         echo 'Certs already exist, skipping generation';
         return
