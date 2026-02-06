@@ -29,6 +29,9 @@ services:
       - source: workspace-kubeconfig-secret-setup
         target: /entrypoint.d/90-kubeconfig-secret-setup.sh
         mode: 0755
+      - source: workspace-configure-k3s-coredns
+        target: /entrypoint.d/91-configure-k3s-coredns.sh
+        mode: 0755
     depends_on:
       git:
         condition: service_healthy
@@ -459,3 +462,47 @@ configs:
         mkdir -p ~/.kube
         cat /kubeconfig/kubeconfig.yaml | sed 's/127.0.0.1/k8s.dockerlabs.xyz/g' > ~/.kube/config
       fi
+
+  workspace-configure-k3s-coredns:
+    content: |
+      #!/bin/bash
+
+      set -e
+
+      sudo apt update && sudo apt install dnsutils -y
+
+      IP=$$(dig +short git.dockerlabs.xyz A | grep -E '^[0-9.]+$$' | head -n 1)
+
+      cat << EOF > /tmp/config.yaml
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: coredns-custom
+        namespace: kube-system
+      data:
+        dockerlabs-xyz.server: |
+          dockerlabs.xyz:53 {
+            log
+            errors
+            file /etc/coredns/custom/dockerlabs.xyz
+          }
+        dockerlabs.xyz: |
+          \$$ORIGIN dockerlabs.xyz.
+          \$$TTL 3600
+
+          @   IN  SOA ns1.dockerlabs.xyz. hostmaster.dockerlabs.xyz. (
+                  2026020601 ; serial (YYYYMMDDnn)
+                  3600       ; refresh
+                  900        ; retry
+                  1209600    ; expire
+                  3600       ; minimum
+          )
+
+              IN  NS  ns1.dockerlabs.xyz.
+
+          ; A records
+          @   IN  A   $$IP
+          *   IN  A   $$IP
+      EOF
+
+      kubectl -n kube-system rollout restart deployment/coredns
