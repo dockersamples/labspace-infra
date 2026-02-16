@@ -18,3 +18,9 @@ sections:
     contentPath: ./04-the-vscode-extension.md
   - title: Labspace Content
     contentPath: ./05-labspace-content.md
+
+# Remove if there is no need to link compose services in the editor ui, icons are from: https://fonts.google.com/icons
+services:
+  - title: Marlin
+    url: http://localhost:3030
+    icon: anchor
