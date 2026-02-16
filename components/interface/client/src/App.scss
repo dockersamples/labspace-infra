@@ -121,3 +121,26 @@ div.code-block {
     }
   }
 }
+
+.app-nav {
+  width: 68px;
+  font-size: 0.65em;
+  background-color: $gray-900;
+  padding-top: 10px;
+}
+
+.app-nav a {
+  padding-left: 0px;
+  padding-right: 0px;
+  color: white !important;
+}
+
+.app-nav .active .badge {
+  background-color: $blue;
+}
+
+.app-nav .app-icon {
+  color: white;
+  padding: 10px;
+  font-size: 20px !important;
+}
