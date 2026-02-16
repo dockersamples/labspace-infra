@@ -12,7 +12,7 @@ import { useNavigate, useParams } from "react-router";
 const WorkshopContext = createContext();
 
 export const WorkshopContextProvider = ({ children }) => {
-  const { sectionId } = useParams();
+  const { appId, sectionId } = useParams();
   const navigate = useNavigate();
   const [workshop, setWorkshop] = useState(null);
   const [activeSection, setActiveSection] = useState(null);
@@ -27,7 +27,7 @@ export const WorkshopContextProvider = ({ children }) => {
   const changeActiveSection = useCallback(
     (sectionId) => {
       console.log("Changing active section to:", sectionId);
-      navigate(`/${sectionId}`);
+      navigate(`/${appId}/${sectionId}`);
     },
     [navigate],
   );
