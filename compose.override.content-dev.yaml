@@ -23,10 +23,15 @@ services:
   interface:
     environment:
       CONTENT_DEV_MODE: true
+    develop:
+      watch:
+        - path: $CONTENT_PATH/labspace
+          action: sync
+          target: /labspace/instructions
 
   workspace:
     develop:
       watch:
-        - path: $CONTENT_PATH
+        - path: $CONTENT_PATH/project
           action: sync
           target: /home/coder/project

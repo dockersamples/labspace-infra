@@ -9,7 +9,8 @@ services:
     image: dockersamples/labspace-configurator:latest
     use_api_socket: true
     volumes:
-      - content:/project
+      - labspace-content:/project
+      - labspace-instructions:/instructions
       - docker-creds:/docker-creds
       - labspace-support:/etc/labspace-support
 
@@ -18,7 +19,7 @@ services:
     ports:
       - "3030:3030"
     volumes:
-      - content:/project
+      - labspace-instructions:/labspace/instructions:ro
       - type: volume
         source: labspace-support
         target: /etc/labspace-support/private-key
@@ -53,7 +54,7 @@ services:
       - 3000:3000 # For the Node application running in the IDE
     volumes:
       - socket-proxy:/var/run
-      - content:/home/coder/project
+      - labspace-content:/home/coder/project
       - docker-creds:/docker-creds
       - type: volume
         source: labspace-support
@@ -113,8 +114,9 @@ services:
 volumes:
   socket-proxy:
     name: labspace-socket-proxy
-  content:
+  labspace-content:
     name: labspace-content
+  labspace-instructions:
   docker-creds:
   labspace-support:
 
