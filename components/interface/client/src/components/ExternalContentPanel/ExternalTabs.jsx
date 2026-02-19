@@ -23,8 +23,8 @@ export function ExternalTabs({
                 eventKey={tab.id}
                 href={tab.url}
                 className={
-                  `p-0 ps-3 pe-3 rounded-top d-flex align-items-center text-white ` +
-                  (activeTab === tab.id ? "bg-primary" : "")
+                  `p-0 ps-3 rounded-top d-flex align-items-center text-white ` +
+                  (activeTab === tab.id ? "bg-primary pe-2" : "pe-3")
                 }
                 style={{ fontSize: "0.7rem" }}
                 onClick={(e) => {
@@ -36,16 +36,18 @@ export function ExternalTabs({
                 </span>
                 <span>{tab.title}</span>
 
-                {activeTab === tab.url && (
+                {activeTab === tab.id && (
                   <Button
                     size="sm"
                     variant="default"
-                    className="rounded-circle p-1 pt-0 pb-0"
+                    className="rounded-circle p-0 ms-2"
                     onClick={(e) => {
                       e.stopPropagation();
                       e.preventDefault();
                       onRefreshClick();
                     }}
+                    title="Refresh"
+                    style={{ fontSize: "0.6rem" }}
                   >
                     <span className="material-symbols-outlined">refresh</span>
                   </Button>
