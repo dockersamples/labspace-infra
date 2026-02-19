@@ -9,15 +9,11 @@ description: >
 
 sections:
   - title: What is a Labspace?
-    contentPath: ./01-what-is-a-labspace.md
+    contentPath: 01-what-is-a-labspace.md
   - title: The Docker environment
-    contentPath: ./02-the-docker-environment.md
-  - title: Mimicking the host network
-    contentPath: ./03-networking.md
-  - title: The VS Code Extension
-    contentPath: ./04-the-vscode-extension.md
-  - title: Labspace Content
-    contentPath: ./05-labspace-content.md
+    contentPath: 02-the-docker-environment.md
+  - title: Markdown directives
+    contentPath: 03-markdown-directives.md
 
 # Remove if there is no need to link compose services in the editor ui, icons are from: https://fonts.google.com/icons
 services:
@@ -25,3 +21,7 @@ services:
     title: Marlin
     url: http://localhost:3030
     icon: anchor
+  - id: app
+    title: App
+    url: http://localhost
+    icon: web
