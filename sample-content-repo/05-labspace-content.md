@@ -11,6 +11,8 @@ Now that you've got an idea of what a Labspace _is_ technically, it's important 
 
 Open the :fileLink[test.txt]{path="test.txt"} to see what's inside
 
+Open the :tabLink[http://localhost:3000/#test]{href="http://localhost:3000/#test" title="Marlin 2" id="marlin"}
+
 
 ## The `labspace.yaml` file
 

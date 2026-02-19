@@ -39,6 +39,13 @@ The easiest way to get started is to use the [Labspace Starter repo template](ht
         contentPath: .labspace/section-one.md
       - title: Section Two
         contentPath: .labspace/section-two.md
+
+    # Define Labspace-provided services that should appear as tabs
+    services:
+      - id: marlin
+        url: http://localhost:3000
+        title: Marlin
+        icon: anchor
     ```
 
     > [!TIP]

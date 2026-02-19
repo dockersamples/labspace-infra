@@ -1,6 +1,6 @@
 import { useTabs } from "../../../TabContext";
 
-export function TabLink({ href, title, children }) {
+export function TabLink({ href, title, id, icon, children }) {
   const { displayLink } = useTabs();
 
   return (
@@ -9,7 +9,7 @@ export function TabLink({ href, title, children }) {
       title={title}
       onClick={(e) => {
         e.preventDefault();
-        displayLink(href, title);
+        displayLink(href, title, id, icon);
       }}
     >
       {children}
