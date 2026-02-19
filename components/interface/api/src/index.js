@@ -22,7 +22,7 @@ app.get("*splat", (req, res) =>
   res.sendFile(path.resolve("public", "index.html")),
 );
 
-async function run() {  
+async function run() {
   await labspaceService.bootstrap();
   console.log("Labspace bootstrapped");
 

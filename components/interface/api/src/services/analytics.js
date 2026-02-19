@@ -2,10 +2,11 @@ import fs from "fs";
 import { fetch } from "undici";
 import { labspaceService } from "./labspace.js";
 
-
 export class AnalyticsPublisher {
   constructor() {
-    const labspaceMetadata = JSON.parse(fs.readFileSync("/etc/labspace-support/metadata/metadata.json", "utf8"));
+    const labspaceMetadata = JSON.parse(
+      fs.readFileSync("/etc/labspace-support/metadata/metadata.json", "utf8"),
+    );
 
     this.optIn = labspaceMetadata.analytics_enabled === true;
 
@@ -16,13 +17,15 @@ export class AnalyticsPublisher {
     this.infraVersion = labspaceMetadata.infra_version;
     this.sourceRepo = labspaceMetadata.source_repo;
     this.contentVersion = labspaceMetadata.content_version;
-    
+
     this.queuedEvents = [];
     this.startTimestamp = Date.now();
     this.previousSectionId = null;
     this.sectionsVisited = new Set();
 
-    console.log(`AnalyticsPublisher initialized. ${this.optIn ? "Analytics enabled" : "Analytics disabled"}`);
+    console.log(
+      `AnalyticsPublisher initialized. ${this.optIn ? "Analytics enabled" : "Analytics disabled"}`,
+    );
   }
 
   publishStartEvent() {
@@ -43,7 +46,13 @@ export class AnalyticsPublisher {
     });
   }
 
-  publishUserActionEvent(action, sectionId, codeBlockIndex, isSuccess, filename) {
+  publishUserActionEvent(
+    action,
+    sectionId,
+    codeBlockIndex,
+    isSuccess,
+    filename,
+  ) {
     return this.#sendEvent("user_action", {
       action,
       section_id: sectionId,
@@ -68,7 +77,9 @@ export class AnalyticsPublisher {
       section_id: sectionId,
       section_index: labspaceService.getSectionIndex(sectionId),
       prev_section: prevSection,
-      prev_section_index: prevSection ? labspaceService.getSectionIndex(prevSection) : null,
+      prev_section_index: prevSection
+        ? labspaceService.getSectionIndex(prevSection)
+        : null,
     });
   }
 
@@ -105,16 +116,20 @@ export class AnalyticsPublisher {
       method: "POST",
       headers,
       body: JSON.stringify({
-        records: [ enhancedEvent ]
+        records: [enhancedEvent],
       }),
-    }).then(async (res) => {
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Non-200 response from analytics endpoint: ${res.status} - ${text}`);
-      }
-    }).catch((err) => {
-      console.error("Failed to send analytics event:", err);
-    });
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(
+            `Non-200 response from analytics endpoint: ${res.status} - ${text}`,
+          );
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to send analytics event:", err);
+      });
   }
 }
 

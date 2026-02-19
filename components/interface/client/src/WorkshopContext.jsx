@@ -125,18 +125,21 @@ export const WorkshopContextProvider = ({ children }) => {
       });
   }, []);
 
-  const openFile = useCallback((filePath, line) => {
-    fetch(`/api/labspace/open-file`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ filePath, line, sectionId: activeSectionId }),
-    }).catch((error) => {
-      console.error("Error opening file:", error);
-      toast.error("Failed to open file. Please try again.");
-    });
-  }, [activeSectionId]);
+  const openFile = useCallback(
+    (filePath, line) => {
+      fetch(`/api/labspace/open-file`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ filePath, line, sectionId: activeSectionId }),
+      }).catch((error) => {
+        console.error("Error opening file:", error);
+        toast.error("Failed to open file. Please try again.");
+      });
+    },
+    [activeSectionId],
+  );
 
   useEffect(() => {
     if (!workshop) return;

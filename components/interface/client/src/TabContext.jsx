@@ -1,34 +1,37 @@
 import { createContext, useCallback, useContext, useState } from "react";
+import { useWorkshop } from "./WorkshopContext";
 
 const TabContext = createContext([]);
 
 export function TabContextProvider({ children }) {
-  const [tabs, setTabs] = useState([]);
-  const [activeTab, setActiveTab] = useState(null);
+  const workshop = useWorkshop();
+  const [customTabs, setCustomTabs] = useState([]);
+  const [activeTab, setActiveTab] = useState("ide");
 
   const addTab = useCallback(
-    (url, title) => {
+    (url, title, id) => {
       if (!title) title = url;
-      setTabs((prevTabs) => [...prevTabs, { url, title }]);
-      setActiveTab(url);
+      if (!id) id = title;
+      setCustomTabs((prevTabs) => [...prevTabs, { url, title, id }]);
+      setActiveTab(id);
     },
-    [setTabs, setActiveTab],
+    [setCustomTabs, setActiveTab],
   );
 
   const removeTab = useCallback(
-    (url) => {
-      setTabs((prevTabs) => {
-        const updatedTabs = prevTabs.filter((tab) => tab.url !== url);
+    (id) => {
+      setCustomTabs((prevTabs) => {
+        const updatedTabs = prevTabs.filter((tab) => tab.id !== id);
 
         setActiveTab((prevActiveTab) => {
-          if (prevActiveTab === url) {
-            const tabIndex = prevTabs.findIndex((tab) => tab.url === url);
+          if (prevActiveTab === id) {
+            const tabIndex = prevTabs.findIndex((tab) => tab.id === id);
             if (updatedTabs.length > 0) {
               const newIndex =
                 tabIndex === 0
                   ? 0
                   : Math.min(tabIndex - 1, updatedTabs.length - 1);
-              return updatedTabs[newIndex].url;
+              return updatedTabs[newIndex].id;
             } else {
               return null;
             }
@@ -39,23 +42,44 @@ export function TabContextProvider({ children }) {
         return updatedTabs;
       });
     },
-    [setTabs, setActiveTab],
+    [setCustomTabs, setActiveTab],
   );
 
   const displayLink = useCallback(
-    (url, title) => {
+    (url, title, id, icon) => {
       if (!title) title = url;
+      if (!id) id = title;
 
-      setTabs((prevTabs) => {
-        if (!prevTabs.find((tab) => tab.url === url)) {
-          return [...prevTabs, { url, title }];
+      if (workshop.services && workshop.services.find((s) => s.id === id)) {
+        workshop.services.find((s) => s.id === id).url = url;
+        setActiveTab(id);
+        return;
+      }
+
+      setCustomTabs((prevTabs) => {
+        const existingTab = prevTabs.find((tab) => tab.id === id);
+        if (existingTab) {
+          existingTab.url = url;
+          return prevTabs;
         }
-        return prevTabs;
+
+        return [...prevTabs, { url, title, id, icon }];
       });
-      setActiveTab(url);
+      setActiveTab(id);
     },
-    [setTabs, setActiveTab],
+    [workshop.services, setCustomTabs, setActiveTab],
   );
+
+  const tabs = [
+    {
+      id: "ide",
+      url: "http://localhost:8085",
+      icon: "code",
+      title: "IDE",
+    },
+    ...(workshop.services || []),
+    ...customTabs,
+  ];
 
   return (
     <TabContext.Provider

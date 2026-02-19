@@ -5,6 +5,7 @@ import path from "path";
 export class LabspaceService {
   constructor() {
     this.sections = [];
+    this.services = [];
     this.variables = {};
   }
 
@@ -14,6 +15,18 @@ export class LabspaceService {
       "utf8",
     );
     this.config = parse(labspaceYaml);
+
+    if (!this.config.services) {
+      this.config.services = [];
+    } else {
+      this.config.services = this.config.services.map((service) => ({
+        ...service,
+        id: service.title
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, "") // remove special characters except spaces and dashes
+          .replace(/\s+/g, "-"), // replace spaces with dashes
+      }));
+    }
 
     this.config.sections = this.config.sections.map((section) => ({
       ...section,
@@ -33,6 +46,12 @@ export class LabspaceService {
       sections: this.config.sections.map((section) => ({
         id: section.id,
         title: section.title,
+      })),
+      services: this.config.services.map((service) => ({
+        id: service.id,
+        title: service.title,
+        icon: service.icon,
+        url: service.url,
       })),
     };
 
