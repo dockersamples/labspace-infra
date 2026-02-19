@@ -14,12 +14,24 @@ router.post("/open-file", (req, res) => {
   vscodeService
     .openFileInIDE(filePath, line)
     .then(() => {
-      analyticsPublisher.publishUserActionEvent("open_file", sectionId || null, null, true, filePath);
-      res.json({ success: true })
+      analyticsPublisher.publishUserActionEvent(
+        "open_file",
+        sectionId || null,
+        null,
+        true,
+        filePath,
+      );
+      res.json({ success: true });
     })
     .catch((error) => {
       console.error("Error opening file:", error);
-      analyticsPublisher.publishUserActionEvent("open_file", sectionId || null, null, false, filePath);
+      analyticsPublisher.publishUserActionEvent(
+        "open_file",
+        sectionId || null,
+        null,
+        false,
+        filePath,
+      );
       res.status(500).json({ error: "Failed to open file" });
     });
 });
@@ -43,12 +55,22 @@ router.post("/sections/:sectionId/command", (req, res) => {
   vscodeService
     .executeCommand(sectionId, codeBlockIndex)
     .then(() => {
-      analyticsPublisher.publishUserActionEvent("run_command", sectionId, codeBlockIndex, true);
-      res.json({ success: true, message: "Command executed" })
+      analyticsPublisher.publishUserActionEvent(
+        "run_command",
+        sectionId,
+        codeBlockIndex,
+        true,
+      );
+      res.json({ success: true, message: "Command executed" });
     })
     .catch((error) => {
       console.error("Error executing command:", error);
-      analyticsPublisher.publishUserActionEvent("run_command", sectionId, codeBlockIndex, false);
+      analyticsPublisher.publishUserActionEvent(
+        "run_command",
+        sectionId,
+        codeBlockIndex,
+        false,
+      );
       res.status(500).json({ error: "Failed to execute command" });
     });
 });
@@ -56,16 +78,28 @@ router.post("/sections/:sectionId/command", (req, res) => {
 router.post("/sections/:sectionId/save-file", (req, res) => {
   const { codeBlockIndex } = req.body;
   const sectionId = req.params.sectionId;
-  
+
   vscodeService
     .saveFile(sectionId, codeBlockIndex)
     .then((filename) => {
-      analyticsPublisher.publishUserActionEvent("save_file", sectionId, codeBlockIndex, true, filename);
-      res.json({ success: true, message: "File saved" })
+      analyticsPublisher.publishUserActionEvent(
+        "save_file",
+        sectionId,
+        codeBlockIndex,
+        true,
+        filename,
+      );
+      res.json({ success: true, message: "File saved" });
     })
     .catch((error) => {
       console.error("Error saving file:", error);
-      analyticsPublisher.publishUserActionEvent("save_file", sectionId, codeBlockIndex, false, error.fileName);
+      analyticsPublisher.publishUserActionEvent(
+        "save_file",
+        sectionId,
+        codeBlockIndex,
+        false,
+        error.fileName,
+      );
       res.status(500).json({ error: "Failed to save file" });
     });
 });

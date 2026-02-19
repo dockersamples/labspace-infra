@@ -9,8 +9,11 @@ export function ExternalContentPanel() {
 
   return (
     <div className="d-flex flex-fill flex-column">
-      { tabs.length > 1 && (
-        <div className="p-2 bg-dark border-bottom border-light-subtle" id="service-selector">
+      {tabs.length > 1 && (
+        <div
+          className="p-2 bg-dark border-bottom border-light-subtle"
+          id="service-selector"
+        >
           <ExternalTabs
             activeTab={activeTab}
             setActiveTab={setActiveTab}
@@ -34,8 +37,6 @@ export function ExternalContentPanel() {
           className={tab.id === activeTab ? "d-block" : "d-none"}
         />
       ))}
-
-
     </div>
   );
 }

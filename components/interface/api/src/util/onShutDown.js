@@ -43,31 +43,31 @@ export function onShutdown(name, dependencies, handler) {
     typeof name === "function"
       ? name
       : typeof dependencies === "function"
-      ? dependencies
-      : handler;
+        ? dependencies
+        : handler;
   dependencies =
     name instanceof Array
       ? name
       : dependencies instanceof Array
-      ? dependencies
-      : [];
+        ? dependencies
+        : [];
   name = typeof name === "string" ? name : Math.random().toString(36);
 
   if (dependencies.reduce((acc, dep) => acc || testForCycles(dep), false)) {
     throw new Error(
-      `Adding shutdown handler "${name}" will create a dependency loop: aborting`
+      `Adding shutdown handler "${name}" will create a dependency loop: aborting`,
     );
   }
 
   dependencyTree.set(
     name,
-    Array.from(new Set((dependencyTree.get(name) || []).concat(dependencies)))
+    Array.from(new Set((dependencyTree.get(name) || []).concat(dependencies))),
   );
   if (!handlers.has(name)) {
     handlers.set(name, []);
   }
   handlers.get(name).push(handler);
-};
+}
 
 /**
  * Optional export to handle shutdown errors.
@@ -75,7 +75,7 @@ export function onShutdown(name, dependencies, handler) {
  */
 export function onShutdownError(callback) {
   shutdownErrorHandlers.push(callback);
-};
+}
 
 async function shutdown(name, promisesMap) {
   if (promisesMap.has(name)) {
@@ -119,7 +119,7 @@ handledEvents.forEach((event) =>
           .then(() => exit(42759))
           .catch(() => exit(42758));
       });
-  })
+  }),
 );
 
 // -------- Utility functions -------- \\
@@ -133,14 +133,14 @@ function testForCycles(name, visitedSet = new Set()) {
   // If any of the cycles found in dependencies, return true.
   return (dependencyTree.get(name) || []).reduce(
     (acc, name) => acc || testForCycles(name),
-    false
+    false,
   );
 }
 
 function getAllUnreferencedNames() {
   const allNodes = new Set(Array.from(dependencyTree.keys()));
   Array.from(dependencyTree.values()).forEach((deps) =>
-    deps.forEach((dep) => allNodes.delete(dep))
+    deps.forEach((dep) => allNodes.delete(dep)),
   );
   return Array.from(allNodes);
 }

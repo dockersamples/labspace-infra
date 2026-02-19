@@ -51,7 +51,7 @@ export function TabContextProvider({ children }) {
       if (!id) id = title;
 
       if (workshop.services && workshop.services.find((s) => s.id === id)) {
-        workshop.services.find(s => s.id === id).url = url;
+        workshop.services.find((s) => s.id === id).url = url;
         setActiveTab(id);
         return;
       }
@@ -77,8 +77,8 @@ export function TabContextProvider({ children }) {
       icon: "code",
       title: "IDE",
     },
-    ...(workshop.services || []), 
-    ...customTabs
+    ...(workshop.services || []),
+    ...customTabs,
   ];
 
   return (

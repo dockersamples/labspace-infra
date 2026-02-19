@@ -22,7 +22,10 @@ export function ExternalTabs({
               <Nav.Link
                 eventKey={tab.id}
                 href={tab.url}
-                className={`p-0 ps-3 pe-3 rounded-top d-flex align-items-center text-white ` + (activeTab === tab.id ? "bg-primary" : "")}
+                className={
+                  `p-0 ps-3 pe-3 rounded-top d-flex align-items-center text-white ` +
+                  (activeTab === tab.id ? "bg-primary" : "")
+                }
                 style={{ fontSize: "0.7rem" }}
                 onClick={(e) => {
                   e.preventDefault();
@@ -54,5 +57,4 @@ export function ExternalTabs({
       )}
     </>
   );
-  
 }
