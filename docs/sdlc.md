@@ -50,6 +50,7 @@ All services communicate via internal DNS using the `.dockerlabs.xyz` domain (wh
 |---------|-------------|---------------|---------|
 | Gitea | `http://git.dockerlabs.xyz` | 80, 443 | Git hosting, web UI, container registry |
 | Gitea SSH | `git.dockerlabs.xyz:22` | 22 | Git SSH operations |
+| Zot | `registry.dockerlabs.xyz | 80, 443 | Container registry |
 | k3s API | `https://k8s.dockerlabs.xyz:6443` | - | Kubernetes API server |
 | k8s Apps | `http://app.dockerlabs.xyz` | 80, 443 | Applications deployed to k8s (routed via Traefik) |
 | Traefik Dashboard | `http://localhost:8080` | 8080 | Traefik web UI |
@@ -61,7 +62,7 @@ The environment is pre-configured with a demo user and repository:
 | Service | Username | Password | Additional Info |
 |---------|----------|----------|-----------------|
 | Gitea | `moby` | `moby1234` | Admin account, auto-created |
-| Gitea Registry | `moby` | `moby1234` | Used by k3s for image pulls |
+| Zot | - | - | No credentials required |
 
 **Default Repository**: `moby/demo-app`
 - Automatically created at startup
@@ -74,9 +75,9 @@ The following secrets are automatically configured in the `moby/demo-app` reposi
 
 | Secret Name | Value | Purpose |
 |------------|-------|---------|
-| `DOCKER_USERNAME` | `moby` | Authenticate to Gitea registry |
-| `DOCKER_PASSWORD` | `moby1234` | Authenticate to Gitea registry |
-| `DOCKER_REGISTRY` | `git.dockerlabs.xyz` | Registry URL for image push |
+| `DOCKER_USERNAME` | `moby` | Authenticate to container registry (not required) |
+| `DOCKER_PASSWORD` | `moby1234` | Authenticate to container registry (not required) |
+| `DOCKER_REGISTRY` | `registry.dockerlabs.xyz` | Registry URL for image push |
 | `DOCKERHUB_USERNAME` | (from Docker Desktop) | Authenticate to Docker Hub |
 | `DOCKERHUB_PASSWORD` | (from Docker Desktop) | Authenticate to Docker Hub |
 | `KUBECONFIG` | (generated) | Deploy to k3s cluster |
@@ -111,18 +112,18 @@ The Gitea service runs a comprehensive bootstrap process:
 1. Creates the `moby` admin user (if not exists)
 2. Creates the `moby/demo-app` repository (if not exists)
 3. Generates SSH keypair and adds public key to `moby` user
-4. Creates CI/CD secrets for the Gitea registry:
+4. Creates CI/CD secrets for the Gitea registry (which the registry doesn't require):
    - `DOCKER_USERNAME`: `moby`
    - `DOCKER_PASSWORD`: `moby1234`
-   - `DOCKER_REGISTRY`: `git.dockerlabs.xyz`
+   - `DOCKER_REGISTRY`: `registry.dockerlabs.xyz`
 5. Generates runner registration token for CI/CD
 
 ### k3s Configuration
 
 The Kubernetes cluster is configured with:
 - TLS SAN for `k8s.dockerlabs.xyz` hostname
-- Registry credentials for pulling from Gitea registry (`git.dockerlabs.xyz`)
-- Insecure TLS verification for the Gitea registry
+- Registry credentials for pulling from the container registry (`registry.dockerlabs.xyz`)
+- Insecure TLS verification for the container registry
 - Ingress routing via Traefik for `app.dockerlabs.xyz` subdomain
 
 ## Socket Proxy Configuration
@@ -170,10 +171,10 @@ jobs:
         # This config is only needed in this demo environment due to self-signed certs
         with:
           config-inline: |
-            [registry."git.dockerlabs.xyz"]
+            [registry."registry.dockerlabs.xyz"]
               http = true
 
-      - name: Log in to Gitea Docker Registry
+      - name: Log in to container registry
         uses: docker/login-action@v3
         with:
           registry: ${{ secrets.DOCKER_REGISTRY }}
@@ -266,7 +267,7 @@ spec:
         app: app
     spec:
       containers:
-        - image: git.dockerlabs.xyz/moby/demo-app:latest
+        - image: registry.dockerlabs.xyz/moby/demo-app:latest
           name: application
           ports:
             - containerPort: 3000
@@ -292,6 +293,7 @@ k describe pod
 
 From the user's browser:
 - Gitea UI: http://git.dockerlabs.xyz (routed via Traefik)
+- Container registry: http://registry.dockerlabs.xyz
 - Deployed apps: http://app.dockerlabs.xyz
 - Traefik dashboard: http://localhost:8080
 
@@ -302,6 +304,7 @@ This environment is designed for educational/demo purposes:
 - All credentials are hardcoded and publicly documented
 - TLS verification is disabled for the Gitea registry
 - The Traefik API is exposed without authentication
+- The container registry does not require authentication to push or pull images
 - k3s uses a static token
 
 **Do not use these configurations in production environments.**
