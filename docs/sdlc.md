@@ -92,7 +92,6 @@ When the workspace starts, several setup scripts run automatically:
 - Creates SSH keypair for the `moby` user
 - Configures git client with `moby@local` identity
 - Initializes the Labspace project as a git repository
-- Adds `.labspace` and `labspace.yaml` to `.gitignore`
 - Commits and pushes the labspace project to `git@git.dockerlabs.xyz:moby/demo-app.git`
 
 **Kubernetes Setup**:

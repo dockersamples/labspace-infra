@@ -12,12 +12,9 @@ To help with discovery and making it clear that the repo is for a Labspace, name
 
 This applies to your code repo (whether on GitHub or elsewhere) and your published Labspace Compose file.
 
-### Use the `.labspace` directory
+### Use the `labspace` and `project` directories
 
-In your content repo, consider placing your writeups in the `.labspace` directory to keep things organized and to reduce the clutter that might exist with lots of files/directories in the project directory.
-
-Note: We may consider excluding the `.labspace` directory from the File Explorer in VS Code, further reducing the clutter.
-
+In your content repo, place your `labspace.yaml` and markdown instructions in the `labspace` directory to keep things organized and to reduce the clutter that might exist with lots of files/directories in the project directory.
 
 
 ## Authoring practices

@@ -22,7 +22,7 @@ The easiest way to get started is to use the [Labspace Starter repo template](ht
 
 1. Create a repository that will host your content
 
-2. At the root of the repository, create a `labspace.yaml` file. That file should have content similar to the following:
+2. Inside the `labspace` directory, create a `labspace.yaml` file. That file should have content similar to the following:
 
     ```yaml
     metadata:
@@ -36,9 +36,9 @@ The easiest way to get started is to use the [Labspace Starter repo template](ht
 
     sections:
       - title: Section One
-        contentPath: .labspace/section-one.md
+        contentPath: section-one.md
       - title: Section Two
-        contentPath: .labspace/section-two.md
+        contentPath: section-two.md
 
     # Define Labspace-provided services that should appear as tabs
     services:
@@ -48,13 +48,9 @@ The easiest way to get started is to use the [Labspace Starter repo template](ht
         icon: anchor
     ```
 
-    > [!TIP]
-    > While it's not required to put everything in the `.labspace` directory, it is highly recommended as it helps provide a better
-    > experience for participants as it helps reduce clutter in the development environment.
-
 3. Write the content for each of the sections. See the [Markdown Options](./markdown-options.md) for Markdown-specific capabilities.
 
-4. Create a `.labspace/compose.override.yaml` file. This file will contain any overrides you need to make to the default Labspace environment (see [Configuration](./configuration.md) for more info).
+4. Create a `compose.override.yaml` file. This file will contain any overrides you need to make to the default Labspace environment (see [Configuration](./configuration.md) for more info).
 
     ```yaml
     services:
@@ -72,10 +68,10 @@ The easiest way to get started is to use the [Labspace Starter repo template](ht
 
     ```console
     # Mac/Linux
-    CONTENT_PATH=$PWD docker compose -f oci://dockersamples/labspace-content-dev -f .labspace/compose.override.yaml up --watch
+    CONTENT_PATH=$PWD docker compose -f oci://dockersamples/labspace-content-dev -f compose.override.yaml up --watch
 
     # On Windows with PowerShell
-    $Env:CONTENT_PATH = (Get-Location).Path; docker compose -f oci://dockersamples/labspace-content-dev -f .labspace/compose.override.yaml up --watch
+    $Env:CONTENT_PATH = (Get-Location).Path; docker compose -f oci://dockersamples/labspace-content-dev -f compose.override.yaml up --watch
     ```
 
     Once the stack starts, you can open the app at [http://localhost:3030](http://localhost:3030).
@@ -103,7 +99,7 @@ Publishing a Labspace is as simple as publishing a Compose file. With the base C
 2. Publish the Compose file with the following command:
 
     ```console
-    docker compose -f oci://dockersamples/labspace -f .labspace/compose.override.yaml publish ${HUB_USERNAME}/${HUB_REPO} --with-env -y
+    docker compose -f oci://dockersamples/labspace -f compose.override.yaml publish ${HUB_USERNAME}/${HUB_REPO} --with-env -y
     ```
 
     This will merge the two Compose files together and publish it as an OCI artifact. This example would publish to `moby/labspace-demo`.

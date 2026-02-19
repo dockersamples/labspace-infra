@@ -20,7 +20,7 @@ Beyond the project clone URL, **only the workspace service should be modified.**
 
 ## Configuration examples
 
-The following examples are configurations of the `.labspace/compose.override.yaml` file used to publish the Labspace.
+The following examples are configurations of the `compose.override.yaml` file used to publish the Labspace.
 
 ### Required configuration
 
@@ -196,13 +196,13 @@ To do so, you need to:
 
 When the configurator runs, it will copy all files located at `LOCAL_CONTENT_PATH` into the volume used by the Labspace. Any defined setup scripts will still execute as configured. Since the content is copied, changes to files in the Labspace will change the copied files, making it easy to restart the Labspace from a known and valid state.
 
-The following `compose.override.yaml` will mount the parent directory (since this is in the `.labspace` directory) into the configurator.
+The following `compose.override.yaml` will mount the parent directory (since this as at the root of the repo) into the configurator.
 
 ```yaml
 services:
   configurator:
     volumes:
-      - ../:/custom-content
+      - ./:/custom-content
     environment:
       LOCAL_MODE: "true"
       LOCAL_CONTENT_PATH: /custom-content

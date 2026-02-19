@@ -15,15 +15,15 @@ For example, given the following directory structure:
 
 ```
 .
-└── .labspace/
+└── labspace/
     └── images/
         └── screenshot.png
 ```
 
 The image will be rendered with either of the following markdown snippets:
 
-    ![Screenshot](/.labspace/images/screenshot.png)
-    ![Screenshot](.labspace/images/screenshot.png)
+    ![Screenshot](/labspace/images/screenshot.png)
+    ![Screenshot](labspace/images/screenshot.png)
 
 
 

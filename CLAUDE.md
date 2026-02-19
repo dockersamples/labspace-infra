@@ -52,9 +52,23 @@ Supporting services:
 
 | Volume | Purpose |
 |--------|---------|
-| `labspace-content` | Project/content files |
+| `labspace-content` | Project files (user workspace files in `/home/coder/project`) |
+| `labspace-instructions` | Labspace instructions (labspace.yaml + markdown files) |
 | `labspace-socket-proxy` | Proxied Docker socket |
 | `labspace-support` | Security keypairs, metadata, extension socket |
+
+### Volume Mounting and File Paths
+
+The content volumes are mounted differently across services:
+
+| Service | Volume | Mount Point | Access | Purpose |
+|---------|--------|-------------|--------|---------|
+| **Configurator** | `labspace-content` | `/project` | Read-write | Copies project files from staging |
+| | `labspace-instructions` | `/instructions` | Read-write | Copies instruction files from staging |
+| **Interface** | `labspace-instructions` | `/labspace/instructions` | Read-only | Reads labspace.yaml and markdown files |
+| **Workspace** | `labspace-content` | `/home/coder/project` | Read-write | User's working directory in VS Code |
+
+This separation ensures instructions cannot be modified by users and keeps the workspace clean.
 
 ## Content Loading (Configurator)
 
@@ -72,11 +86,28 @@ The configurator supports multiple ways to load content:
 
 4. **PROJECT_CLONE_URL**: Clones content from a git repository. Used by `compose.run.yaml` for production deployments.
 
-If `PROJECT_SUBPATH` is set, only that subdirectory is copied to `/project`.
+**Content Repository Structure:**
+
+Content repositories must follow this directory structure:
+
+```
+content-repo/
+├── labspace/              # Instructions and configuration
+│   ├── labspace.yaml      # Labspace configuration
+│   └── *.md               # Markdown instruction files
+└── project/               # User workspace files
+    └── (code, scripts, etc.)
+```
+
+The configurator copies these to separate destinations:
+- `/staging/labspace/*` → `/instructions` (mounted as `labspace-instructions` volume)
+- `/staging/project/*` → `/project` (mounted as `labspace-content` volume)
+
+If `PROJECT_SUBPATH` is set, only that subdirectory is copied (legacy behavior for repos not following the new structure).
 
 ### Init Scripts
 
-After content is staged, the configurator looks for executable scripts in `/init-scripts/` and runs them in order. Content repos can provide these via a `.labspace/init-scripts/` directory that gets mounted.
+After content is staged, the configurator looks for executable scripts in `/init-scripts/` and runs them in order.
 
 This is useful for:
 - Downloading additional dependencies
@@ -88,6 +119,8 @@ This is useful for:
 ```
 1. setup_support_directories  → Create /etc/labspace-support/{private-key,public-key,socket,metadata}
 2. setup_project_directory    → Load content via one of the methods above
+                                 - Copy /staging/project/* to /project
+                                 - Copy /staging/labspace/* to /instructions
    └── run_setup_script       → Execute any init scripts
 3. create_keypair             → Generate EC key pair for JWT signing (if not exists)
 4. copy_docker_credentials    → Copy Docker config from /run/secrets/docker/config.json
@@ -241,6 +274,7 @@ docker compose up --watch --build
 - Access at http://localhost:5173 (Vite dev server)
 - Hot-reload enabled via Compose Watch
 - Uses `sample-content-repo/` as test content
+- Compose Watch syncs `sample-content-repo/labspace/` to interface and `sample-content-repo/project/` to workspace
 
 ### Content Development (creating labspace content)
 
@@ -249,7 +283,10 @@ CONTENT_PATH=./your-content docker compose -f compose.run.yaml -f compose.overri
 ```
 
 - Access at http://localhost:3030
-- Compose Watch syncs content changes to the workspace in real-time
+- Compose Watch syncs content changes in real-time:
+  - `$CONTENT_PATH/labspace/` → interface instructions
+  - `$CONTENT_PATH/project/` → workspace files
+- Your content directory must have the `labspace/` and `project/` structure
 
 ### Running a Published Labspace
 
@@ -320,6 +357,8 @@ components/
 
 docs/                   # User documentation
 sample-content-repo/    # Example labspace content
+├── labspace/          # Instructions (labspace.yaml + markdown)
+└── project/           # User workspace files
 ```
 
 ## Key Technologies
@@ -344,7 +383,7 @@ Extension endpoints:
 
 ### Labspace Content Format
 
-Content is defined in `labspace.yaml`:
+Content is defined in `labspace/labspace.yaml`:
 
 ```yaml
 metadata:
@@ -357,8 +396,10 @@ description: Description here
 
 sections:
   - title: Section Title
-    contentPath: ./01-intro.md
+    contentPath: 01-intro.md
 ```
+
+**Important:** The `contentPath` is relative to the `labspace/` directory (no `./` prefix needed). The interface reads these files from `/labspace/instructions/` on the interface container.
 
 ## Markdown Rendering Pipeline
 
@@ -368,19 +409,21 @@ The interface uses a multi-stage pipeline to parse, transform, and render markdo
 
 The API backend handles:
 
-1. **Section loading**: Reads `labspace.yaml`, generates section IDs from titles
+1. **Section loading**: Reads `labspace.yaml` from `/labspace/instructions/labspace.yaml`, generates section IDs from titles
 2. **Variable interpolation**: Replaces `$$varName$$` with stored values before sending to client
 3. **Code block extraction**: Parses code blocks by index for command execution
 
 ```
-labspace.yaml → Section config with IDs
-markdown file → Variable replacement → Client
+/labspace/instructions/labspace.yaml → Section config with IDs
+/labspace/instructions/*.md → Variable replacement → Client
 ```
 
 Key methods:
 - `getLabspaceDetails()`: Returns title, description, section list
-- `getSectionDetails(id)`: Returns section content with variables interpolated
+- `getSectionDetails(id)`: Returns section content with variables interpolated from `/labspace/instructions/`
 - `getCodeBlock(sectionId, index)`: Extracts code, language, and metadata from a specific block
+
+**Note:** The interface has read-only access to `/labspace/instructions/` - it cannot modify instruction files.
 
 ### Frontend Rendering (MarkdownRenderer.jsx)
 
@@ -407,9 +450,14 @@ Uses `react-markdown` with a plugin pipeline:
 | `CodeBlock` | Fenced code with syntax highlighting + buttons | `CodeBlock.jsx` |
 | `ExternalLink` | Links that open in new browser tabs | `ExternalLink.jsx` |
 | `RenderedImage` | Images with path resolution | `RenderedImage.jsx` |
-| `TabLink` | `::tabLink` directive - opens URL in IDE tab | `TabLink.jsx` |
+| `TabLink` | `::tabLink` directive - opens/activates URL in IDE tab | `TabLink.jsx` |
 | `FileLink` | `:fileLink` directive - opens file in IDE | `FileLink.jsx` |
 | `VariableDefinition` | `::variableDefinition` - input card for variables | `VariableDefinition.jsx` |
+
+**TabLink Behavior:**
+- If `id` matches an existing labspace service (from `labspace.yaml`), the URL overrides that service's URL and activates the tab
+- If `id="ide"`, activates the IDE tab without changing its URL
+- Otherwise, creates a new custom tab with the specified URL
 
 ### Code Block Processing
 
@@ -500,7 +548,7 @@ Beyond GitHub Flavored Markdown, labspaces support:
 - **Code blocks**: `bash`/`shell` blocks get Run buttons; `save-as=path` adds Save button
 - **Disable buttons**: `no-copy-button`, `no-run-button` metadata
 - **Terminal targeting**: `terminal-id=name` runs command in a specific named terminal
-- **Tab links**: `::tabLink[text]{href="url" title="Tab Title"}`
+- **Tab links**: `::tabLink[text]{href="url" title="Tab Title" id="tab-id"}` - Creates or activates a tab; `id` can reference labspace services to override their URLs
 - **File links**: `:fileLink[text]{path="file.txt" line=10}`
 - **Variables**: `::variableDefinition[name]{prompt="Enter value"}` then use `$$name$$`
 - **Mermaid diagrams**: Standard mermaid code blocks
@@ -621,13 +669,26 @@ docker compose up --watch --build
 ### Naming Conventions
 
 - Prefix container-related names with `labspace-` to avoid conflicts
-- Use `.labspace/` directory in content repos for configuration
+- Use `labspace/` directory in content repos for init scripts and other configuration
+
+### Content Repository Structure
+
+Content repositories **must** follow this structure:
+- `labspace/` directory: Contains `labspace.yaml` and all markdown instruction files
+- `project/` directory: Contains all files that users will work with in the IDE
+
+This separation ensures:
+- Instructions are read-only and isolated from the user's workspace
+- Clear distinction between educational content and working project files
+- The workspace (`/home/coder/project`) only contains relevant project files
+- No need to hide labspace metadata from the IDE file explorer
 
 ### Component Dependencies
 
 - VS Code extension changes may require interface updates (if calling extension APIs)
 - Workspace base changes affect all workspace presets
 - Socket proxy config changes affect all Docker operations
+- Since instructions are now separate from the project, workspace settings no longer need to hide labspace files
 
 ## Things to Avoid
 

@@ -384,11 +384,6 @@ configs:
         echo "$$entry" >> .gitignore
       }
 
-      # Add entries to gitignore
-      add_to_gitignore ".labspace"
-      add_to_gitignore "labspace.yaml"
-      add_to_gitignore ".github/"
-
       rm -rf .git
       git init
       git remote add origin git@git.dockerlabs.xyz:moby/demo-app.git

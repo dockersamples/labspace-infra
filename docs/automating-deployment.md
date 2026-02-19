@@ -8,7 +8,7 @@ Before publishing using GitHub Actions, you will need to do the following:
 
 - Setup a `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` secret in GHA
 
-The following workflow definition will publish to Hub using the `.labspace/compose.override.yaml` file. You will need to swap out the `YOUR-HUB-REPO-NAME-HERE` with the name of your Docker Hub repo.
+The following workflow definition will publish to Hub using the `compose.override.yaml` file. You will need to swap out the `YOUR-HUB-REPO-NAME-HERE` with the name of your Docker Hub repo.
 
 ```yaml
 name: Publish Labspace
@@ -40,7 +40,7 @@ jobs:
 
       - name: Publish Compose file
         run: |
-          docker compose -f oci://dockersamples/labspace -f .labspace/compose.override.yaml publish $DOCKERHUB_USERNAME/YOUR-HUB-REPO-NAME-HERE --with-env -y
+          docker compose -f oci://dockersamples/labspace -f compose.override.yaml publish $DOCKERHUB_USERNAME/YOUR-HUB-REPO-NAME-HERE --with-env -y
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
 
