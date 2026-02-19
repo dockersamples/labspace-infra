@@ -23,6 +23,9 @@ services:
   interface:
     environment:
       CONTENT_DEV_MODE: true
+    volumes:
+      # Remove the read-only flag since watch will be syncing changes
+      - labspace-instructions:/labspace/instructions
     develop:
       watch:
         - path: $CONTENT_PATH/labspace
