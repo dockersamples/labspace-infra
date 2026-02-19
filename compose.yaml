@@ -9,7 +9,8 @@ services:
     build: ./components/configurator
     use_api_socket: true
     volumes:
-      - content:/project
+      - labspace-content:/project
+      - labspace-instructions:/instructions
       - docker-creds:/docker-creds
       - labspace-support:/etc/labspace-support
       - ./sample-content-repo:/dev-content:ro
@@ -25,7 +26,7 @@ services:
       context: ./components/interface
       target: server-dev
     volumes:
-      - ./sample-content-repo:/project
+      - labspace-instructions:/labspace/instructions
       - type: volume
         source: labspace-support
         target: /etc/labspace-support/private-key
@@ -58,6 +59,9 @@ services:
           target: /usr/local/app/src
         - path: ./components/interface/api/package-lock.json
           action: rebuild
+        - path: ./sample-content-repo/labspace
+          action: sync
+          target: /labspace/instructions
 
   interface-client:
     build:
@@ -94,7 +98,7 @@ services:
     volumes:
       - socket-proxy:/var/run
       - docker-creds:/docker-creds
-      - content:/home/coder/project
+      - labspace-content:/home/coder/project
       - type: volume
         source: labspace-support
         target: /etc/labspace-support/public-key
@@ -109,7 +113,7 @@ services:
       watch:
         - path: ./components/workspace
           action: rebuild
-        - path: ./sample-content-repo
+        - path: ./sample-content-repo/project
           action: sync
           target: /home/coder/project
 
@@ -182,8 +186,9 @@ services:
 volumes:
   socket-proxy:
     name: labspace-socket-proxy
-  content:
+  labspace-content:
     name: labspace-content
+  labspace-instructions:
   docker-creds:
   labspace-support:
 

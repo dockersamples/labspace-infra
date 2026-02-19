@@ -11,7 +11,7 @@ export class LabspaceService {
 
   async bootstrap() {
     const labspaceYaml = fs.readFileSync(
-      path.join("/project", "labspace.yaml"),
+      path.join("/labspace", "instructions", "labspace.yaml"),
       "utf8",
     );
     this.config = parse(labspaceYaml);
@@ -74,7 +74,7 @@ export class LabspaceService {
       return null;
     }
 
-    const filePath = path.join("/project", section.contentPath);
+    const filePath = path.join("/labspace", "instructions", section.contentPath);
     const content = fs
       .readFileSync(filePath, "utf8")
       .replace(/\$\$([^\$]+)\$\$/g, (_, varName) => {

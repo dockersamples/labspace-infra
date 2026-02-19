@@ -66,10 +66,12 @@ setup_project_directory() {
     fi
     cp -r /staging/"$PROJECT_SUBPATH"/* /project
   else
-    cp -r /staging/* /project
+    cp -r /staging/project/* /project
+    cp -r /staging/labspace/* /instructions
   fi
   shopt -u dotglob
 }
+
 
 stage_git_repo() {
   git config --global user.email "demo@example.com"
