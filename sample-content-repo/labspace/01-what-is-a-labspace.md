@@ -4,6 +4,8 @@ A Labspace is a collection of containerized services that provide participants w
 
 And guess what? You're in a Labspace right now! 🎉
 
+![Screenshot of a Labspace](images/screenshot.png)
+
 Simply put, there's more than just the VS Code Server with a split-screen interface. Inside the environment is a Docker Socket proxy, port republishing, custom VS Code extension, and more. This Labspace will introduce you to each of these elements.
 
 ## 🏛️ The Labspace architecture
