@@ -65,9 +65,19 @@ setup_project_directory() {
       exit 1
     fi
     cp -r /staging/"$PROJECT_SUBPATH"/* /project
-  else
+  elif [ -d "/staging/project" ]; then
     cp -r /staging/project/* /project
     cp -r /staging/labspace/* /instructions
+    
+  # Backwards compatibility for projects not yet using the new project layout
+  elif [ -f "/staging/labspace.yaml" ] || [ -d "/staging/.labspace" ]; then
+    echo "⚠️ Notice to labspace authors: This project is using a legacy layout. Please update to the new repo layout."
+    cp /staging/labspace.yaml /instructions
+    cp -r /staging/.labspace /instructions/.labspace
+
+    cp /staging/* /project
+    rm -rf /project/labspace.yaml /project/.labspace
+    rm -rf /project/.git /project/.gitignore || true
   fi
   shopt -u dotglob
 }
