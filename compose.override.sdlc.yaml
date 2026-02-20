@@ -79,6 +79,9 @@ services:
         mode: 0755
     volumes:
       - labspace-support:/labspace-support
+    depends_on:
+      traefik:
+        condition: service_started 
 
   traefik:
     image: traefik:3.6.5
@@ -548,5 +551,7 @@ configs:
     content: |
       #!/bin/bash
 
-      kubectl apply -f /labspace-support/k8s-setup/zone-file-config-map.yaml
-      kubectl -n kube-system rollout restart deployment/coredns
+      kubectl apply -f /etc/labspace-support/k8s-setup/zone-file-config-map.yaml
+      if kubectl -n kube-system get deployment coredns > /dev/null 2>&1; then
+        kubectl -n kube-system rollout restart deployment/coredns
+      fi
