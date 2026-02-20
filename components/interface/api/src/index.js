@@ -15,7 +15,7 @@ app.use(express.static("public"));
 app.use("/api", router);
 
 // Content resources
-app.use(express.static("/project", { dotfiles: "allow" }));
+app.use(express.static("/labspace/instructions", { dotfiles: "allow" }));
 
 // Send all unknown routes to the frontend to handle
 app.get("*splat", (req, res) =>
