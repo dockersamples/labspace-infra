@@ -19,6 +19,11 @@ services:
     volumes:
       - gitea-outputs:/gitea-outputs:ro
       - k3s-output:/kubeconfig:ro
+      - type: volume
+        source: labspace-support
+        target: /etc/labspace-support/k8s-setup
+        volume:
+          subpath: k8s-setup
     configs:
       - source: workspace-entrypoint-script
         target: /entrypoint.d/50-entrypoint-script.sh
@@ -40,6 +45,8 @@ services:
         condition: service_healthy
       k3s:
         condition: service_healthy
+      zone-file-creator:
+        condition: service_completed_successfully
 
   interface:
     labels:
@@ -62,6 +69,16 @@ services:
         mode: 0755
     volumes:
       - labspace-traefik-certs:/certs
+
+  zone-file-creator:
+    image: dhi.io/wbitt-network-multitool:3-alpine3.23-dev
+    command: /create-zone-file.sh
+    configs:
+      - source: create-zone-file
+        target: /create-zone-file.sh
+        mode: 0755
+    volumes:
+      - labspace-support:/labspace-support
 
   traefik:
     image: traefik:3.6.5
@@ -171,7 +188,7 @@ services:
         condition: service_healthy
 
   k3s:
-    # When updating the k8s version, ensure the kubectl version in workspace-kubeconfig-secret-setup matches
+    # When updating the k8s version, ensure the kubectl version in the base workspace image is updated
     image: rancher/k3s:v1.35.0-k3s1
     command: server --tls-san k8s.dockerlabs.xyz
     privileged: true
@@ -482,28 +499,20 @@ configs:
         curl -s -u 'moby:moby1234' -X PUT http://git.dockerlabs.xyz/api/v1/repos/moby/demo-app/actions/secrets/KUBECONFIG -H "Content-Type: application/json" -d '{"data":"'"$(echo -n "$$KUBE_CONFIG")"'"}'
       fi
       
-      # Setup kubectl (with an alias of `k`) and the kubeconfig for the coder user
-      if [ ! -f /usr/local/bin/kubectl ]; then
-        echo "kubectl not found, installing..."
-        sudo curl -L "https://dl.k8s.io/release/v1.35.0/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl
-        sudo chmod +x /usr/local/bin/kubectl
-        sudo ln -s /usr/local/bin/kubectl /usr/local/bin/k
+      # Setup the kubeconfig for the coder user
+      mkdir -p ~/.kube
+      cat /kubeconfig/kubeconfig.yaml | sed 's/127.0.0.1/k8s.dockerlabs.xyz/g' > ~/.kube/config
 
-        mkdir -p ~/.kube
-        cat /kubeconfig/kubeconfig.yaml | sed 's/127.0.0.1/k8s.dockerlabs.xyz/g' > ~/.kube/config
-      fi
-
-  workspace-configure-k3s-coredns:
+  create-zone-file:
     content: |
-      #!/bin/bash
+      #!/bin/sh
 
       set -e
 
-      sudo apt update && sudo apt install dnsutils -y
-
       IP=$$(dig +short git.dockerlabs.xyz A | grep -E '^[0-9.]+$$' | head -n 1)
 
-      cat << EOF | kubectl apply -f -
+      mkdir -p /labspace-support/k8s-setup
+      cat << EOF > /labspace-support/k8s-setup/zone-file-config-map.yaml
       apiVersion: v1
       kind: ConfigMap
       metadata:
@@ -535,4 +544,9 @@ configs:
           *   IN  A   $$IP
       EOF
 
+  workspace-configure-k3s-coredns:
+    content: |
+      #!/bin/bash
+
+      kubectl apply -f /labspace-support/k8s-setup/zone-file-config-map.yaml
       kubectl -n kube-system rollout restart deployment/coredns
