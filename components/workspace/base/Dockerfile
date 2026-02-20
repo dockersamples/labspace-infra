@@ -12,7 +12,16 @@ COPY --link --chown=1000:1000 --from=docker/scout-cli:1.19.2 /docker-scout /home
 COPY --link --chown=1000:1000 --from=docker/docker-model-cli-desktop-module:v1.0.9 /cli-plugins/model/linux/docker-model /home/coder/.docker/cli-plugins/docker-model
 COPY --link --chown=1000:1000 --from=docker/docker-mcp-cli-desktop-module:v0.38.0 /cli-plugins/mcp/linux/docker-mcp /home/coder/.docker/cli-plugins/docker-mcp
 
+# Install kubectl. When changing versions, align with the k3s version in the SDLC overlay/variant
+COPY --link --from=dhi.io/kubectl:1.35.0 /usr/local/bin/kubectl /usr/local/bin/kubectl
+
+# Add other tools often required in container labs (and to speed up setup later)
+COPY --link --from=dhi.io/helm:4.1.1 /usr/local/bin/helm /usr/local/bin/helm
+COPY --link --from=dhi.io/cosign:3.0.4 /usr/local/bin/cosign /usr/local/bin/cosign
+
 USER root
+
+RUN ln -s /usr/local/bin/kubectl /usr/local/bin/k
 
 RUN mkdir -p /home/coder/.config/code-server && \
     mkdir -p /home/coder/.local/share/code-server && \
