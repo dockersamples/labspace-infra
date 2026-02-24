@@ -21,7 +21,7 @@ export class LabspaceService {
     } else {
       this.config.services = this.config.services.map((service) => ({
         ...service,
-        id: service.title
+        id: service.id || service.title
           .toLowerCase()
           .replace(/[^a-z0-9\s-]/g, "") // remove special characters except spaces and dashes
           .replace(/\s+/g, "-"), // replace spaces with dashes
