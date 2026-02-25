@@ -184,6 +184,7 @@ export const WorkshopContextProvider = ({ children }) => {
             ...vars,
             [key]: value ? value : undefined,
           }));
+          setRefreshCounter((c) => c + 1);
         })
         .catch((error) => {
           console.error("Error opening file:", error);
