@@ -133,9 +133,13 @@ The variable values are stored in memory in the interface backend. This ensures 
 
 There may be times in which you want to set a value to a pre-defined variable. Use the `::variableSetButton` to do so. Example:
 
-    ::variableSetButton[Set default greeting]{variable="greeting" value="hello"}
+    ::variableSetButton[Set default greeting]{variables="greeting=hello"}
 
 After clicking the button, the variable `greeting` will have the value of `hello`.
+
+Multiple variables can be set with a single button by comma-separating the values. Example:
+
+    ::variableSetButton[Set default greeting]{variables="variable1=hello,variable2=goodbye"}
 
 ### Using the variables
 

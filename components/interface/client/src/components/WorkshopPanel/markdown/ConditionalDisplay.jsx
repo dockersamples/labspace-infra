@@ -1,5 +1,5 @@
 import { useVariables } from "../../../WorkshopContext";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
 /**
  * This custom markdown directive provides the ability to conditionally show content based on variable values.

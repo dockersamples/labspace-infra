@@ -10,7 +10,11 @@ This will create a card to be used for variable setting and set the **greeting**
 
 This will create a button that will set the value of **greeting** specifically to "hello"
 
-::variableSetButton[Display alerts below]{variable="greeting" value="hello"}
+::variableSetButton[Display alerts below]{variables="greeting=hello"}
+
+This will create a button that will set _multiple_ variables:
+
+::variableSetButton[Set multiple values]{variables="greeting=hello,secondaryGreeting=goodbye"}
 
 
 ## Variable usage
