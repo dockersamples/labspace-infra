@@ -15,13 +15,12 @@ export function WorkshopPanel() {
   );
 
   useEffect(() => {
-    // alert("Scrolling?");
     window.bodyRef = bodyRef.current;
     setTimeout(
       () => bodyRef.current.scrollTo({ top: 0, left: 0, behavior: "smooth" }),
       100,
     );
-  }, [activeSection, bodyRef]);
+  }, [activeSection?.id, bodyRef]);
 
   const hasNext = index < sections.length - 1;
   const hasPrev = index > 0;
