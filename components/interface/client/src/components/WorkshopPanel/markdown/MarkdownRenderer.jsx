@@ -13,6 +13,8 @@ import { tabDirective } from "./reactDirective";
 import { TabLink } from "./TabLink";
 import { FileLink } from "./FileLink";
 import { VariableDefinition } from "./VariableDefinition";
+import { VariableSetButton } from "./VariableSetButton";
+import { ConditionalDisplay } from "./ConditionalDisplay";
 
 export function MarkdownRenderer({ children }) {
   return (
@@ -32,6 +34,8 @@ export function MarkdownRenderer({ children }) {
         tablink: TabLink,
         filelink: FileLink,
         variabledefinition: VariableDefinition,
+        variablesetbutton: VariableSetButton,
+        conditionaldisplay: ConditionalDisplay,
       }}
     >
       {children}
