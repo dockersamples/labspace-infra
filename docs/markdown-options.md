@@ -115,9 +115,11 @@ Note that the path is anchored to the workspace directory. However, special hand
 
 Labspaces provide the ability to ask the user for a value for a variable, which will be used throughout the documentation. This prevents the need to have instructions such as "Replace USERNAME with your username before running the command." Now, you can simply ask them for it up front and the command will have the value.
 
-### Defining variables
+There are two options to define variables - use a user-defined value or a pre-defined value.
 
-To define a variable, use the `::variableDefinition` directive. The directive requires the variable name and a prompt. Example:
+### User-defined variables
+
+To allow a user to provide the value for a variable, use the `::variableDefinition` directive. The directive requires the variable name and a prompt. Example:
 
     ::variableDefinition[username]{prompt="What is your Docker username?"}
 
@@ -126,6 +128,14 @@ This will display a card that will ask the user for their Docker username.
 ![Screenshot of the input asking for the Docker username](./images/variable-input.png)
 
 The variable values are stored in memory in the interface backend. This ensures the values are interpolated for all file saves and command executions. Note that because they are stored in memory, if the Labspace is restarted, all values will be lost.
+
+### Pre-defined variables
+
+There may be times in which you want to set a value to a pre-defined variable. Use the `::variableSetButton` to do so. Example:
+
+    ::variableSetButton[Set default greeting]{variable="greeting" value="hello"}
+
+After clicking the button, the variable `greeting` will have the value of `hello`.
 
 ### Using the variables
 
@@ -146,3 +156,22 @@ For example, to use the variable defined in the previous example, you can have t
         ```
 
 Both of these commands will have the user-specified username both displayed in the interface and executed if they press the run button.
+
+### Conditional displays
+
+Using the `:::conditionalDisplay` directive, you can conditionally show content based on variable values. Example:
+
+    :::conditionalDisplay{variable="apiKey" hasNoValue}
+
+    > [!WARNING]
+    > You need to provide an API key above.
+    
+    :::
+
+This example would display the alert if the `apiKey` variable has no value.
+
+For values, the following options are available:
+
+- `requiredValue`: the value to match
+- `hasValue`: if set, the content will be shown if the variable has any value
+- `hasNoValue`: if set, the content will be shown if the variable is undefined or empty
