@@ -13,27 +13,39 @@ import { useCallback, useMemo } from "react";
  *
  * @returns
  */
-export function VariableSetButton({ children, variables: variablesToSetString, ...rest }) {
+export function VariableSetButton({
+  children,
+  variables: variablesToSetString,
+  ...rest
+}) {
   const { variables, setVariable } = useVariables();
 
   // Create a map of { [variableName]: value } for the variables to set
   const variablesToSet = useMemo(() => {
-    return variablesToSetString.split(",")
-      .map(variable => variable.split("="))
-      .reduce((prev, curr) => ({...prev, [curr[0]] : curr[1] }), {})
+    return variablesToSetString
+      .split(",")
+      .map((variable) => variable.split("="))
+      .reduce((prev, curr) => ({ ...prev, [curr[0]]: curr[1] }), {});
   }, [variablesToSetString]);
 
   const allSet = useMemo(() => {
-    return Object.keys(variablesToSet)
-      .filter(variableName => variables[variableName] !== variablesToSet[variableName])
-      .length === 0;
+    return (
+      Object.keys(variablesToSet).filter(
+        (variableName) =>
+          variables[variableName] !== variablesToSet[variableName],
+      ).length === 0
+    );
   }, [variablesToSet, variables]);
 
-  const onClick = useCallback((e) => {
-    e.preventDefault();
-    Object.keys(variablesToSet)
-      .forEach((variableName) => setVariable(variableName, variablesToSet[variableName]));
-  }, [variablesToSet, setVariable]);
+  const onClick = useCallback(
+    (e) => {
+      e.preventDefault();
+      Object.keys(variablesToSet).forEach((variableName) =>
+        setVariable(variableName, variablesToSet[variableName]),
+      );
+    },
+    [variablesToSet, setVariable],
+  );
 
   return (
     <>

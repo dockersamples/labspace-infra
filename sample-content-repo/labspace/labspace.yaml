@@ -16,6 +16,8 @@ sections:
     contentPath: 03-markdown-directives.md
   - title: Variables
     contentPath: 04-variables.md
+  - title: Additional elements
+    contentPath: 05-additional-elements.md
 
 # Remove if there is no need to link compose services in the editor ui, icons are from: https://fonts.google.com/icons
 services:
