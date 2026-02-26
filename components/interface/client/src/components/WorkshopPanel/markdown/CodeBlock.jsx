@@ -9,9 +9,11 @@ import {
   useSaveFileCommand,
 } from "../../../WorkshopContext";
 import { CodeBlockAction } from "./CodeBlockAction";
+import { useTabs } from "../../../TabContext";
 
 export function CodeBlock({ node, inline, className, children, ...props }) {
   const { activeSection } = useActiveSection();
+  const { setActiveTab } = useTabs();
   const runCommand = useRunCommand();
   const saveFileCommand = useSaveFileCommand();
 
@@ -33,11 +35,13 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
 
   // This needs `children` as ReactMarkdown seems to re-use the component instance
   const onRunClick = useCallback(() => {
+    setActiveTab("ide");
     return runCommand(activeSection.id, codeIndex);
   }, [codeIndex, activeSection]);
 
   // This needs `children` as ReactMarkdown seems to re-use the component instance
   const onSaveAsClick = useCallback(() => {
+    setActiveTab("ide");
     return saveFileCommand(activeSection.id, codeIndex);
   }, [codeIndex, activeSection]);
 
