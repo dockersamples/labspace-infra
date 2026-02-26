@@ -16,7 +16,14 @@ import { useMemo } from "react";
  *
  * @returns
  */
-export function ConditionalDisplay({ children, variable, requiredValue, hasValue, hasNoValue, ...rest }) {
+export function ConditionalDisplay({
+  children,
+  variable,
+  requiredValue,
+  hasValue,
+  hasNoValue,
+  ...rest
+}) {
   const { variables } = useVariables();
   const currentValue = variables[variable] || undefined;
 
@@ -34,9 +41,5 @@ export function ConditionalDisplay({ children, variable, requiredValue, hasValue
     return null;
   }
 
-  return (
-    <>
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }

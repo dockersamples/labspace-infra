@@ -31,6 +31,12 @@ export function MarkdownRenderer({ children }) {
         a: ExternalLink,
         img: RenderedImage,
         svg: RenderedSvg,
+        table: ({ node, ...props }) => (
+          <table className="table table-sm table-striped" {...props} />
+        ),
+        tbody: ({ node, ...props }) => (
+          <tbody className="table-group-divider" {...props} />
+        ),
         tablink: TabLink,
         filelink: FileLink,
         variabledefinition: VariableDefinition,
