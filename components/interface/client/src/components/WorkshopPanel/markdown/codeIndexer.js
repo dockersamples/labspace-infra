@@ -20,6 +20,13 @@ export function remarkCodeIndexer() {
 
       const codeBlockMeta = (node.meta || "").split(/\s+/);
 
+      const highlightConfig = codeBlockMeta.find((m) =>
+        m.startsWith("highlight="),
+      );
+      node.data.hProperties["data-highlight-lines"] = highlightConfig
+        ? highlightConfig.split("=")[1]
+        : "";
+
       node.data.hProperties["data-display-run-button"] = codeBlockMeta.includes(
         "no-run-button",
       )

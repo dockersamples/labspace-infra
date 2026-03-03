@@ -27,6 +27,16 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
     node.properties.dataDisplayRunButton === "true" && language === "bash";
   const canCopy = node.properties.dataDisplayCopyButton === "true";
   const canSaveAsFile = node.properties.dataDisplaySaveAsButton === "true";
+  const highlightLines = node.properties.dataHighlightLines
+    ? node.properties.dataHighlightLines.split(",").flatMap((s) => {
+        const trimmed = s.trim();
+        if (trimmed.includes("-")) {
+          const [start, end] = trimmed.split("-").map((n) => parseInt(n, 10));
+          return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+        }
+        return parseInt(trimmed, 10);
+      })
+    : [];
 
   const onCopyClick = useCallback(() => {
     copy(children);
@@ -62,7 +72,20 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
         style={darcula}
         language={language}
         PreTag="div"
-        className="me-auto bg-none"
+        className="flex-grow-1 bg-none"
+        wrapLines={highlightLines.length > 0}
+        showLineNumbers={highlightLines.length > 0}
+        lineNumberStyle={{ display: "none" }}
+        lineProps={(lineNumber) => {
+          const lineProps = {
+            className: "d-block",
+          };
+
+          if (highlightLines.includes(lineNumber))
+            lineProps.className += " highlight-line"; // Highlight the first line (lineNumber is 1-indexed)
+
+          return lineProps;
+        }}
         {...props}
       >
         {String(children).replace(/\n$/, "")}
