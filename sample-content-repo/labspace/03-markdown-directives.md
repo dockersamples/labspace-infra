@@ -86,3 +86,45 @@ graph TD;
     B-->D;
     C-->D;
 ```
+
+## Code block highlighting
+
+Code blocks can add optional highlighting by using the `highlight` metadata attribute:
+
+    ```yaml highlight=2-3
+    services:
+      app:
+        image: nginx
+    ```
+
+Will generate the following:
+
+```yaml highlight=2-3
+services:
+  app:
+    image: nginx
+```
+
+Multiple ranges can be declared by separating them with a comma. For example:
+
+    ```yaml highlight=2-3,6-7
+    services:
+      app:
+        image: nginx
+        volumes:
+          - ./:/usr/share/nginx/html
+        environment:
+          DEMO: value
+    ```
+
+Will render as the following:
+
+```yaml highlight=2-3,6-7
+services:
+  app:
+    image: nginx
+    volumes:
+      - ./:/usr/share/nginx/html
+    environment:
+      DEMO: value
+```
