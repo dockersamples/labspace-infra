@@ -92,6 +92,10 @@ If you want to add another tab to the right-hand panel, you can use the followin
 
 This will render a link with the visible text of "Link text" pointing to "http://localhost:3000". When clicked, a new tab will be created with the title of "Tab title".
 
+To in-line a link, only use one colon when declaring the directive:
+
+    Once the app has started, open :tabLink[http://localhost:3000]{href="http://localhost:3000" title="Tab title" id="app"} to view the app
+
 If a tab with the same `id` exists (either through a previous click or it was defined in the `labspace.yaml`), that tab will be activated and the URL will be updated based on the defined `href`.
 
 
