@@ -82,6 +82,17 @@ The following secrets are automatically configured in the `moby/demo-app` reposi
 | `DOCKERHUB_PASSWORD` | (from Docker Desktop) | Authenticate to Docker Hub |
 | `KUBECONFIG` | (generated) | Deploy to k3s cluster |
 
+To skip automatic secret creation (e.g., when the lab itself guides users through creating secrets), set `SKIP_CI_SECRET_SETUP=true` in your content repo's `compose.override.yaml`:
+
+```yaml
+services:
+  workspace:
+    environment:
+      SKIP_CI_SECRET_SETUP: "true"
+```
+
+When `SKIP_CI_SECRET_SETUP=true`, none of the above secrets are created at startup. The local `~/.kube/config` in the workspace is still configured so `kubectl` works, but the `KUBECONFIG` Gitea secret is not created.
+
 ## Automatic Setup
 
 ### Workspace Configuration

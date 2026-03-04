@@ -16,6 +16,8 @@ services:
   # Overrides to Labspace default services
   ############################################################
   workspace:
+    environment:
+      SKIP_CI_SECRET_SETUP: ${SKIP_CI_SECRET_SETUP:-false}
     volumes:
       - gitea-outputs:/gitea-outputs:ro
       - k3s-output:/kubeconfig:ro
@@ -28,11 +30,14 @@ services:
       - source: workspace-entrypoint-script
         target: /entrypoint.d/50-entrypoint-script.sh
         mode: 0755
-      - source: workspace-hub-credentials
-        target: /startup-scripts/10-hub-credentials.sh
+      - source: workspace-wait-for-bootstrap
+        target: /startup-scripts/00-wait-for-bootstrap.sh
         mode: 0755
-      - source: workspace-kubeconfig-secret-setup
-        target: /startup-scripts/10-kubeconfig-secret-setup.sh
+      - source: workspace-ci-secrets
+        target: /startup-scripts/10-ci-secrets.sh
+        mode: 0755
+      - source: workspace-kubeconfig-setup
+        target: /startup-scripts/10-kubeconfig-setup.sh
         mode: 0755
       - source: workspace-git-setup
         target: /startup-scripts/20-git-setup.sh
@@ -344,14 +349,53 @@ configs:
             "$$script"
           done
 
-  # Configure secrets in Gitea for Docker Hub credentials using the currently logged in user (to support access to DHI, etc.)
-  workspace-hub-credentials:
+  # Waits for the Gitea bootstrap to complete before allowing other startup scripts to proceed.
+  # Validates that the moby user exists and the SSH key is registered, which are the last steps
+  # of the bootstrap and gate everything the workspace startup scripts depend on.
+  workspace-wait-for-bootstrap:
     content: |
       #!/bin/bash
 
+      echo "Waiting for Gitea bootstrap to complete..."
+
+      until curl -sf -u 'moby:moby1234' http://git.dockerlabs.xyz/api/v1/user > /dev/null 2>&1; do
+        echo "Waiting for moby user to be ready..."
+        sleep 2
+      done
+      echo "moby user is ready."
+
+      until curl -s -u 'moby:moby1234' http://git.dockerlabs.xyz/api/v1/user/keys | grep -q '"moby-key"'; do
+        echo "Waiting for SSH key to be registered..."
+        sleep 2
+      done
+      echo "SSH key is registered. Bootstrap complete."
+
+  # Creates all CI secrets in the Gitea repo. Can be skipped by setting SKIP_CI_SECRET_SETUP=true,
+  # which is useful for labs that guide users through creating the secrets themselves.
+  workspace-ci-secrets:
+    content: |
+      #!/bin/bash
+
+      if [ "$$SKIP_CI_SECRET_SETUP" = "true" ]; then
+        echo "SKIP_CI_SECRET_SETUP is set. Skipping CI secret creation."
+        exit 0
+      fi
+
       SECRETS_JSON=$(curl -s -u 'moby:moby1234' http://git.dockerlabs.xyz/api/v1/repos/moby/demo-app/actions/secrets)
-      if echo "$$keys" | grep -q "DOCKERHUB_USERNAME"; then
-        echo "Hub credentials already exist. Skipping secret creation."
+
+      # Create Gitea registry secrets
+      if echo "$$SECRETS_JSON" | grep -q '"DOCKER_USERNAME"'; then
+        echo "Gitea registry secrets already exist. Skipping."
+      else
+        curl -s -u 'moby:moby1234' -X PUT http://git.dockerlabs.xyz/api/v1/repos/moby/demo-app/actions/secrets/DOCKER_USERNAME -H "Content-Type: application/json" -d '{"data":"moby"}'
+        curl -s -u 'moby:moby1234' -X PUT http://git.dockerlabs.xyz/api/v1/repos/moby/demo-app/actions/secrets/DOCKER_PASSWORD -H "Content-Type: application/json" -d '{"data":"moby1234"}'
+        curl -s -u 'moby:moby1234' -X PUT http://git.dockerlabs.xyz/api/v1/repos/moby/demo-app/actions/secrets/DOCKER_REGISTRY -H "Content-Type: application/json" -d '{"data":"registry.dockerlabs.xyz"}'
+        echo "Gitea registry secrets created."
+      fi
+
+      # Create Docker Hub secrets
+      if echo "$$SECRETS_JSON" | grep -q '"DOCKERHUB_USERNAME"'; then
+        echo "Docker Hub secrets already exist. Skipping."
       else
         HUB_AUTH=$(jq '.auths."https://index.docker.io/v1/".auth' -r ~/.docker/config.json | base64 -d -)
         USERNAME=$(echo $$HUB_AUTH | cut -d: -f1)
@@ -359,11 +403,20 @@ configs:
 
         curl -s -u 'moby:moby1234' -X PUT http://git.dockerlabs.xyz/api/v1/repos/moby/demo-app/actions/secrets/DOCKERHUB_USERNAME -H "Content-Type: application/json" -d '{"data":"'"$$USERNAME"'"}'
         curl -s -u 'moby:moby1234' -X PUT http://git.dockerlabs.xyz/api/v1/repos/moby/demo-app/actions/secrets/DOCKERHUB_PASSWORD -H "Content-Type: application/json" -d '{"data":"'"$$TOKEN"'"}'
-        echo "CI secrets created."
+        echo "Docker Hub secrets created."
 
         unset HUB_AUTH
         unset USERNAME
         unset TOKEN
+      fi
+
+      # Create KUBECONFIG secret
+      if echo "$$SECRETS_JSON" | grep -q '"KUBECONFIG"'; then
+        echo "KUBECONFIG secret already exists. Skipping."
+      else
+        KUBE_CONFIG=$(cat /kubeconfig/kubeconfig.yaml | sed 's/127.0.0.1/k8s.dockerlabs.xyz/g')
+        curl -s -u 'moby:moby1234' -X PUT http://git.dockerlabs.xyz/api/v1/repos/moby/demo-app/actions/secrets/KUBECONFIG -H "Content-Type: application/json" -d '{"data":"'"$(echo -n "$$KUBE_CONFIG")"'"}'
+        echo "KUBECONFIG secret created."
       fi
 
   workspace-git-setup:
@@ -444,17 +497,6 @@ configs:
           echo "Repository 'moby/demo-app' already exists. Skipping creation."
       fi
 
-      # Create CI secrets for the Gitea registry if they don't exist
-      SECRETS_JSON=$(curl -s -u 'moby:moby1234' http://localhost:3000/api/v1/repos/moby/demo-app/actions/secrets)
-      if echo "$$keys" | grep -q "DOCKER_USERNAME"; then
-        echo "CI secrets already exist. Skipping secret creation."
-      else
-        curl -s -u 'moby:moby1234' -X PUT http://localhost:3000/api/v1/repos/moby/demo-app/actions/secrets/DOCKER_USERNAME -H "Content-Type: application/json" -d '{"data":"moby"}'
-        curl -s -u 'moby:moby1234' -X PUT http://localhost:3000/api/v1/repos/moby/demo-app/actions/secrets/DOCKER_PASSWORD -H "Content-Type: application/json" -d '{"data":"moby1234"}'
-        curl -s -u 'moby:moby1234' -X PUT http://localhost:3000/api/v1/repos/moby/demo-app/actions/secrets/DOCKER_REGISTRY -H "Content-Type: application/json" -d '{"data":"registry.dockerlabs.xyz"}'
-        echo "CI secrets created."
-      fi
-
       # Get and store registration token for the runner
       TOKEN_JSON=$(curl -s -u 'moby:moby1234' http://localhost:3000/api/v1/repos/moby/demo-app/actions/runners/registration-token)
       REGISTRATION_TOKEN=$(echo $$TOKEN_JSON | grep -o '"token":"[^"]*"' | cut -d'"' -f4)
@@ -487,21 +529,12 @@ configs:
           tls:
             insecure_skip_verify: true
 
-  workspace-kubeconfig-secret-setup:
+  workspace-kubeconfig-setup:
     content: |
       #!/bin/bash
 
       set -e
 
-      # Add the KUBECONFIG as a secret to the Gitea repo if it doesn't exist
-      SECRETS_JSON=$(curl -s -u 'moby:moby1234' http://git.dockerlabs.xyz/api/v1/repos/moby/demo-app/actions/secrets)
-      if echo "$$keys" | grep -q "KUBECONFIG"; then
-        echo "CI secrets already exist. Skipping secret creation."
-      else
-        KUBE_CONFIG=$(cat /kubeconfig/kubeconfig.yaml | sed 's/127.0.0.1/k8s.dockerlabs.xyz/g')
-        curl -s -u 'moby:moby1234' -X PUT http://git.dockerlabs.xyz/api/v1/repos/moby/demo-app/actions/secrets/KUBECONFIG -H "Content-Type: application/json" -d '{"data":"'"$(echo -n "$$KUBE_CONFIG")"'"}'
-      fi
-      
       # Setup the kubeconfig for the coder user
       mkdir -p ~/.kube
       cat /kubeconfig/kubeconfig.yaml | sed 's/127.0.0.1/k8s.dockerlabs.xyz/g' > ~/.kube/config
