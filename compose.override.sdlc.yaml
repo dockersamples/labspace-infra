@@ -30,6 +30,9 @@ services:
       - source: workspace-entrypoint-script
         target: /entrypoint.d/50-entrypoint-script.sh
         mode: 0755
+      - source: workspace-wait-for-bootstrap
+        target: /startup-scripts/00-wait-for-bootstrap.sh
+        mode: 0755
       - source: workspace-ci-secrets
         target: /startup-scripts/10-ci-secrets.sh
         mode: 0755
@@ -345,6 +348,27 @@ configs:
             echo "→ Running $$script"
             "$$script"
           done
+
+  # Waits for the Gitea bootstrap to complete before allowing other startup scripts to proceed.
+  # Validates that the moby user exists and the SSH key is registered, which are the last steps
+  # of the bootstrap and gate everything the workspace startup scripts depend on.
+  workspace-wait-for-bootstrap:
+    content: |
+      #!/bin/bash
+
+      echo "Waiting for Gitea bootstrap to complete..."
+
+      until curl -sf -u 'moby:moby1234' http://git.dockerlabs.xyz/api/v1/user > /dev/null 2>&1; do
+        echo "Waiting for moby user to be ready..."
+        sleep 2
+      done
+      echo "moby user is ready."
+
+      until curl -s -u 'moby:moby1234' http://git.dockerlabs.xyz/api/v1/user/keys | grep -q '"moby-key"'; do
+        echo "Waiting for SSH key to be registered..."
+        sleep 2
+      done
+      echo "SSH key is registered. Bootstrap complete."
 
   # Creates all CI secrets in the Gitea repo. Can be skipped by setting SKIP_CI_SECRET_SETUP=true,
   # which is useful for labs that guide users through creating the secrets themselves.
