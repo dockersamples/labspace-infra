@@ -6,7 +6,7 @@
 
 services:
   configurator:
-    image: dockersamples/labspace-configurator:dev
+    image: dockersamples/labspace-configurator:latest
     use_api_socket: true
     volumes:
       - labspace-content:/project
@@ -15,7 +15,7 @@ services:
       - labspace-support:/etc/labspace-support
 
   interface:
-    image: dockersamples/labspace-interface:dev
+    image: dockersamples/labspace-interface:latest
     ports:
       - "3030:3030"
     volumes:
@@ -43,7 +43,7 @@ services:
     restart: unless-stopped
 
   workspace:
-    image: dockersamples/labspace-workspace-node:dev
+    image: dockersamples/labspace-workspace-node:latest
     depends_on:
       configurator:
         condition: service_completed_successfully
@@ -69,7 +69,7 @@ services:
 
 
   host-republisher:
-    image: dockersamples/labspace-host-port-republisher:dev
+    image: dockersamples/labspace-host-port-republisher:latest
     pull_policy: always
     restart: always
     volumes:
@@ -82,7 +82,7 @@ services:
       - socket-proxy
 
   workspace-cleaner:
-    image: dockersamples/labspace-cleaner:dev
+    image: dockersamples/labspace-cleaner:latest
     pull_policy: always
     volumes:
       - socket-proxy:/var/run
