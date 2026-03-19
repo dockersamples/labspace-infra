@@ -201,7 +201,7 @@ create_labspace_metadata() {
 }
 
 get_and_store_from_labspace_yaml() {
-  VALUE=$(yq ."$1" /staging/labspace.yaml 2>/dev/null || echo "")
+  VALUE=$(yq ."$1" /staging/labspace/labspace.yaml 2>/dev/null || echo "")
   if [ -z "$VALUE" ] || [ "$VALUE" == "null" ]; then
     VALUE="unknown"
   fi
