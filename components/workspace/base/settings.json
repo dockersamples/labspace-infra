@@ -7,5 +7,9 @@
     "terminal.integrated.env.linux": {
         "PATH": "${env:PATH}"
     },
-    "terminal.integrated.scrollback": 10000
+    "terminal.integrated.scrollback": 10000,
+
+    // This setting ensures that when a user goes from one lab to another, they won't
+    // have the same files opened in the new lab. Every lab starts from scratch.
+    "workbench.editor.restoreEditors": false
 }
