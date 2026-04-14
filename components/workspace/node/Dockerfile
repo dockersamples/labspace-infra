@@ -1,7 +1,7 @@
 FROM labspace-workspace-base
 
 USER root
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x -o /tmp/nodesource_setup.sh && \
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x -o /tmp/nodesource_setup.sh && \
     bash /tmp/nodesource_setup.sh && \
     apt-get install -y nodejs && \
     rm /tmp/nodesource_setup.sh && \
