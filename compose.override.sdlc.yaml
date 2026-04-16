@@ -89,7 +89,7 @@ services:
         condition: service_started 
 
   traefik:
-    image: traefik:3.6.5
+    image: traefik:3.6.13
     command:
       - --api.insecure=true
       - --providers.docker=true
@@ -121,7 +121,7 @@ services:
         condition: service_completed_successfully
 
   registry:
-    image: ghcr.io/project-zot/zot:v2.1.14
+    image: ghcr.io/project-zot/zot:v2.1.15
     labels:
       traefik.enable: true
       traefik.http.routers.registry.rule: Host(`registry.dockerlabs.xyz`)
@@ -130,7 +130,7 @@ services:
       traefik.http.routers.registry.middlewares: remove-frame-headers
 
   git:
-    image: gitea/gitea:1.25.3
+    image: gitea/gitea:1.25.5
     volumes:
       - gitea-data:/data
       - gitea-outputs:/gitea-outputs
@@ -174,7 +174,7 @@ services:
         user: root
 
   gitea-runner:
-    image: gitea/act_runner:0.2.13
+    image: gitea/act_runner:0.3.1
     entrypoint: []
     command: bash -c "GITEA_RUNNER_REGISTRATION_TOKEN=$(cat /gitea-outputs/runner_token.txt) /sbin/tini -- run.sh"
     volumes:
@@ -197,7 +197,7 @@ services:
 
   k3s:
     # When updating the k8s version, ensure the kubectl version in the base workspace image is updated
-    image: rancher/k3s:v1.35.0-k3s1
+    image: rancher/k3s:v1.35.3-k3s1
     command: server --tls-san k8s.dockerlabs.xyz
     privileged: true
     volumes:

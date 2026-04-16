@@ -13,7 +13,7 @@ COPY --link --chown=1000:1000 --from=docker/docker-model-cli-desktop-module:v1.1
 COPY --link --chown=1000:1000 --from=docker/docker-mcp-cli-desktop-module:v0.40.4 /cli-plugins/mcp/linux/docker-mcp /home/coder/.docker/cli-plugins/docker-mcp
 
 # Install kubectl. When changing versions, align with the k3s version in the SDLC overlay/variant
-COPY --link --from=dhi.io/kubectl:1.35.4 /usr/local/bin/kubectl /usr/local/bin/kubectl
+COPY --link --from=dhi.io/kubectl:1.35.3 /usr/local/bin/kubectl /usr/local/bin/kubectl
 
 # Add other tools often required in container labs (and to speed up setup later)
 COPY --link --from=dhi.io/helm:4.1.4 /usr/local/bin/helm /usr/local/bin/helm
