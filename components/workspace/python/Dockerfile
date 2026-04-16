@@ -10,7 +10,7 @@ RUN apt update && \
     chown -R 1000:1000 /home/coder/.local/share/pip
 
 # Install Poetry using pip (more reliable than the install script)
-RUN pip3 install --upgrade pip setuptools wheel --break-system-packages && \
+RUN pip3 install --upgrade setuptools --break-system-packages && \
     pip3 install poetry --break-system-packages
 
 # Install additional Python development tools
