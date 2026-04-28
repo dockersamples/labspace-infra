@@ -1,6 +1,6 @@
 import express from "express";
 import { labspaceService } from "../services/labspace.js";
-import { vscodeService } from "../services/vscode.js";
+import { workspaceService } from "../services/workspace.js";
 import { analyticsPublisher } from "../services/analytics.js";
 
 const router = express.Router();
@@ -11,7 +11,7 @@ router.get("/", (req, res) => {
 
 router.post("/open-file", (req, res) => {
   const { filePath, line, sectionId } = req.body;
-  vscodeService
+  workspaceService
     .openFileInIDE(filePath, line)
     .then(() => {
       analyticsPublisher.publishUserActionEvent(
@@ -52,7 +52,7 @@ router.post("/sections/:sectionId/command", (req, res) => {
   const { codeBlockIndex } = req.body;
   const sectionId = req.params.sectionId;
 
-  vscodeService
+  workspaceService
     .executeCommand(sectionId, codeBlockIndex)
     .then(() => {
       analyticsPublisher.publishUserActionEvent(
@@ -79,7 +79,7 @@ router.post("/sections/:sectionId/save-file", (req, res) => {
   const { codeBlockIndex } = req.body;
   const sectionId = req.params.sectionId;
 
-  vscodeService
+  workspaceService
     .saveFile(sectionId, codeBlockIndex)
     .then((filename) => {
       analyticsPublisher.publishUserActionEvent(
