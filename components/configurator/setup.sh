@@ -7,6 +7,29 @@ LABSPACE_CONTENT_VERSION=""
 HOSTNAME=$(cat /etc/hostname)
 
 setup_project_directory() {
+  if [ -n "$TERMINAL_URL" ]; then
+    setup_host_based_project_directory
+  fi
+
+  setup_volume_backed_project_directory
+}
+
+setup_host_based_project_directory() {
+  if [ "$DEV_MODE" = "true" ]; then
+    echo "📁 Host-based terminal is in use with DEV_MODE. Project directory will be configured via external sync"
+    return
+  fi
+
+  if [ ! -n "$PROJECT_TAR_PATH" ]; then
+    echo "PROJECT_TAR_PATH must be set when using host-based terminal."
+    exit 1
+  fi
+
+  echo "📁 Host-based terminal detected (TERMINAL_URL is set), using tarball at $PROJECT_TAR_PATH as source material"
+  curl -X POST --data-binary @"$PROJECT_TAR_PATH" "$TERMINAL_URL/api/bootstrap"
+}
+
+setup_volume_backed_project_directory() {
   echo "📁 Setting up project directory"
 
   clear_project_directory
