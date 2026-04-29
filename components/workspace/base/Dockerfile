@@ -1,4 +1,4 @@
-FROM codercom/code-server:4.116.0
+FROM codercom/code-server:4.117.0
 
 ENV CS_DISABLE_GETTING_STARTED_OVERRIDE=1
 ENV PORT=8085
@@ -6,10 +6,10 @@ EXPOSE 8085
 
 # Install Docker CLI and plugins
 RUN mkdir -p ~/.docker/cli-plugins && chown -R 1000:1000 ~/.docker
-COPY --link --from=docker:29.4.0 /usr/local/bin/docker /usr/local/bin/docker
-COPY --link --chown=1000:1000 --from=docker:29.4.0 /usr/local/libexec/docker/cli-plugins /home/coder/.docker/cli-plugins
+COPY --link --from=docker:29.4.1 /usr/local/bin/docker /usr/local/bin/docker
+COPY --link --chown=1000:1000 --from=docker:29.4.1 /usr/local/libexec/docker/cli-plugins /home/coder/.docker/cli-plugins
 COPY --link --chown=1000:1000 --from=docker/scout-cli:1.20.4 /docker-scout /home/coder/.docker/cli-plugins/docker-scout
-COPY --link --chown=1000:1000 --from=docker/docker-model-cli-desktop-module:v1.1.35 /cli-plugins/model/linux/docker-model /home/coder/.docker/cli-plugins/docker-model
+COPY --link --chown=1000:1000 --from=docker/docker-model-cli-desktop-module:v1.1.37 /cli-plugins/model/linux/docker-model /home/coder/.docker/cli-plugins/docker-model
 COPY --link --chown=1000:1000 --from=docker/docker-mcp-cli-desktop-module:v0.40.4 /cli-plugins/mcp/linux/docker-mcp /home/coder/.docker/cli-plugins/docker-mcp
 
 # Install kubectl. When changing versions, align with the k3s version in the SDLC overlay/variant
