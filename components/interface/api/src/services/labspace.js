@@ -37,7 +37,7 @@ export class LabspaceService {
     }));
 
     if (this.config.variables) {
-      this.variables = { ...this.config.variables };
+      this.variables = { ...this.config.variables, ...this.variables };
     }
   }
 
