@@ -183,3 +183,26 @@ For values, the following options are available:
 - `requiredValue`: the value to match
 - `hasValue`: if set, the content will be shown if the variable has any value
 - `hasNoValue`: if set, the content will be shown if the variable is undefined or empty
+
+### Labspace-defined variables
+
+To support easier maintenance for values that may need to be updated in multiple locations, variables can also be defined in the `labspace.yaml` file. 
+
+For example, the following `labspace.yaml` configuration will define a variable named `pythonImageTag`:
+
+```yaml
+variables:
+  pythonImageTag: 3.14-alpine
+```
+
+It can be injected using the same variable syntax throughout the markdown:
+
+```dockerfile
+FROM python:$$pythonImageTag$$
+```
+
+will then render as:
+
+```dockerfile
+FROM python:3.14-alpine
+```

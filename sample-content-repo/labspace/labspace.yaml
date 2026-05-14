@@ -29,3 +29,9 @@ services:
     title: App
     url: http://localhost
     icon: web
+
+# Define variables that will be injected into the markdown context. Using variables makes maintenance easier
+# when the same value is used in multiple places. If desired, you can also allow these values to be overridden
+# by the end users.
+variables:
+  pythonImageTag: 3.14-alpine

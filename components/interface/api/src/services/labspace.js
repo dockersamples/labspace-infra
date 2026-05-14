@@ -35,6 +35,10 @@ export class LabspaceService {
         .replace(/[^a-z0-9\s-]/g, "") // remove special characters except spaces and dashes
         .replace(/\s+/g, "-"), // replace spaces with dashes
     }));
+
+    if (this.config.variables) {
+      this.variables = { ...this.config.variables };
+    }
   }
 
   getLabspaceDetails() {
@@ -85,7 +89,8 @@ export class LabspaceService {
         const value = has ? this.variables[key] : undefined;
         if (value === undefined || value === null) return key;
         return String(value);
-      });
+      })
+      .replace(/\\\$\\\$/g, "$$$$"); // Allow the usage of \$\$ to render as $$ in the markdown
 
     return {
       id: section.id,
