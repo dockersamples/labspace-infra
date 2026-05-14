@@ -57,3 +57,26 @@ Variables can be used to support the conditional displaying of text.
     > [!TIP]
     > It appears the conditional is set and this content is displayed!
     :::
+
+## Default Labspace variables
+
+As a help to authors, variables can also be defined in the `labspace.yaml` file to reduce maintenance where a value may appear in multiple places throughout the writeup. 
+
+For example, the following `labspace.yaml` configuration will define a variable named `pythonImageTag`:
+
+```yaml
+variables:
+  pythonImageTag: 3.14-alpine
+```
+
+It can be injected using the same variable syntax throughout the markdown:
+
+```dockerfile
+FROM python:\$\$pythonImageTag\$\$
+```
+
+will then render as:
+
+```dockerfile
+FROM python:$$pythonImageTag$$
+```
