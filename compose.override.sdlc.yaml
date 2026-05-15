@@ -54,7 +54,7 @@ services:
         target: /startup-scripts/15-configure-k3s-coredns.sh
         mode: 0755
     depends_on:
-      cert_creator:
+      cert-creator:
         condition: service_completed_successfully
       git:
         condition: service_healthy
