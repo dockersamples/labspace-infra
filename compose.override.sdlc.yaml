@@ -22,6 +22,11 @@ services:
       - gitea-outputs:/gitea-outputs:ro
       - k3s-output:/kubeconfig:ro
       - type: volume
+        source: labspace-traefik-certs
+        target: /traefik-ca
+        volume:
+          subpath: ca/
+      - type: volume
         source: labspace-support
         target: /etc/labspace-support/k8s-setup
         volume:
@@ -49,6 +54,8 @@ services:
         target: /startup-scripts/15-configure-k3s-coredns.sh
         mode: 0755
     depends_on:
+      cert_creator:
+        condition: service_completed_successfully
       git:
         condition: service_healthy
       k3s:
@@ -375,7 +382,7 @@ configs:
 
   # Sets up the CA cert used by Traefik (the reverse proxy for all of the lab) in the workspace, so that the 
   # workspace can trust the TLS connections to Gitea and k3s using the Traefik certs
-  workspace-ca-cert-setup: |
+  workspace-ca-cert-setup:
     content: |
       #!/bin/bash
 
