@@ -33,6 +33,9 @@ services:
       - source: workspace-wait-for-bootstrap
         target: /startup-scripts/00-wait-for-bootstrap.sh
         mode: 0755
+      - source: workspace-ca-cert-setup
+        target: /startup-scripts/05-ca-cert-setup.sh
+        mode: 0755
       - source: workspace-ci-secrets
         target: /startup-scripts/10-ci-secrets.sh
         mode: 0755
@@ -369,6 +372,17 @@ configs:
         sleep 2
       done
       echo "SSH key is registered. Bootstrap complete."
+
+  # Sets up the CA cert used by Traefik (the reverse proxy for all of the lab) in the workspace, so that the 
+  # workspace can trust the TLS connections to Gitea and k3s using the Traefik certs
+  workspace-ca-cert-setup: |
+    content: |
+      #!/bin/bash
+
+      set -e
+
+      cp /traefik-ca/ca.crt /usr/local/share/ca-certificates/traefik-ca.crt
+      update-ca-certificates
 
   # Creates all CI secrets in the Gitea repo. Can be skipped by setting SKIP_CI_SECRET_SETUP=true,
   # which is useful for labs that guide users through creating the secrets themselves.
