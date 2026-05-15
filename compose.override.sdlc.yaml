@@ -388,8 +388,8 @@ configs:
 
       set -e
 
-      cp /traefik-ca/ca.crt /usr/local/share/ca-certificates/traefik-ca.crt
-      update-ca-certificates
+      sudo cp /traefik-ca/ca.crt /usr/local/share/ca-certificates/traefik-ca.crt
+      sudo update-ca-certificates
 
   # Creates all CI secrets in the Gitea repo. Can be skipped by setting SKIP_CI_SECRET_SETUP=true,
   # which is useful for labs that guide users through creating the secrets themselves.
