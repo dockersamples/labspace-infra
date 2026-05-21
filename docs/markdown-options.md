@@ -184,6 +184,39 @@ For values, the following options are available:
 - `hasValue`: if set, the content will be shown if the variable has any value
 - `hasNoValue`: if set, the content will be shown if the variable is undefined or empty
 
+### OS-conditional displays
+
+The `:::conditionalDisplay` directive also supports filtering by the operating system of the user's browser using the `os` parameter. This is useful when commands must run natively on the user's machine and differ between platforms.
+
+Example:
+
+    :::conditionalDisplay{os="unix"}
+    On Mac/Linux, run:
+
+    ```bash
+    echo "Hello from a Unix-like shell"
+    ```
+    :::
+
+    :::conditionalDisplay{os="windows"}
+    On Windows, run:
+
+    ```powershell
+    Write-Host "Hello from PowerShell"
+    ```
+    :::
+
+Supported `os` values (comma-separated for multiple):
+
+- `mac` — macOS
+- `linux` — Linux
+- `windows` — Windows
+- `unix` — alias for `mac,linux`
+
+The `os` parameter can be combined with `variable`, `requiredValue`, `hasValue`, or `hasNoValue`. When both are present, the content is shown only if *both* the OS and variable conditions match.
+
+OS detection uses `navigator.userAgentData.platform` when available, falling back to `navigator.platform`. Detection happens in the user's browser, so the result reflects where the browser is running — which is what matters for commands meant to run natively on the user's machine.
+
 ### Labspace-defined variables
 
 To support easier maintenance for values that may need to be updated in multiple locations, variables can also be defined in the `labspace.yaml` file. 
