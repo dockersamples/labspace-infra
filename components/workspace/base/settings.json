@@ -7,5 +7,10 @@
     "terminal.integrated.env.linux": {
         "PATH": "${env:PATH}"
     },
-    "terminal.integrated.scrollback": 10000
+    "terminal.integrated.scrollback": 10000,
+
+    // Disable auto-updates for extensions and VS Code itself, mostly for supply chain
+    // security reasons, but also to avoid breaking changes with lab sessions.
+    "update.mode": "none",
+    "extensions.autoUpdate": false
 }
