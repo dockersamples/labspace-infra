@@ -58,6 +58,26 @@ Variables can be used to support the conditional displaying of text.
     > It appears the conditional is set and this content is displayed!
     :::
 
+## OS-conditional display
+
+Content can also be filtered by the operating system the user is viewing from. This is useful for showing commands that run natively on the user's machine.
+
+:::conditionalDisplay{os="unix"}
+You appear to be on Mac or Linux. Try this:
+
+```bash
+echo "Hello from a Unix-like shell"
+```
+:::
+
+:::conditionalDisplay{os="windows"}
+You appear to be on Windows. Try this:
+
+```powershell
+Write-Host "Hello from PowerShell"
+```
+:::
+
 ## Default Labspace variables
 
 As a help to authors, variables can also be defined in the `labspace.yaml` file to reduce maintenance where a value may appear in multiple places throughout the writeup. 
