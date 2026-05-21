@@ -56,4 +56,4 @@ COPY ./entrypoint.d /entrypoint.d
 
 USER 1000
 
-CMD ["/home/coder/project"]
+CMD ["--disable-update-check", "/home/coder/project"]
