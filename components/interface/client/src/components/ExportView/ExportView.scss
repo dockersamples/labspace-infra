@@ -1,0 +1,54 @@
+.export-view {
+  max-width: 900px;
+  margin: 0 auto;
+
+  .export-section {
+    page-break-after: always;
+
+    &:last-child {
+      page-break-after: auto;
+    }
+  }
+
+  div.code-block {
+    pre,
+    code {
+      white-space: pre-wrap !important;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    .print-line {
+      white-space: pre-wrap !important;
+      word-break: break-word;
+    }
+  }
+}
+
+@media print {
+  body,
+  #root {
+    height: auto !important;
+    display: block !important;
+    overflow: visible !important;
+  }
+
+  .export-view {
+    max-width: none;
+    margin: 0;
+    padding: 0 !important;
+  }
+
+  .export-view div.code-block {
+    background: #f5f5f5 !important;
+    color: #000 !important;
+    border: 1px solid #ccc;
+
+    pre,
+    code,
+    span {
+      color: #000 !important;
+      background: transparent !important;
+    }
+  }
+}

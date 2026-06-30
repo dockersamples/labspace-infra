@@ -10,12 +10,14 @@ import {
 } from "../../../WorkshopContext";
 import { CodeBlockAction } from "./CodeBlockAction";
 import { useTabs } from "../../../TabContext";
+import { usePrintMode } from "../../../PrintModeContext";
 
 export function CodeBlock({ node, inline, className, children, ...props }) {
   const { activeSection } = useActiveSection();
   const { setActiveTab } = useTabs();
   const runCommand = useRunCommand();
   const saveFileCommand = useSaveFileCommand();
+  const printMode = usePrintMode();
 
   const match = /language-(\w+)/.exec(className || "");
   let language = match ? match[1] : "text";
@@ -24,9 +26,13 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
   // These properties are populated by the codeIndexer remark plugin
   const codeIndex = node.properties.dataCodeIndex;
   const canRun =
-    node.properties.dataDisplayRunButton === "true" && language === "bash";
-  const canCopy = node.properties.dataDisplayCopyButton === "true";
-  const canSaveAsFile = node.properties.dataDisplaySaveAsButton === "true";
+    !printMode &&
+    node.properties.dataDisplayRunButton === "true" &&
+    language === "bash";
+  const canCopy =
+    !printMode && node.properties.dataDisplayCopyButton === "true";
+  const canSaveAsFile =
+    !printMode && node.properties.dataDisplaySaveAsButton === "true";
   const highlightLines = node.properties.dataHighlightLines
     ? node.properties.dataHighlightLines.split(",").flatMap((s) => {
         const trimmed = s.trim();
@@ -73,13 +79,15 @@ export function CodeBlock({ node, inline, className, children, ...props }) {
         language={language}
         PreTag="div"
         className="flex-grow-1 bg-none"
-        wrapLines={highlightLines.length > 0}
+        wrapLines={highlightLines.length > 0 || printMode}
+        wrapLongLines={printMode}
         showLineNumbers={highlightLines.length > 0}
         lineNumberStyle={{ display: "none" }}
         lineProps={(lineNumber) => {
           const lineProps = {
             className: "d-block",
           };
+          if (printMode) lineProps.className += " print-line";
 
           if (highlightLines.includes(lineNumber))
             lineProps.className += " highlight-line"; // Highlight the first line (lineNumber is 1-indexed)
