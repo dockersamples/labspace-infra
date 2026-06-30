@@ -9,7 +9,7 @@ import { remarkCodeIndexer } from "./codeIndexer";
 import { ExternalLink } from "./ExternalLink";
 import { RenderedImage } from "./RenderedImage";
 import { RenderedSvg } from "./RenderedSvg";
-import { tabDirective } from "./reactDirective";
+import { reactDirective } from "./reactDirective";
 import { TabLink } from "./TabLink";
 import { FileLink } from "./FileLink";
 import { VariableDefinition } from "./VariableDefinition";
@@ -23,7 +23,7 @@ export function MarkdownRenderer({ children }) {
         remarkGfm,
         remarkCodeIndexer,
         remarkDirective,
-        tabDirective,
+        reactDirective,
       ]}
       rehypePlugins={[rehypeRaw, rehypeMermaid, rehypeGithubAlerts]}
       components={{

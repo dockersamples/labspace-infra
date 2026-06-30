@@ -3,7 +3,7 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import InputGroup from "react-bootstrap/InputGroup";
 import { useVariables } from "../../../WorkshopContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 /**
  * This custom markdown directive provides the ability to define a Labspace variable.
@@ -22,7 +22,22 @@ import { useState } from "react";
  */
 export function VariableDefinition({ children, prompt, ...rest }) {
   const { variables, setVariable } = useVariables();
+
   const [value, setValue] = useState(variables[children] || "");
+
+  /*
+   * This state and effect is in place because react-markdown creates the key when using
+   * custom directives, which means the component is potentially reused when the variable value changes.
+   * But, when doing so, the state is not updated to its updated default value. So, we need to keep
+   * track of when children changes (the variable name) and update the state accordingly.
+   */
+  const [lastChildren, setLastChildren] = useState(children);
+  useEffect(() => {
+    if (children === lastChildren) return;
+
+    setValue(variables[children] || "");
+    setLastChildren(children);
+  }, [variables, children, lastChildren]);
 
   const hasValue =
     variables[children] !== undefined && variables[children] !== "";
@@ -37,7 +52,7 @@ export function VariableDefinition({ children, prompt, ...rest }) {
         }}
       >
         <Card.Body>
-          <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+          <Form.Group className="mb-3" controlId={`variableDefinition-${children}`}>
             <Form.Label>
               {prompt || `WARNING: NO PROMPT DEFINED FOR ${children}`}
             </Form.Label>
