@@ -21,10 +21,12 @@ export class LabspaceService {
     } else {
       this.config.services = this.config.services.map((service) => ({
         ...service,
-        id: service.id || service.title
-          .toLowerCase()
-          .replace(/[^a-z0-9\s-]/g, "") // remove special characters except spaces and dashes
-          .replace(/\s+/g, "-"), // replace spaces with dashes
+        id:
+          service.id ||
+          service.title
+            .toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, "") // remove special characters except spaces and dashes
+            .replace(/\s+/g, "-"), // replace spaces with dashes
       }));
     }
 
@@ -78,7 +80,23 @@ export class LabspaceService {
       return null;
     }
 
-    const filePath = path.join("/labspace", "instructions", section.contentPath);
+    return this._loadSectionContent(section);
+  }
+
+  getAllSectionDetails() {
+    if (process.env.CONTENT_DEV_MODE) this.bootstrap();
+
+    return this.config.sections.map((section) =>
+      this._loadSectionContent(section),
+    );
+  }
+
+  _loadSectionContent(section) {
+    const filePath = path.join(
+      "/labspace",
+      "instructions",
+      section.contentPath,
+    );
     const content = fs
       .readFileSync(filePath, "utf8")
       .replace(/\$\$([^\$]+)\$\$/g, (_, varName) => {

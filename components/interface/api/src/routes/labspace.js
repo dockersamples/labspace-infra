@@ -9,6 +9,15 @@ router.get("/", (req, res) => {
   res.json(labspaceService.getLabspaceDetails());
 });
 
+router.get("/export", (req, res) => {
+  const details = labspaceService.getLabspaceDetails();
+  res.json({
+    title: details.title,
+    subtitle: details.subtitle,
+    sections: labspaceService.getAllSectionDetails(),
+  });
+});
+
 router.post("/open-file", (req, res) => {
   const { filePath, line, sectionId } = req.body;
   workspaceService

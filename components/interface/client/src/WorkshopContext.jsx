@@ -11,18 +11,21 @@ import { useNavigate, useParams } from "react-router";
 
 const WorkshopContext = createContext();
 
-export const WorkshopContextProvider = ({ children }) => {
+export const WorkshopContextProvider = ({ children, printMode = false }) => {
   const { sectionId } = useParams();
   const navigate = useNavigate();
   const [workshop, setWorkshop] = useState(null);
   const [activeSection, setActiveSection] = useState(null);
-  const [activeSectionId, setActiveSectionId] = useState(sectionId);
+  const [activeSectionId, setActiveSectionId] = useState(
+    printMode ? null : sectionId,
+  );
   const [refreshCounter, setRefreshCounter] = useState(0);
   const [variables, setVariables] = useState(null);
 
   useEffect(() => {
+    if (printMode) return;
     setActiveSectionId(sectionId);
-  }, [sectionId]);
+  }, [sectionId, printMode]);
 
   const changeActiveSection = useCallback(
     (sectionId) => {
@@ -167,8 +170,9 @@ export const WorkshopContextProvider = ({ children }) => {
   }, [changeActiveSection, refreshCounter]);
 
   useEffect(() => {
+    if (printMode) return;
     setActiveSectionId((id) => id || workshop?.sections?.[0]?.id);
-  }, [workshop, setActiveSectionId]);
+  }, [workshop, setActiveSectionId, printMode]);
 
   const setVariable = useCallback(
     (key, value) => {
@@ -194,7 +198,7 @@ export const WorkshopContextProvider = ({ children }) => {
     [setVariables],
   );
 
-  if (!workshop || !activeSection || variables === null) {
+  if (!workshop || (!printMode && !activeSection) || variables === null) {
     return (
       <div className="loading text-center mt-5 w-100">
         <Spinner />
