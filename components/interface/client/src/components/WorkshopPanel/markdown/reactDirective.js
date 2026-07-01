@@ -10,7 +10,7 @@ import { visit } from "unist-util-visit";
  *
  * @returns
  */
-export function reactDirective() {
+export function tabDirective() {
   /**
    * @param {Root} tree
    *   Tree.
