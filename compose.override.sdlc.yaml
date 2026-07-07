@@ -15,6 +15,23 @@ services:
   ############################################################
   # Overrides to Labspace default services
   ############################################################
+  configurator:
+    volumes:
+      - $CONTENT_PATH:/dev-content:ro
+    environment:
+      DEV_MODE: true
+
+  interface:
+    environment:
+      CONTENT_DEV_MODE: true
+    volumes:
+      # Remove the read-only flag since watch will be syncing changes
+      - labspace-instructions:/labspace/instructions
+    develop:
+      watch:
+        - path: $CONTENT_PATH/labspace
+          action: sync
+          target: /labspace/instruction
   workspace:
     environment:
       SKIP_CI_SECRET_SETUP: ${SKIP_CI_SECRET_SETUP:-false}
@@ -62,6 +79,11 @@ services:
         condition: service_healthy
       zone-file-creator:
         condition: service_completed_successfully
+    develop:
+        watch:
+          - path: $CONTENT_PATH/project
+            action: sync
+            target: /home/coder/project
 
   interface:
     labels:
@@ -74,7 +96,7 @@ services:
   ############################################################
   # New services
   ############################################################
-  
+
   cert-creator:
     image: alpine
     command: /generate-certs.sh
@@ -96,7 +118,7 @@ services:
       - labspace-support:/labspace-support
     depends_on:
       traefik:
-        condition: service_started 
+        condition: service_started
 
   traefik:
     image: traefik:3.6.13
@@ -250,7 +272,7 @@ volumes:
   gitea-data:
   gitea-outputs:
   k3s-server:
-  k3s-output: 
+  k3s-output:
   labspace-traefik-certs:
 
 
@@ -338,8 +360,8 @@ configs:
             - act-toolcache
             - GITEA*
 
-  # The /entrypoint.d hook in code-server does not guarantee order of execution, as it simply uses `find` to get files in the 
-  # directory. To ensure our scripts run in the correct order, we prefix them with numbers and use a custom entrypoint script 
+  # The /entrypoint.d hook in code-server does not guarantee order of execution, as it simply uses `find` to get files in the
+  # directory. To ensure our scripts run in the correct order, we prefix them with numbers and use a custom entrypoint script
   # to sort and execute the scripts in order.
   workspace-entrypoint-script:
     content: |
@@ -380,7 +402,7 @@ configs:
       done
       echo "SSH key is registered. Bootstrap complete."
 
-  # Sets up the CA cert used by Traefik (the reverse proxy for all of the lab) in the workspace, so that the 
+  # Sets up the CA cert used by Traefik (the reverse proxy for all of the lab) in the workspace, so that the
   # workspace can trust the TLS connections to Gitea and k3s using the Traefik certs
   workspace-ca-cert-setup:
     content: |
@@ -446,7 +468,7 @@ configs:
 
       # Configure the SSH key for git access
       sudo mkdir -p /home/coder/.ssh
-      sudo cp /gitea-outputs/id_rsa /home/coder/.ssh/id_rsa 
+      sudo cp /gitea-outputs/id_rsa /home/coder/.ssh/id_rsa
       sudo cp /gitea-outputs/id_rsa.pub /home/coder/.ssh/id_rsa.pub
       sudo chown -R coder:coder /home/coder/.ssh
 
@@ -455,7 +477,7 @@ configs:
       git config --global init.defaultBranch main
       git config --global user.name 'Moby'
       git config --global user.email 'moby@local'
-      
+
       # Commit the initial Labspace project to the git repo
       cd /home/coder/project
 
@@ -505,9 +527,9 @@ configs:
           while ! curl -sL -u 'moby:moby1234' http://localhost:3000/api/v1/user > /dev/null; do
             echo "Waiting for user to be fully ready to use..."
             sleep 2
-          done          
+          done
       fi
-      
+
       # Check if demo-app repo exists. Create it if it doesn't.
       repo_status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/api/v1/repos/moby/demo-app)
       if [ "$$repo_status" = "404" ]; then
