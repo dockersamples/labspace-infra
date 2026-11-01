@@ -14,15 +14,16 @@ function tags {
 }
 
 group "default" {
-  targets = [ 
-    "configurator", 
+  targets = [
+    "configurator",
     "support-vscode-extension",
     "interface",
     "host-port-republisher",
     "labspace-cleaner",
     "workspace-base",
-    "workspace-node", 
+    "workspace-dotnet",
     "workspace-java",
+    "workspace-node",
     "workspace-python"
   ]
 }
@@ -30,15 +31,16 @@ group "default" {
 target "workspaces" {
   targets = [
     "workspace-base",
-    "workspace-node", 
+    "workspace-dotnet",
     "workspace-java",
+    "workspace-node",
     "workspace-python"
   ]
 }
 
 target "_common" {
   dockerfile = "Dockerfile"
-  
+
   platforms = [
     "linux/amd64",
     "linux/arm64",
@@ -83,10 +85,10 @@ target "workspace-base" {
   }
 }
 
-target "workspace-node" {
+target "workspace-dotnet" {
   inherits = ["_common"]
-  context = "./components/workspace/node"
-  tags = tags(IMAGE_NAMESPACE, "labspace-workspace-node", IMAGE_TAG)
+  context = "./components/workspace/dotnet"
+  tags = tags(IMAGE_NAMESPACE, "labspace-workspace-dotnet", IMAGE_TAG)
 
   contexts = {
     labspace-workspace-base = "target:workspace-base"
@@ -97,6 +99,16 @@ target "workspace-java" {
   inherits = ["_common"]
   context = "./components/workspace/java"
   tags = tags(IMAGE_NAMESPACE, "labspace-workspace-java", IMAGE_TAG)
+
+  contexts = {
+    labspace-workspace-base = "target:workspace-base"
+  }
+}
+
+target "workspace-node" {
+  inherits = ["_common"]
+  context = "./components/workspace/node"
+  tags = tags(IMAGE_NAMESPACE, "labspace-workspace-node", IMAGE_TAG)
 
   contexts = {
     labspace-workspace-base = "target:workspace-base"
