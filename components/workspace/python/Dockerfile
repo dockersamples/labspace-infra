@@ -11,7 +11,7 @@ RUN apt update && \
 
 # Install Poetry using pip (more reliable than the install script)
 RUN pip3 install --upgrade setuptools --break-system-packages && \
-    pip3 install poetry --break-system-packages
+    pip3 install --ignore-installed packaging poetry --break-system-packages
 
 # Install additional Python development tools
 RUN pip3 install black flake8 pytest pytest-cov mypy isort --break-system-packages
