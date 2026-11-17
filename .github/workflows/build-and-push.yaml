@@ -38,6 +38,7 @@ jobs:
         with:
           driver: cloud
           endpoint: ${{ secrets.DOCKER_BUILDER_ENDPOINT }}
+          version: v0.39.0 # Getting version that should make buildx exports faster
 
       - name: Set tag for builds
         run: |
