@@ -133,14 +133,30 @@ export class LabspaceService {
 
   getCodeBlock(sectionId, index) {
     const { content } = this.getSectionDetails(sectionId);
-    const codeBlocks = content.match(/```(.*?)```/gs);
-    if (!codeBlocks || codeBlocks[index] === undefined) {
+    const codeBlocks = [...content.matchAll(/```(.*?)```/gs)];
+    if (codeBlocks[index] === undefined) {
       throw new Error(
         `Code block at index ${index} not found in section ${sectionId}`,
       );
     }
 
-    const codeRows = codeBlocks[index].split("\n");
+    // A code block inside a blockquote or an alert (> [!TIP]) has the quote's
+    // "> " on each of its lines: count the levels on the opening fence's line
+    // and remove them, so that "> ls" runs "ls".
+    const { 0: block, index: start } = codeBlocks[index];
+    const fencePrefix = content.slice(
+      content.lastIndexOf("\n", start) + 1,
+      start,
+    );
+    const quoteLevels = (fencePrefix.match(/>/g) || []).length;
+    const unquote = (row) => {
+      for (let i = 0; i < quoteLevels; i++) row = row.replace(/^ {0,3}> ?/, "");
+      return row;
+    };
+
+    const codeRows = block
+      .split("\n")
+      .map((row, i) => (i ? unquote(row) : row));
     const headerRow = codeRows.shift().substring(3);
     codeRows.pop(); // remove the closing ```
 
