@@ -18,7 +18,7 @@ RUN set -eux; \
     echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen; \
     locale-gen en_US.UTF-8; \
     rm -rf /var/lib/apt/lists/*
-COPY --from=eclipse-temurin:21.0.9_10-jdk /opt/java/openjdk /opt/java/openjdk
+COPY --from=eclipse-temurin:21.0.13_9-jdk /opt/java/openjdk /opt/java/openjdk
 RUN find "$JAVA_HOME/lib" -name '*.so' -exec dirname '{}' ';' | sort -u > /etc/ld.so.conf.d/docker-openjdk.conf; \
     ldconfig; \
     java -Xshare:dump;
@@ -32,7 +32,7 @@ RUN set -eux; \
 
 # Setup Maven
 ENV MAVEN_HOME=/usr/share/maven
-COPY --from=maven:3.9.12-eclipse-temurin-21 ${MAVEN_HOME} ${MAVEN_HOME}
+COPY --from=maven:3.10.0-eclipse-temurin-21 ${MAVEN_HOME} ${MAVEN_HOME}
 RUN ln -s ${MAVEN_HOME}/bin/mvn /usr/bin/mvn
 
 
